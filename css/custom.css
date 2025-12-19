@@ -1,10 +1,24 @@
-/* 文章容器半透明背景 */
+/* 整个页面背景图 */
+body {
+  background-image: url('/img/文章背景.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+}
+
+/* 文章内容区域半透明 */
 #board {
   background-color: rgba(255, 255, 255, 0.85) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* 文章内容区域 */
-.post-content {
-  background-color: transparent !important;
+/* 导航栏半透明 */
+#navbar {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 页脚半透明(可选) */
+footer {
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
