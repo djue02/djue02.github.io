@@ -1,0 +1,10 @@
+/* 文章容器半透明背景 */
+#board {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 文章内容区域 */
+.post-content {
+  background-color: transparent !important;
+}
