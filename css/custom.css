@@ -1,0 +1,8 @@
+/* 隐藏打字机光标 */
+.typed-cursor {
+  display: none !important;
+}
+
+span.typed-cursor {
+  display: none !important;
+}
