@@ -406,7 +406,22 @@
           {"serverURL":"https://icomeworld.vercel.app","path":"window.location.pathname","meta":["nick","mail"],"requiredMeta":["nick","mail"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"login":"disable"},
           {
             el: '#waline',
-            path: window.location.pathname
+            path: window.location.pathname,
+            imageUploader: function(file) {
+              var formData = new FormData();
+              formData.append('image', file);
+              return fetch('https://api.imgbb.com/1/upload?key=71de7a48dbd352fc1427d32157dd302f', {
+                method: 'POST',
+                body: formData
+              })
+              .then(function(res) { return res.json(); })
+              .then(function(data) {
+                if (data.success) {
+                  return data.data.url;
+                }
+                throw new Error('上传失败');
+              });
+            }
           }
         )
         Waline.init(options);
