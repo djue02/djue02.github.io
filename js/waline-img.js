@@ -24,3 +24,13 @@ window.walineOptions.imageUploader = async (file) => {
     throw err;
   }
 };
+
+// 隐藏 about 页面的向下箭头
+if (window.location.pathname.includes('/about')) {
+  document.addEventListener('DOMContentLoaded', function() {
+    var arrow = document.querySelector('.scroll-down-bar');
+    if (arrow) {
+      arrow.style.display = 'none';
+    }
+  });
+}
