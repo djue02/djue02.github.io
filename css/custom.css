@@ -5,3 +5,7 @@
 .wl-panel .wl-action {
   display: none !important;
 }
+
+.subtitle {
+  text-align: left !important;
+}
