@@ -15,43 +15,165 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 7px;
+  height: 3px;
   background: rgba(0, 0, 0, 0.1);
   z-index: 9999;
+}
+
+@media (prefers-color-scheme: dark) {
+  #reading-track {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  #reading-bar {
+    background: rgba(255, 255, 255, 0.4);
+  }
+}
+
+[data-user-color-scheme="dark"] #reading-track {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-user-color-scheme="dark"] #reading-bar {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 #reading-bar {
   height: 100%;
   width: 0;
-  background: rgba(100, 100, 100, 0.4);
+  background: rgba(100, 100, 100, 0.3);
   transition: width 0.1s linear;
 }
 
 #pixel-runner {
   position: absolute;
   bottom: 0;
-  left: -8px;
-  width: 14px;
+  left: -10px;
+  width: 16px;
   height: 16px;
   image-rendering: pixelated;
   transition: left 0.1s linear;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='28' viewBox='0 0 12 14'%3E%3Crect x='4' y='0' width='4' height='2' fill='%23f5d442'/%3E%3Crect x='3' y='2' width='6' height='3' fill='%23ffcc99'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23333'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%23333'/%3E%3Crect x='3' y='5' width='6' height='4' fill='%234a90d9'/%3E%3Crect x='2' y='6' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='8' y='6' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='4' y='9' width='2' height='3' fill='%23555'/%3E%3Crect x='6' y='9' width='2' height='3' fill='%23555'/%3E%3Crect x='3' y='12' width='2' height='2' fill='%23964B00'/%3E%3Crect x='7' y='12' width='2' height='2' fill='%23964B00'/%3E%3C/svg%3E");
-  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='16' viewBox='0 0 112 16'%3E%3Cg id='stand'%3E%3Crect x='5' y='0' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='2' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='6' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='8' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='11' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='4' y='10' width='8' height='2' fill='%230000ff'/%3E%3Crect x='4' y='12' width='3' height='2' fill='%238B4513'/%3E%3Crect x='9' y='12' width='3' height='2' fill='%238B4513'/%3E%3C/g%3E%3Cg id='run1' transform='translate(16,0)'%3E%3Crect x='5' y='0' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='2' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='6' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='8' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='11' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='4' y='10' width='8' height='2' fill='%230000ff'/%3E%3Crect x='2' y='12' width='3' height='3' fill='%238B4513'/%3E%3Crect x='10' y='11' width='3' height='2' fill='%238B4513'/%3E%3C/g%3E%3Cg id='run2' transform='translate(32,0)'%3E%3Crect x='5' y='0' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='2' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='6' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='8' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='11' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='4' y='10' width='8' height='2' fill='%230000ff'/%3E%3Crect x='3' y='11' width='3' height='2' fill='%238B4513'/%3E%3Crect x='11' y='12' width='3' height='3' fill='%238B4513'/%3E%3C/g%3E%3Cg id='jump-up' transform='translate(48,0)'%3E%3Crect x='5' y='0' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='2' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='6' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='8' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='2' y='7' width='2' height='3' fill='%23ffcc99'/%3E%3Crect x='12' y='7' width='2' height='3' fill='%23ffcc99'/%3E%3Crect x='4' y='10' width='8' height='2' fill='%230000ff'/%3E%3Crect x='4' y='12' width='3' height='2' fill='%238B4513'/%3E%3Crect x='9' y='12' width='3' height='2' fill='%238B4513'/%3E%3C/g%3E%3Cg id='jump-air' transform='translate(64,0)'%3E%3Crect x='5' y='1' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='3' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='5' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='5' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='5' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='5' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='7' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='9' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='1' y='8' width='3' height='2' fill='%23ffcc99'/%3E%3Crect x='12' y='8' width='3' height='2' fill='%23ffcc99'/%3E%3Crect x='4' y='11' width='8' height='2' fill='%230000ff'/%3E%3Crect x='3' y='13' width='4' height='2' fill='%238B4513'/%3E%3Crect x='9' y='13' width='4' height='2' fill='%238B4513'/%3E%3C/g%3E%3Cg id='jump-down' transform='translate(80,0)'%3E%3Crect x='5' y='0' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='2' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='6' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='8' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='11' y='8' width='2' height='2' fill='%230000ff'/%3E%3Crect x='4' y='10' width='8' height='3' fill='%230000ff'/%3E%3Crect x='2' y='13' width='5' height='2' fill='%238B4513'/%3E%3Crect x='9' y='13' width='5' height='2' fill='%238B4513'/%3E%3C/g%3E%3Cg id='celebrate' transform='translate(96,0)'%3E%3Crect x='5' y='0' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='2' width='10' height='2' fill='%23ff0000'/%3E%3Crect x='3' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='5' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='7' y='4' width='2' height='2' fill='%238B4513'/%3E%3Crect x='9' y='4' width='2' height='2' fill='%23ffcc99'/%3E%3Crect x='3' y='6' width='10' height='2' fill='%23ffcc99'/%3E%3Crect x='5' y='8' width='6' height='2' fill='%23ff0000'/%3E%3Crect x='1' y='5' width='2' height='3' fill='%23ffcc99'/%3E%3Crect x='13' y='5' width='2' height='3' fill='%23ffcc99'/%3E%3Crect x='4' y='10' width='8' height='2' fill='%230000ff'/%3E%3Crect x='4' y='12' width='3' height='2' fill='%238B4513'/%3E%3Crect x='9' y='12' width='3' height='2' fill='%238B4513'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 112px 16px;
+  background-position: 0 0;
   background-repeat: no-repeat;
-  animation: pixel-run 0.4s steps(2) infinite;
+}
+
+#pixel-runner.ready {
+  animation: mario-ready 0.6s ease-out;
+}
+
+#pixel-runner.idle {
+  animation: none;
+  background-position: 0 0;
+}
+
+#pixel-runner.running {
+  animation: mario-run 0.18s steps(1) infinite;
+}
+
+#pixel-runner.running.fast {
+  animation: mario-run 0.1s steps(1) infinite;
+}
+
+#pixel-runner.running.superfast {
+  animation: mario-run 0.05s steps(1) infinite;
+}
+
+/* 小跳：轻快干脆 */
+#pixel-runner.jumping.low-jump {
+  animation: 
+    mario-jump-sprite-low 0.32s steps(1) forwards,
+    mario-jump-move-low 0.32s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+
+/* 中跳：标准节奏 */
+#pixel-runner.jumping {
+  animation: 
+    mario-jump-sprite-normal 0.42s steps(1) forwards,
+    mario-jump-move-normal 0.42s cubic-bezier(0.2, 0.85, 0.35, 1) forwards;
+}
+
+/* 大跳：有力量感 */
+#pixel-runner.jumping.high-jump {
+  animation: 
+    mario-jump-sprite-high 0.52s steps(1) forwards,
+    mario-jump-move-high 0.52s cubic-bezier(0.15, 0.9, 0.3, 1) forwards;
 }
 
 #pixel-runner.celebrate {
-  animation: pixel-jump 0.5s steps(1) infinite;
+  animation: 
+    mario-celebrate 0.35s steps(1) infinite,
+    mario-celebrate-bounce 0.2s cubic-bezier(0.5, 0, 0.5, 1.5) infinite;
 }
 
-@keyframes pixel-run {
+@keyframes mario-ready {
   0% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  30% { transform: translateY(-5px); }
   100% { transform: translateY(0); }
 }
 
-@keyframes pixel-jump {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(10deg); }
+@keyframes mario-run {
+  0%, 100% { background-position: -16px 0; }
+  50% { background-position: -32px 0; }
+}
+
+/* 小跳精灵帧：快速起跳落地 */
+@keyframes mario-jump-sprite-low {
+  0%, 8% { background-position: -48px 0; }
+  12%, 80% { background-position: -64px 0; }
+  85%, 95% { background-position: -80px 0; }
+  100% { background-position: 0 0; }
+}
+
+/* 小跳位移：轻盈 */
+@keyframes mario-jump-move-low {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-10px); }
+  45%, 55% { transform: translateY(-12px); }
+  70% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+/* 中跳精灵帧 */
+@keyframes mario-jump-sprite-normal {
+  0%, 10% { background-position: -48px 0; }
+  15%, 75% { background-position: -64px 0; }
+  82%, 93% { background-position: -80px 0; }
+  100% { background-position: 0 0; }
+}
+
+/* 中跳位移 */
+@keyframes mario-jump-move-normal {
+  0% { transform: translateY(0); }
+  28% { transform: translateY(-18px); }
+  42%, 55% { transform: translateY(-22px); }
+  72% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+/* 大跳精灵帧：起跳蓄力更久 */
+@keyframes mario-jump-sprite-high {
+  0%, 12% { background-position: -48px 0; }
+  18%, 72% { background-position: -64px 0; }
+  80%, 92% { background-position: -80px 0; }
+  100% { background-position: 0 0; }
+}
+
+/* 大跳位移：更高更有力 */
+@keyframes mario-jump-move-high {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(-28px); }
+  40%, 52% { transform: translateY(-34px); }
+  70% { transform: translateY(-18px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes mario-celebrate {
+  0%, 100% { background-position: -96px 0; }
+  50% { background-position: 0 0; }
+}
+
+@keyframes mario-celebrate-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
 }
