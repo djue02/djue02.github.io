@@ -93,7 +93,7 @@
     mario-jump-move-normal 0.42s cubic-bezier(0.2, 0.85, 0.35, 1) forwards;
 }
 
-/* 大跳：有力量感 */
+/* 大跳：有力重感 */
 #pixel-runner.jumping.high-jump {
   animation: 
     mario-jump-sprite-high 0.52s steps(1) forwards,
@@ -176,4 +176,41 @@
 @keyframes mario-celebrate-bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-7px); }
+}
+
+/* ========== 移动端适配 ========== */
+
+/* 平板和大屏手机 (768px 以下) */
+@media screen and (max-width: 768px) {
+  #pixel-runner {
+    width: 24px;
+    height: 24px;
+    background-size: 168px 24px;
+  }
+  
+  #reading-track {
+    height: 4px;
+  }
+}
+
+/* 小屏手机 (480px 以下) */
+@media screen and (max-width: 480px) {
+  #pixel-runner {
+    width: 20px;
+    height: 20px;
+    background-size: 140px 20px;
+  }
+  
+  #reading-track {
+    height: 4px;
+  }
+}
+
+/* 超小屏设备 (360px 以下) */
+@media screen and (max-width: 360px) {
+  #pixel-runner {
+    width: 18px;
+    height: 18px;
+    background-size: 126px 18px;
+  }
 }
