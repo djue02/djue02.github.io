@@ -46,7 +46,7 @@
 
 #pixel-runner {
   position: absolute;
-  bottom: -32px;
+  bottom: -35px;
   left: -15px;
   width: 28px;  /*根据图片像素计算， 210÷7＝30 但是有裁切有问题 */
   height: 115px;
