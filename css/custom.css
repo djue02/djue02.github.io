@@ -10,33 +10,6 @@
   display: none !important;
 }
 
-/* 修复电脑端导航栏文字看不见的问题 */
-.navbar-col .nav-link {
-  color: #333 !important;
-}
-
-.navbar-col .nav-link:hover {
-  color: #000 !important;
-}
-
-/* 深色模式下使用白色文字 */
-@media (prefers-color-scheme: dark) {
-  .navbar-col .nav-link {
-    color: #fff !important;
-  }
-  .navbar-col .nav-link:hover {
-    color: #ddd !important;
-  }
-}
-
-[data-user-color-scheme="dark"] .navbar-col .nav-link {
-  color: #fff !important;
-}
-
-[data-user-color-scheme="dark"] .navbar-col .nav-link:hover {
-  color: #ddd !important;
-}
-
 #reading-track {
   position: fixed;
   bottom: 0;
@@ -74,16 +47,13 @@
 #pixel-runner {
   position: absolute;
   bottom: 0;
-  left: -10px;
-  width: 16px;
-  height: 16px;
+  left: -20px;
+  width: 40px;                /* 单帧宽度: 280÷7 = 40px */
+  height: 153px;              /* 保持原始高度 */
   image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-  -webkit-font-smoothing: none;
   transition: left 0.1s linear;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAAAQCAYAAADOFPsRAAABCElEQVR4nO2Y2RGCMBCGNw4dQCm0kFa0AX3QAuQBG8BWbIFStIb1gRkwmd0QGFgO93/K9W0ge3AYIIQASI0bAEONK78cf4gxqFqvHI9ynicgMpKUl+c1Azeu5LfzsCkAAJyLe9O/3py+yU/BGq68PK8ZuAJhXSHWVVT59NcbfyLGABdJyo/jhzjPt7ObDBwawXNei6S8SEIEAEDmc8W0L0mGqeXL8W1JyY9BHutn0yazaHv3v5sM/FexURhAev4mKC/JizmwtFnbvrw+pI3SptiteU+6/175xJ+mDto9WNpstybMx6q0GcM3bT4Ixl3/VnnxZyB38H1zKlqTHZgbJfM4QmIPlUpUXzU18Sbd5OgEAAAAAElFTkSuQmCC");
-  background-size: 112px 16px;
+  background-image: url("/img/阅读条.png");
+  background-size: 280px 153px;   /* 保持原始尺寸不缩放 */
   background-position: 0 0;
   background-repeat: no-repeat;
 }
@@ -123,7 +93,7 @@
     mario-jump-move-normal 0.42s cubic-bezier(0.2, 0.85, 0.35, 1) forwards;
 }
 
-/* 大跳：有力重感 */
+/* 大跳：有力量感 */
 #pixel-runner.jumping.high-jump {
   animation: 
     mario-jump-sprite-high 0.52s steps(1) forwards,
@@ -142,20 +112,21 @@
   100% { transform: translateY(0); }
 }
 
+/* 跑步动画：第2帧(-40px)和第3帧(-80px)交替 */
 @keyframes mario-run {
-  0%, 100% { background-position: -16px 0; }
-  50% { background-position: -32px 0; }
+  0%, 100% { background-position: -40px 0; }
+  50% { background-position: -80px 0; }
 }
 
-/* 小跳精灵帧：快速起跳落地 */
+/* 小跳精灵帧 */
 @keyframes mario-jump-sprite-low {
-  0%, 8% { background-position: -48px 0; }
-  12%, 80% { background-position: -64px 0; }
-  85%, 95% { background-position: -80px 0; }
-  100% { background-position: 0 0; }
+  0%, 8% { background-position: -120px 0; }      /* 第4帧: 起跳 */
+  12%, 80% { background-position: -160px 0; }    /* 第5帧: 空中 */
+  85%, 95% { background-position: -200px 0; }    /* 第6帧: 落地 */
+  100% { background-position: 0 0; }             /* 第1帧: 站立 */
 }
 
-/* 小跳位移：轻盈 */
+/* 小跳位移 */
 @keyframes mario-jump-move-low {
   0% { transform: translateY(0); }
   30% { transform: translateY(-10px); }
@@ -166,9 +137,9 @@
 
 /* 中跳精灵帧 */
 @keyframes mario-jump-sprite-normal {
-  0%, 10% { background-position: -48px 0; }
-  15%, 75% { background-position: -64px 0; }
-  82%, 93% { background-position: -80px 0; }
+  0%, 10% { background-position: -120px 0; }
+  15%, 75% { background-position: -160px 0; }
+  82%, 93% { background-position: -200px 0; }
   100% { background-position: 0 0; }
 }
 
@@ -181,15 +152,15 @@
   100% { transform: translateY(0); }
 }
 
-/* 大跳精灵帧：起跳蓄力更久 */
+/* 大跳精灵帧 */
 @keyframes mario-jump-sprite-high {
-  0%, 12% { background-position: -48px 0; }
-  18%, 72% { background-position: -64px 0; }
-  80%, 92% { background-position: -80px 0; }
+  0%, 12% { background-position: -120px 0; }
+  18%, 72% { background-position: -160px 0; }
+  80%, 92% { background-position: -200px 0; }
   100% { background-position: 0 0; }
 }
 
-/* 大跳位移：更高更有力 */
+/* 大跳位移 */
 @keyframes mario-jump-move-high {
   0% { transform: translateY(0); }
   25% { transform: translateY(-28px); }
@@ -198,8 +169,9 @@
   100% { transform: translateY(0); }
 }
 
+/* 庆祝动画：第7帧(-240px)和第1帧(0)交替 */
 @keyframes mario-celebrate {
-  0%, 100% { background-position: -96px 0; }
+  0%, 100% { background-position: -240px 0; }
   50% { background-position: 0 0; }
 }
 
