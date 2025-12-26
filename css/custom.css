@@ -46,9 +46,9 @@
 
 #pixel-runner {
   position: absolute;
-  bottom: 0;
+  bottom: -45px;
   left: -20px;
-  width: 40px;                /* 单帧宽度: 280÷7 = 40px */
+  width: 38px;                /* 单帧宽度: 280÷7 = 40px */
   height: 153px;              /* 保持原始高度 */
   image-rendering: pixelated;
   transition: left 0.1s linear;
