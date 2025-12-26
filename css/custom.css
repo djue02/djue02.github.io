@@ -10,33 +10,6 @@
   display: none !important;
 }
 
-/* 修复电脑端导航栏文字看不见的问题 */
-.navbar-col .nav-link {
-  color: #333 !important;
-}
-
-.navbar-col .nav-link:hover {
-  color: #000 !important;
-}
-
-/* 深色模式下使用白色文字 */
-@media (prefers-color-scheme: dark) {
-  .navbar-col .nav-link {
-    color: #fff !important;
-  }
-  .navbar-col .nav-link:hover {
-    color: #ddd !important;
-  }
-}
-
-[data-user-color-scheme="dark"] .navbar-col .nav-link {
-  color: #fff !important;
-}
-
-[data-user-color-scheme="dark"] .navbar-col .nav-link:hover {
-  color: #ddd !important;
-}
-
 #reading-track {
   position: fixed;
   bottom: 0;
@@ -123,7 +96,7 @@
     mario-jump-move-normal 0.42s cubic-bezier(0.2, 0.85, 0.35, 1) forwards;
 }
 
-/* 大跳：有力重感 */
+/* 大跳：有力量感 */
 #pixel-runner.jumping.high-jump {
   animation: 
     mario-jump-sprite-high 0.52s steps(1) forwards,
