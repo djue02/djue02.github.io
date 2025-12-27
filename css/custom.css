@@ -12,17 +12,25 @@
 
 @media (max-width: 767px) {
   /* 白天模式 */
+  html,
   body,
   footer,
   .footer-inner {
     background-color: #fff !important;
   }
+  :root {
+    --body-bg-color: #fff !important;
+  }
   
   /* 暗色模式 */
+  html[data-user-color-scheme="dark"],
   html[data-user-color-scheme="dark"] body,
   html[data-user-color-scheme="dark"] footer,
   html[data-user-color-scheme="dark"] .footer-inner {
     background-color: #252d38 !important;
+  }
+  html[data-user-color-scheme="dark"]:root {
+    --body-bg-color: #252d38 !important;
   }
 }
 
