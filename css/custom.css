@@ -44,6 +44,19 @@
   transition: width 0.1s linear;
 }
 
+/* 移动端 footer 背景色统一 */
+@media (max-width: 767px) {
+  /* 白天模式 */
+  footer.footer {
+    background-color: #fff !important;
+  }
+  
+  /* 暗色模式 */
+  html[data-user-color-scheme="dark"] footer.footer {
+    background-color: #252d38 !important;
+  }
+}
+
 #pixel-runner {
   position: absolute;
   bottom: -35px;
