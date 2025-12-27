@@ -10,6 +10,15 @@
   display: none !important;
 }
 
+@media (max-width: 767px) {
+  body {
+    background-color: #fff !important;
+  }
+  html[data-user-color-scheme="dark"] body {
+    background-color: #252d38 !important;
+  }
+}
+
 #reading-track {
   position: fixed;
   bottom: 0;
@@ -42,19 +51,6 @@
   width: 0;
   background: rgba(100, 100, 100, 0.3);
   transition: width 0.1s linear;
-}
-
-/* 移动端 footer 背景色统一 */
-@media (max-width: 767px) {
-  /* 白天模式 */
-  footer.footer {
-    background-color: #fff !important;
-  }
-  
-  /* 暗色模式 */
-  html[data-user-color-scheme="dark"] footer.footer {
-    background-color: #252d38 !important;
-  }
 }
 
 #pixel-runner {
