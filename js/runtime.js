@@ -9,7 +9,7 @@ function showRuntime() {
     var secs = Math.floor((diff % (1000 * 60)) / 1000);
     
     document.getElementById("runtime_span").innerHTML = 
-        "不谙世事的 第" + days + " 天 " + hours + " 时 " + mins + " 分 " + secs + " 秒";
+        "Wish缘分还在 已过" + days + " 天 " + hours + " 时 " + mins + " 分 " + secs + " 秒";
 }
 setInterval(showRuntime, 1000);
 showRuntime();
