@@ -1,0 +1,1 @@
+var SITE_STATS = { words: "1k", posts: 1 };
