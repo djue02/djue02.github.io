@@ -20,8 +20,8 @@ function umiTongji() {
   })
   .then(res => res.json())
   .then(resdata => {
-    document.querySelector('#umami-pv').innerHTML = resdata.pageviews.value;
-    document.querySelector('#umami-uv').innerHTML = resdata.visitors.value;
+    document.querySelector('#umami-pv').innerHTML = resdata.pageviews;
+    document.querySelector('#umami-uv').innerHTML = resdata.visitors;
   })
   .catch(err => {
     console.log('Umami error:', err);
