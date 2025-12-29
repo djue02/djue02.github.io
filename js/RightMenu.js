@@ -72,39 +72,39 @@ document.addEventListener('contextmenu', function(event) {
         goToLinkItem.hidden = true;
     }
 
+*/
+
     //检查是否有图片被点击
     const downloadImageItem = document.getElementById('download-image');
-    const copyImageItem = document.getElementById('copy-image-link');
+//  const copyImageItem = document.getElementById('copy-image-link');
     const img = event.target.closest('img') || event.target.closest('svg');
     if (img) {
         downloadImageItem.hidden = false;
         if (img.tagName.toLowerCase() === 'img') {
-        copyImageItem.hidden = false;
+//      copyImageItem.hidden = false;
         downloadImageItem.querySelector('a').setAttribute('onclick', `downloadImage('${img.src}')`);
-        copyImageItem.querySelector('a').setAttribute('onclick', `copyImageLink('${img.src}')`);
+//      copyImageItem.querySelector('a').setAttribute('onclick', `copyImageLink('${img.src}')`);
         } else if (img.tagName.toLowerCase() === 'svg' && img.classList.contains('custom-gallery-svg')) {
             const backgroundImage = img.style.backgroundImage;
             const urlMatch = backgroundImage.match(/url\(["']?(.*?)["']?\)/);
             if (urlMatch && urlMatch[1]) {
             const imageUrl = urlMatch[1];
             downloadImageItem.querySelector('a').setAttribute('onclick', `downloadImage('${imageUrl}')`);
-            copyImageItem.querySelector('a').setAttribute('onclick', `copyImageLink('${imageUrl}')`);
+//          copyImageItem.querySelector('a').setAttribute('onclick', `copyImageLink('${imageUrl}')`);
             }
         }
     } else {
         downloadImageItem.hidden = true;
-        copyImageItem.hidden = true;
+//      copyImageItem.hidden = true;
     }
 
     // 根据前三者判断第一栏是否有元素，需要分割线
     const topLineItem = document.getElementById('top-line');
-    if (copySelectedTextItem.hidden && !link && !img) {
+    if (copySelectedTextItem.hidden && !img) {
         topLineItem.hidden = true;
     } else {
         topLineItem.hidden = false;
     }
-
-*/
 
     // 更新尺寸相关参数
     rect = document.getElementById("rightmenu-content").getBoundingClientRect();
@@ -150,6 +150,7 @@ function searchSelectedTextBing() {
     }
 }
 
+*/
 
 // 下载图片-下载选中图片功能
 function downloadImage(imgsrc) {
@@ -179,6 +180,8 @@ function downloadImage(imgsrc) {
         })
         .catch(error => console.error('Error downloading image:', error));
 }
+
+/*
 
 // 复制图片链接-复制选中图片链接功能
 function copyImageLink(imgsrc) {
