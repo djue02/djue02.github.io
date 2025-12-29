@@ -50,15 +50,17 @@ window.onclick = function(e){ //点击窗口，右键菜单隐藏
 document.addEventListener('contextmenu', function(event) {
     // 检查是否有选中的文本
     const copySelectedTextItem = document.getElementById('copy-selected-text');
-    const searchSelectedTextItem = document.getElementById('search-selected-text-BING');
+// const searchSelectedTextItem = document.getElementById('search-selected-text-BING');
     const selectedText = window.getSelection().toString().trim();
     if (selectedText) {
         copySelectedTextItem.hidden = false;
-        searchSelectedTextItem.hidden = false;
+//      searchSelectedTextItem.hidden = false;
     } else {
         copySelectedTextItem.hidden = true;
-        searchSelectedTextItem.hidden = true;
+//      searchSelectedTextItem.hidden = true;
     }
+
+/*
 
     // 检查是否有链接被点击
     const goToLinkItem = document.getElementById('go-to-link');
@@ -102,6 +104,8 @@ document.addEventListener('contextmenu', function(event) {
         topLineItem.hidden = false;
     }
 
+*/
+
     // 更新尺寸相关参数
     rect = document.getElementById("rightmenu-content").getBoundingClientRect();
 });
@@ -136,6 +140,7 @@ function copySelectedText() {
     }
 }
 
+/*
 // 必应搜索-在Bing上搜索选中文本功能
 function searchSelectedTextBing() {
     const selectedText = window.getSelection().toString().trim();
@@ -144,6 +149,7 @@ function searchSelectedTextBing() {
         window.open(bingSearchUrl, '_blank');
     }
 }
+
 
 // 下载图片-下载选中图片功能
 function downloadImage(imgsrc) {
@@ -213,6 +219,7 @@ function RandomGo() {
         window.location.href = randomLink;
     }
 }
+*/
 
 // 复制链接-复制当前地址功能
 function copyLink() {
