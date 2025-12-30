@@ -1,0 +1,101 @@
+/* ============================================================
+   博客标题 SVG 描边动画 - "我不想当ai"
+   优化版：流畅、从容、有呼吸感
+   ============================================================ */
+
+/* ---------- SVG 容器 ---------- */
+.navbar-brand .title-svg {
+    width: 160px;
+    height: 36px;
+    overflow: visible;
+}
+
+/* ---------- 描边动画核心 ---------- */
+.navbar-brand .title-path {
+    fill: transparent;
+    stroke: #fff;
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    
+    /* 描边动画 */
+    stroke-dasharray: var(--path-length, 5000);
+    stroke-dashoffset: var(--path-length, 5000);
+    
+    /* 双动画：描边 + 填充分开控制 */
+    animation: 
+        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        fillIn 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards;
+}
+
+/* 描边动画 - 慢慢画出 */
+@keyframes strokeDraw {
+    0% {
+        stroke-dashoffset: var(--path-length, 5000);
+        stroke-opacity: 0.6;
+    }
+    5% {
+        stroke-opacity: 1;
+    }
+    100% {
+        stroke-dashoffset: 0;
+        stroke-opacity: 1;
+    }
+}
+
+/* 填充动画 - 淡入 */
+@keyframes fillIn {
+    0% {
+        fill: transparent;
+    }
+    100% {
+        fill: rgba(255, 255, 255, 0.95);
+    }
+}
+
+/* ---------- 悬停效果 ---------- */
+.navbar-brand:hover .title-path {
+    animation: 
+        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        fillIn 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards,
+        gentleGlow 2s ease-in-out infinite 5s;
+}
+
+@keyframes gentleGlow {
+    0%, 100% {
+        filter: none;
+    }
+    50% {
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+    }
+}
+
+/* ---------- 深色模式 ---------- */
+[data-user-color-scheme="dark"] .navbar-brand .title-path {
+    stroke: #d0d0d0;
+    animation: 
+        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        fillInDark 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards;
+}
+
+@keyframes fillInDark {
+    0% {
+        fill: transparent;
+    }
+    100% {
+        fill: rgba(208, 208, 208, 0.95);
+    }
+}
+
+/* ---------- 减少动画偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .navbar-brand .title-path {
+        animation: none;
+        stroke-dashoffset: 0;
+        fill: #fff;
+    }
+    
+    [data-user-color-scheme="dark"] .navbar-brand .title-path {
+        fill: #d0d0d0;
+    }
+}

@@ -1,0 +1,186 @@
+/* ============================================================
+   博客标题动画 - "我不想当ai"
+   ============================================================ */
+
+/* ---------- 标题容器 ---------- */
+.navbar-brand {
+    position: relative;
+}
+
+.navbar-brand strong {
+    position: relative;
+    display: inline-block;
+    font-weight: 600;
+    letter-spacing: 3px;
+    
+    /* 初始状态 */
+    opacity: 0;
+    transform: translateY(6px);
+    
+    /* 淡入动画 */
+    animation: titleEnter 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.3s forwards;
+}
+
+@keyframes titleEnter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- 光泽层 ---------- */
+.navbar-brand strong::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(
+        105deg,
+        transparent 0%,
+        transparent 35%,
+        rgba(255, 255, 255, 0.35) 45%,
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(255, 255, 255, 0.35) 55%,
+        transparent 65%,
+        transparent 100%
+    );
+    animation: shimmerOnce 1.2s cubic-bezier(0.23, 1, 0.32, 1) 0.8s forwards;
+    pointer-events: none;
+}
+
+@keyframes shimmerOnce {
+    0% {
+        left: -120%;
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    85% {
+        opacity: 1;
+    }
+    100% {
+        left: 150%;
+        opacity: 0;
+    }
+}
+
+/* ---------- 底部装饰线 ---------- */
+.navbar-brand strong::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        currentColor 15%,
+        currentColor 85%,
+        transparent 100%
+    );
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: lineGrow 0.5s cubic-bezier(0.23, 1, 0.32, 1) 1.2s forwards;
+}
+
+@keyframes lineGrow {
+    to {
+        opacity: 0.3;
+        transform: scaleX(1);
+    }
+}
+
+/* ---------- 悬停效果 ---------- */
+.navbar-brand:hover strong {
+    animation: breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% {
+        transform: translateY(0);
+        letter-spacing: 3px;
+    }
+    50% {
+        transform: translateY(-1px);
+        letter-spacing: 3.5px;
+    }
+}
+
+/* 悬停时底线变亮 */
+.navbar-brand:hover strong::after {
+    opacity: 0.5;
+}
+
+/* 悬停时再次光泽 */
+.navbar-brand:hover strong::before {
+    animation: shimmerHover 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes shimmerHover {
+    0% {
+        left: -120%;
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        left: 150%;
+        opacity: 0;
+    }
+}
+
+/* ---------- 深色模式 ---------- */
+[data-user-color-scheme="dark"] .navbar-brand strong::before {
+    background: linear-gradient(
+        105deg,
+        transparent 0%,
+        transparent 35%,
+        rgba(255, 255, 255, 0.15) 45%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.15) 55%,
+        transparent 65%,
+        transparent 100%
+    );
+}
+
+[data-user-color-scheme="dark"] .navbar-brand strong::after {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.8) 15%,
+        rgba(255, 255, 255, 0.8) 85%,
+        transparent 100%
+    );
+}
+
+/* ---------- 减少动画偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .navbar-brand strong {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
+    
+    .navbar-brand strong::before,
+    .navbar-brand strong::after {
+        animation: none;
+    }
+    
+    .navbar-brand strong::after {
+        opacity: 0.3;
+        transform: scaleX(1);
+    }
+    
+    .navbar-brand:hover strong {
+        animation: none;
+    }
+}
