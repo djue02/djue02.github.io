@@ -1,0 +1,6 @@
+#subtitle {
+    background: linear-gradient(-45deg, #0f76c1, #3a8dc0, #80d2ef, #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

@@ -1,0 +1,435 @@
+#waline {
+  --waline-theme-color: var(--text-color);
+  --waline-active-color: var(--text-color);
+  --waline-color: var(--text-color);
+  --waline-bgcolor: transparent;
+  --waline-bgcolor-light: transparent;
+  --waline-bgcolor-hover: transparent;
+  --waline-border-color: var(--line-color);
+  --waline-disable-bgcolor: transparent;
+  --waline-disable-color: var(--sec-text-color);
+  --waline-info-bgcolor: transparent;
+  --waline-info-color: var(--sec-text-color);
+  --waline-border: 1px solid var(--line-color);
+  --waline-avatar-size: 2.5rem;
+  --waline-m-avatar-size: 2rem;
+  --waline-font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--text-color);
+}
+#waline .wl-panel {
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  position: relative;
+}
+#waline .wl-panel::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--sec-text-color) 30%, var(--sec-text-color) 70%, transparent 100%);
+  opacity: 0.15;
+}
+#waline .wl-panel:focus-within::after {
+  opacity: 0.25;
+}
+#waline .wl-header {
+  padding: 0 0 0.75rem 0;
+  background: transparent;
+  border: none;
+  gap: 1.5rem;
+}
+#waline .wl-header .wl-header-item {
+  flex: 1;
+}
+#waline .wl-header label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--sec-text-color);
+  letter-spacing: 0.02em;
+}
+#waline .wl-header input {
+  font-size: var(--waline-font-size);
+  font-family: inherit;
+  padding: 0.25rem 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-color);
+  width: 100%;
+}
+#waline .wl-header input::placeholder {
+  color: var(--sec-text-color);
+  opacity: 0.6;
+}
+#waline .wl-header input:focus {
+  outline: none;
+  box-shadow: none;
+}
+#waline .wl-editor {
+  min-height: 80px;
+  padding: 0.75rem 0;
+  font-size: var(--waline-font-size);
+  font-family: inherit;
+  line-height: 1.75;
+  background: transparent;
+  color: var(--text-color);
+}
+#waline .wl-editor::placeholder {
+  color: var(--sec-text-color);
+  opacity: 0.5;
+}
+#waline .wl-footer {
+  padding: 0.5rem 0 0 0;
+  background: transparent;
+  border: none;
+}
+#waline .wl-info {
+  font-size: 0.75rem;
+  color: var(--sec-text-color);
+  opacity: 0.6;
+}
+#waline .wl-action {
+  gap: 0.25rem;
+}
+#waline .wl-action button {
+  padding: 0.25rem;
+  border-radius: 0;
+  color: var(--sec-text-color);
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+#waline .wl-action button svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+#waline .wl-action button:hover {
+  opacity: 0.7;
+  background: transparent;
+}
+#waline .wl-btn {
+  padding: 0.35rem 1rem !important;
+  border-radius: 0 !important;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  background: transparent !important;
+  color: var(--sec-text-color) !important;
+  border: 1px solid var(--line-color) !important;
+  box-shadow: none !important;
+  transition: color 0.15s ease, border-color 0.15s ease !important;
+}
+#waline .wl-btn:hover {
+  color: var(--text-color) !important;
+  border-color: var(--sec-text-color) !important;
+  background: transparent !important;
+}
+#waline .wl-btn:active {
+  opacity: 0.7;
+}
+#waline .wl-emoji-popup {
+  border-radius: 2px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  border: 1px solid var(--line-color);
+  background: var(--board-color);
+}
+#waline .wl-emoji-item {
+  border-radius: 0;
+}
+#waline .wl-emoji-item:hover {
+  background: var(--line-color);
+}
+#waline .wl-tabs {
+  border-bottom: 1px solid var(--line-color);
+}
+#waline .wl-tabs .wl-tab.active {
+  background: transparent;
+  border-bottom: 1px solid var(--text-color);
+}
+#waline .wl-count {
+  font-size: var(--waline-font-size);
+  font-weight: 400;
+  color: var(--sec-text-color);
+  margin-bottom: 1rem;
+}
+#waline .wl-sort {
+  font-size: 0.75rem;
+}
+#waline .wl-sort li {
+  color: var(--sec-text-color);
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+  padding: 0 0.5rem;
+}
+#waline .wl-sort li:hover {
+  opacity: 0.8;
+}
+#waline .wl-sort li.active {
+  opacity: 1;
+  color: var(--text-color);
+}
+#waline .wl-cards .wl-card-item {
+  padding: 1.25rem 0;
+  border-bottom: none;
+  position: relative;
+}
+#waline .wl-cards .wl-card-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: var(--waline-avatar-size);
+  right: 0;
+  height: 1px;
+  background: var(--line-color);
+  opacity: 0.5;
+}
+#waline .wl-cards .wl-card-item:last-child::after {
+  display: none;
+}
+#waline .wl-cards .wl-card-item:hover {
+  background: transparent;
+}
+#waline .wl-user-avatar {
+  border-radius: 50%;
+  box-shadow: none;
+  border: none;
+  filter: grayscale(10%);
+  opacity: 0.9;
+}
+#waline .wl-user-avatar:hover {
+  filter: none;
+  opacity: 1;
+}
+#waline .wl-user {
+  line-height: 1.4;
+}
+#waline .wl-nick {
+  font-weight: 500;
+  font-size: var(--waline-font-size);
+  color: var(--text-color);
+}
+#waline .wl-nick:hover {
+  color: var(--text-color);
+}
+#waline .wl-badge {
+  background: transparent;
+  color: var(--sec-text-color);
+  font-size: 0.65rem;
+  font-weight: 400;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0;
+  border: 1px solid var(--line-color);
+  box-shadow: none;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+#waline .wl-time {
+  font-size: 0.75rem;
+  color: var(--sec-text-color);
+  opacity: 0.6;
+}
+#waline .wl-meta {
+  margin-top: 0.15rem;
+}
+#waline .wl-meta > span {
+  font-size: 0.65rem;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin-right: 0.5rem;
+  color: var(--sec-text-color);
+  opacity: 0.35;
+}
+#waline .wl-meta > span:hover {
+  opacity: 0.5;
+}
+#waline .wl-content {
+  font-size: var(--waline-font-size);
+  font-family: inherit;
+  line-height: 1.8;
+  padding: 0.4rem 0 0.25rem 0;
+  color: var(--text-color);
+}
+#waline .wl-content p {
+  margin: 0.4rem 0;
+}
+#waline .wl-content blockquote {
+  border-left: 2px solid var(--line-color);
+  background: transparent;
+  padding: 0.4rem 0 0.4rem 0.75rem;
+  border-radius: 0;
+  margin: 0.6rem 0;
+  color: var(--sec-text-color);
+}
+#waline .wl-content code {
+  background: var(--line-color);
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  font-size: 0.85em;
+  font-family: var(--code-font);
+}
+#waline .wl-content pre {
+  background: var(--board-color);
+  border: 1px solid var(--line-color);
+  border-radius: 2px;
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+#waline .wl-content pre code {
+  background: transparent;
+  padding: 0;
+}
+#waline .wl-content a {
+  color: var(--text-color);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-color);
+  transition: border-color 0.15s ease;
+}
+#waline .wl-content a:hover {
+  border-bottom-color: var(--sec-text-color);
+}
+#waline .wl-content img {
+  border-radius: 2px;
+}
+#waline .wl-comment-actions {
+  margin-top: 0.25rem;
+}
+#waline .wl-comment-actions button {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0;
+  color: var(--sec-text-color);
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+}
+#waline .wl-comment-actions button:hover {
+  background: transparent;
+  opacity: 0.6;
+}
+#waline .wl-quote {
+  margin-top: 0.75rem;
+  padding-left: 0;
+  border-left: none;
+}
+#waline .wl-quote .wl-card-item {
+  padding: 0.75rem 0;
+}
+#waline .wl-quote .wl-card-item::after {
+  left: var(--waline-m-avatar-size);
+  opacity: 0.3;
+}
+#waline .wl-empty {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--sec-text-color);
+  opacity: 0.4;
+  font-size: var(--waline-font-size);
+}
+#waline .wl-more {
+  padding: 0.35rem 1rem;
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--line-color);
+  color: var(--sec-text-color);
+  font-weight: 400;
+  font-size: 0.8rem;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+#waline .wl-more:hover {
+  background: transparent;
+  color: var(--text-color);
+  border-color: var(--sec-text-color);
+}
+#waline .wl-page li {
+  min-width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.8rem;
+  color: var(--sec-text-color);
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+#waline .wl-page li:hover {
+  opacity: 0.8;
+  background: transparent;
+}
+#waline .wl-page li.active {
+  opacity: 1;
+  color: var(--text-color);
+  background: transparent;
+}
+#waline .wl-loading .wl-loading-item {
+  background: var(--line-color);
+  opacity: 0.3;
+}
+[data-user-color-scheme='dark'] #waline .wl-emoji-popup {
+  box-shadow: 0 1px 12px rgba(0,0,0,0.2);
+}
+[data-user-color-scheme='dark'] #waline .wl-content code {
+  background: rgba(255,255,255,0.08);
+}
+[data-user-color-scheme='dark'] #waline .wl-content pre {
+  background: rgba(255,255,255,0.03);
+}
+[data-user-color-scheme='dark'] #waline .wl-user-avatar {
+  opacity: 0.85;
+}
+[data-user-color-scheme='dark'] #waline .wl-user-avatar:hover {
+  opacity: 0.95;
+}
+@media (max-width: 768px) {
+  #waline {
+    --waline-avatar-size: 2rem;
+    --waline-m-avatar-size: 1.75rem;
+    --waline-font-size: 0.85rem;
+  }
+  #waline .wl-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  #waline .wl-panel {
+    margin-bottom: 1.25rem;
+  }
+  #waline .wl-cards .wl-card-item {
+    padding: 1rem 0;
+  }
+  #waline .wl-cards .wl-card-item::after {
+    left: var(--waline-avatar-size);
+  }
+  #waline .wl-quote {
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--line-color);
+  }
+  #waline .wl-quote .wl-card-item::after {
+    display: none;
+  }
+  #waline .wl-btn {
+    padding: 0.3rem 0.8rem !important;
+  }
+  #waline .wl-footer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+@media print {
+  #waline .wl-panel,
+  #waline .wl-comment-actions,
+  #waline .wl-more,
+  #waline .wl-page,
+  #waline .wl-sort {
+    display: none;
+  }
+  #waline .wl-cards .wl-card-item::after {
+    background: #ccc;
+  }
+}
