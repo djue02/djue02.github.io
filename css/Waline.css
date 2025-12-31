@@ -420,6 +420,15 @@
     flex-wrap: wrap;
     gap: 0.5rem;
   }
+  #waline .wl-editor {
+    resize: vertical !important;
+    overflow: auto !important;
+    background-image: none !important;
+  }
+  #waline .wl-editor::-webkit-resizer {
+    background-color: transparent !important;
+    -webkit-appearance: none !important;
+  }
 }
 @media print {
   #waline .wl-panel,
