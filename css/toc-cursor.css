@@ -1,0 +1,32 @@
+.toc-body {
+  overflow: visible !important;
+  padding-left: 1rem !important;
+}
+.toc-list-item {
+  position: relative !important;
+}
+.toc-list-item::before {
+  content: '' !important;
+  position: absolute !important;
+  left: -12px !important;
+  top: 0.8rem !important;
+  width: 4px !important;
+  height: 4px !important;
+  border-radius: 50% !important;
+  background: rgba(0,0,0,0.35) !important;
+  transition: all 0.2s ease-in-out !important;
+  z-index: 10 !important;
+  display: block !important;
+}
+.toc-list-item.is-active-li::before {
+  height: 18px !important;
+  top: 0.3rem !important;
+  border-radius: 2px !important;
+  background: #2f4154 !important;
+}
+[data-user-color-scheme='dark'] .toc-list-item::before {
+  background: rgba(255,255,255,0.4) !important;
+}
+[data-user-color-scheme='dark'] .toc-list-item.is-active-li::before {
+  background: #fff !important;
+}

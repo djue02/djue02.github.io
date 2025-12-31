@@ -1,0 +1,165 @@
+/* ============================================================
+   Project: Aesthetic Tuning (审美调优)
+   Focus: 极致融合、色彩统一、克制通透
+   ============================================================ */
+
+/* 1. 遮罩：更通透，更少打扰 */
+.modal-backdrop.show {
+    /* 透明度从 0.5 降到 0.3，让背景网页更清晰，减少压迫感 */
+    opacity: 0.3 !important; 
+    background: #000;
+    backdrop-filter: none !important;
+}
+
+/* 2. 容器：米色卡片基底 */
+.modal-dialog {
+    margin-top: 10vh;
+    max-width: 550px;
+}
+.modal-content {
+    background-color: #f5f2ed; /* 维持你的米色主调 */
+    border: none;
+    border-radius: 12px;
+    /* 阴影变得更柔和、弥散，减少“硬”的悬浮感 */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+/* 3. 关闭按钮：极度克制 */
+.modal-header {
+    border: none;
+    padding: 15px 20px 0;
+    display: flex;
+    justify-content: flex-end;
+}
+.modal-title { display: none; } 
+
+.modal-header .close {
+    font-size: 28px; /* 稍微缩小一点 */
+    /* 颜色调整为极淡的灰色，几乎融入背景，只有鼠标放上去才显现 */
+    color: rgba(0, 0, 0, 0.2); 
+    opacity: 1;
+    outline: none;
+    cursor: pointer;
+    transition: color 0.3s ease; /* 更缓慢的过渡 */
+    padding: 0; margin: 0; line-height: 0.6;
+}
+.modal-header .close:hover {
+    color: rgba(0, 0, 0, 0.6); /* 悬停时也不要纯黑，保持克制 */
+}
+
+/* 4. 输入区域：核心调色 */
+.modal-body {
+    padding: 10px 40px 40px;
+}
+.md-form label { display: none !important; }
+
+.md-form {
+    position: relative !important;
+    margin-top: 32px;
+}
+
+/* ========================================================
+   【色彩统一核心】标题与背景融合
+   ======================================================== */
+.md-form::before {
+    content: "关键字";
+    position: absolute;
+    top: -26px;
+    left: 4px;
+    
+    /* 【关键】颜色调整：不再是突兀的深灰 */
+    /* 使用带透明度的黑色，让它透出一点背后的米色，与输入框背景色系高度统一 */
+    color: rgba(0, 0, 0, 0.4); 
+    
+    font-size: 14px;
+    font-weight: 500; /* 字重稍微减轻 */
+    font-family: "Noto Serif SC", serif;
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* 输入框本体 */
+#local-search-input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 48px;
+    
+    /* 【关键】背景色调整：极淡的半透明黑，让米色底色透上来 */
+    /* 这比纯粹的灰色更融洽 */
+    background-color: rgba(0, 0, 0, 0.04); 
+    
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 0 15px;
+    color: #333; /* 输入文字的颜色保持清晰 */
+    font-size: 16px;
+    font-family: "Noto Serif SC", serif;
+    box-shadow: none !important;
+    transition: all 0.2s ease;
+}
+
+/* 聚焦时：保持克制，不要突然变白 */
+#local-search-input:focus {
+    /* 背景稍微变亮一点点，而不是纯白 */
+    background-color: rgba(0, 0, 0, 0.02);
+    /* 边框也是极淡的半透明黑 */
+    border-color: rgba(0, 0, 0, 0.1);
+    /* 阴影非常微弱 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
+}
+
+#local-search-input::placeholder {
+    opacity: 0 !important;
+}
+
+/* 5. 结果列表：材质融合 */
+.list-group { margin-top: 25px; }
+
+.list-group-item {
+    background: transparent;
+    border: none;
+    /* 分割线颜色极淡化 */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    padding: 12px 8px;
+    /* 文字颜色也稍微调淡 */
+    color: rgba(0, 0, 0, 0.6);
+    font-family: "Noto Serif SC", serif;
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    /* 悬停背景色也用半透明，保持通透感 */
+    background-color: rgba(0, 0, 0, 0.02);
+    color: #000;
+    border-radius: 6px; /* 悬停时加个圆角，更精致 */
+    padding-left: 12px; /* 微交互：轻微右移 */
+}
+
+.list-group-item .search-keyword {
+    /* 关键词高亮颜色调得更雅致一点，不那么刺眼 */
+    color: #c04848; 
+    font-weight: bold;
+}
+
+/* 6. 暗色模式适配 (同样遵循高融合度原则) */
+[data-user-color-scheme='dark'] .modal-content { background-color: #1a1a1a; }
+[data-user-color-scheme='dark'] .md-form::before { color: rgba(255, 255, 255, 0.4); } 
+[data-user-color-scheme='dark'] .modal-header .close { color: rgba(255, 255, 255, 0.2); }
+[data-user-color-scheme='dark'] .modal-header .close:hover { color: rgba(255, 255, 255, 0.6); }
+[data-user-color-scheme='dark'] #local-search-input {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #eee;
+}
+[data-user-color-scheme='dark'] #local-search-input:focus {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-user-color-scheme='dark'] .list-group-item {
+    border-bottom-color: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.6);
+}
+[data-user-color-scheme='dark'] .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
