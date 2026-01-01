@@ -1,152 +1,187 @@
 /* ============================================================
-   Project: Aesthetic Tuning (审美调优)
-   Focus: 极致融合、色彩统一、克制通透
+   Project: Final Perfect Static (最终完美定稿·静止版)
+   Focus: 黄金比例布局 + 26px精致图标 + 0动画 + 淡色交互
    ============================================================ */
 
-/* 1. 遮罩：更通透，更少打扰 */
+/* 1. 基础清理 */
+.modal-content::before, .modal-content::after { display: none !important; }
+
+/* 遮罩：极度通透 */
 .modal-backdrop.show {
-    /* 透明度从 0.5 降到 0.3，让背景网页更清晰，减少压迫感 */
-    opacity: 0.3 !important; 
+    opacity: 0.3 !important;
     background: #000;
     backdrop-filter: none !important;
 }
 
-/* 2. 容器：米色卡片基底 */
+/* 2. 抽屉容器 */
 .modal-dialog {
-    margin-top: 10vh;
+    margin: 0 auto !important; 
+    width: 100%;
     max-width: 550px;
-}
-.modal-content {
-    background-color: #f5f2ed; /* 维持你的米色主调 */
-    border: none;
-    border-radius: 12px;
-    /* 阴影变得更柔和、弥散，减少“硬”的悬浮感 */
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    z-index: 9999 !important;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* 3. 关闭按钮：极度克制 */
-.modal-header {
+.modal-content {
+    background-color: #f5f2ed !important;
     border: none;
-    padding: 15px 20px 0;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+/* 3. 头部区域：黄金比例 Flex 布局 */
+.modal-header {
+    border: none !important;
+    padding: 12px 20px 0; 
     display: flex;
     justify-content: flex-end;
+    position: relative;
+    z-index: 10001;
 }
+
 .modal-title { display: none; } 
 
+/* 4. 关闭按钮：【微调】缩小、静止 */
 .modal-header .close {
-    font-size: 28px; /* 稍微缩小一点 */
-    /* 颜色调整为极淡的灰色，几乎融入背景，只有鼠标放上去才显现 */
-    color: rgba(0, 0, 0, 0.2); 
+    font-family: sans-serif;
+    
+    /* 【核心微调】从 32px 降为 26px，更加精致 */
+    font-size: 26px;      
+    font-weight: 300;     
+    
+    /* 默认颜色：极淡灰 */
+    color: #b0b0b0;          
+    
     opacity: 1;
     outline: none;
     cursor: pointer;
-    transition: color 0.3s ease; /* 更缓慢的过渡 */
-    padding: 0; margin: 0; line-height: 0.6;
-}
-.modal-header .close:hover {
-    color: rgba(0, 0, 0, 0.6); /* 悬停时也不要纯黑，保持克制 */
+    
+    /* 保持大点击区，方便手指点击 */
+    padding: 10px;
+    
+    /* 负边距修正，确保对齐右上角 */
+    margin: -10px -10px 0 0; 
+    
+    line-height: 1;
+    background: transparent !important;
+    
+    /* 只有颜色的轻微过渡，无位移 */
+    transition: color 0.2s;
 }
 
-/* 4. 输入区域：核心调色 */
+/* 【悬停效果】 */
+.modal-header .close:hover {
+    /* 悬停颜色：中性灰 (#777)，淡雅协调 */
+    color: #777; 
+    
+    /* 绝对没有任何动画 */
+    transform: none !important;
+}
+
+/* 5. 输入区域 */
 .modal-body {
-    padding: 10px 40px 40px;
+    padding: 20px 40px 40px; 
 }
 .md-form label { display: none !important; }
 
 .md-form {
     position: relative !important;
-    margin-top: 32px;
+    margin-top: 0; 
+    margin-bottom: 30px; 
 }
 
-/* ========================================================
-   【色彩统一核心】标题与背景融合
-   ======================================================== */
+/* 标题：关键字 */
 .md-form::before {
     content: "关键字";
     position: absolute;
-    top: -26px;
-    left: 4px;
-    
-    /* 【关键】颜色调整：不再是突兀的深灰 */
-    /* 使用带透明度的黑色，让它透出一点背后的米色，与输入框背景色系高度统一 */
+    top: -24px;
+    left: 2px;
     color: rgba(0, 0, 0, 0.4); 
-    
-    font-size: 14px;
-    font-weight: 500; /* 字重稍微减轻 */
+    font-size: 13px;
+    font-weight: 600;
     font-family: "Noto Serif SC", serif;
     letter-spacing: 1px;
     pointer-events: none;
     z-index: 10;
+    line-height: 1.5; 
 }
 
-/* 输入框本体 */
+/* 底部渐变分割线 */
+.md-form::after {
+    content: "";
+    position: absolute;
+    bottom: -25px;   
+    left: 5%;        
+    width: 90%;      
+    height: 1px;     
+    background: linear-gradient(
+        to right, 
+        rgba(0, 0, 0, 0), 
+        rgba(0, 0, 0, 0.08), 
+        rgba(0, 0, 0, 0)
+    );
+    pointer-events: none;
+}
+
+/* 输入框 */
 #local-search-input {
     box-sizing: border-box;
     width: 100%;
-    height: 48px;
-    
-    /* 【关键】背景色调整：极淡的半透明黑，让米色底色透上来 */
-    /* 这比纯粹的灰色更融洽 */
+    height: 46px; 
     background-color: rgba(0, 0, 0, 0.04); 
-    
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 0 15px;
-    color: #333; /* 输入文字的颜色保持清晰 */
+    color: #333;
     font-size: 16px;
     font-family: "Noto Serif SC", serif;
     box-shadow: none !important;
-    transition: all 0.2s ease;
+    -webkit-text-size-adjust: 100%;
 }
 
-/* 聚焦时：保持克制，不要突然变白 */
 #local-search-input:focus {
-    /* 背景稍微变亮一点点，而不是纯白 */
     background-color: rgba(0, 0, 0, 0.02);
-    /* 边框也是极淡的半透明黑 */
     border-color: rgba(0, 0, 0, 0.1);
-    /* 阴影非常微弱 */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
 }
 
-#local-search-input::placeholder {
-    opacity: 0 !important;
-}
+#local-search-input::placeholder { opacity: 0 !important; }
 
-/* 5. 结果列表：材质融合 */
-.list-group { margin-top: 25px; }
+/* 6. 结果列表 */
+.list-group { margin-top: 10px; }
 
 .list-group-item {
     background: transparent;
     border: none;
-    /* 分割线颜色极淡化 */
     border-bottom: 1px solid rgba(0, 0, 0, 0.03);
     padding: 12px 8px;
-    /* 文字颜色也稍微调淡 */
     color: rgba(0, 0, 0, 0.6);
     font-family: "Noto Serif SC", serif;
-    transition: all 0.2s ease;
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
 .list-group-item:hover {
-    /* 悬停背景色也用半透明，保持通透感 */
     background-color: rgba(0, 0, 0, 0.02);
     color: #000;
-    border-radius: 6px; /* 悬停时加个圆角，更精致 */
-    padding-left: 12px; /* 微交互：轻微右移 */
+    border-radius: 4px;
 }
 
+/* 关键词颜色 */
 .list-group-item .search-keyword {
-    /* 关键词高亮颜色调得更雅致一点，不那么刺眼 */
-    color: #c04848; 
+    color: #d65050; 
     font-weight: bold;
 }
 
-/* 6. 暗色模式适配 (同样遵循高融合度原则) */
-[data-user-color-scheme='dark'] .modal-content { background-color: #1a1a1a; }
+/* 7. 暗色模式适配 */
+[data-user-color-scheme='dark'] .modal-content { background-color: #1a1a1a !important; }
+[data-user-color-scheme='dark'] .md-form::after {
+    background: linear-gradient(
+        to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)
+    );
+}
 [data-user-color-scheme='dark'] .md-form::before { color: rgba(255, 255, 255, 0.4); } 
-[data-user-color-scheme='dark'] .modal-header .close { color: rgba(255, 255, 255, 0.2); }
-[data-user-color-scheme='dark'] .modal-header .close:hover { color: rgba(255, 255, 255, 0.6); }
+[data-user-color-scheme='dark'] .modal-header .close { color: #666; } 
+[data-user-color-scheme='dark'] .modal-header .close:hover { color: #999; }
 [data-user-color-scheme='dark'] #local-search-input {
     background-color: rgba(255, 255, 255, 0.05);
     color: #eee;
