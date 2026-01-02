@@ -1,21 +1,71 @@
 /* ============================================================
-   Project: Final Perfect Static (最终完美定稿·静止版)
-   Focus: 黄金比例布局 + 26px精致图标 + 0动画 + 淡色交互
+   Project: Final Perfect Static · Enhanced (最终完美定稿·增强版)
+   Based on: 黄金比例布局 + 26px精致图标 + 0动画 + 淡色交互
+   Enhanced: CSS变量系统 + 无障碍优化 + 滚动条美化 + 细节打磨
    ============================================================ */
 
-/* 1. 基础清理 */
-.modal-content::before, .modal-content::after { display: none !important; }
+/* ─────────────────────────────────────────────────────────────
+   0. 设计令牌 (Design Tokens)
+   ───────────────────────────────────────────────────────────── */
+:root {
+    /* 月白 · 亮色主题 */
+    --search-bg: #f5f2ed;
+    --search-text: #333;
+    --search-text-muted: rgba(0, 0, 0, 0.4);
+    --search-text-soft: rgba(0, 0, 0, 0.6);
+    --search-border: rgba(0, 0, 0, 0.1);
+    --search-divider: rgba(0, 0, 0, 0.08);
+    --search-input-bg: rgba(0, 0, 0, 0.04);
+    --search-input-bg-focus: rgba(0, 0, 0, 0.02);
+    --search-hover-bg: rgba(0, 0, 0, 0.02);
+    --search-close: #c0c0c0;
+    --search-close-hover: #888;
+    --search-keyword: #c45c5c;
+    --search-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    --search-shadow-elevated: 0 25px 80px rgba(0, 0, 0, 0.12);
+}
 
-/* 遮罩：极度通透 */
+[data-user-color-scheme='dark'] {
+    /* 乌木 · 暗色主题 */
+    --search-bg: #1a1a1a;
+    --search-text: #eee;
+    --search-text-muted: rgba(255, 255, 255, 0.4);
+    --search-text-soft: rgba(255, 255, 255, 0.6);
+    --search-border: rgba(255, 255, 255, 0.1);
+    --search-divider: rgba(255, 255, 255, 0.08);
+    --search-input-bg: rgba(255, 255, 255, 0.05);
+    --search-input-bg-focus: rgba(255, 255, 255, 0.08);
+    --search-hover-bg: rgba(255, 255, 255, 0.05);
+    --search-close: #4a4a4a;
+    --search-close-hover: #888;
+    --search-keyword: #e08080;
+    --search-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    --search-shadow-elevated: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   1. 基础清理
+   ───────────────────────────────────────────────────────────── */
+.modal-content::before,
+.modal-content::after {
+    display: none !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. 遮罩层：极度通透
+   ───────────────────────────────────────────────────────────── */
 .modal-backdrop.show {
     opacity: 0.3 !important;
     background: #000;
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
-/* 2. 抽屉容器 */
+/* ─────────────────────────────────────────────────────────────
+   3. 抽屉容器
+   ───────────────────────────────────────────────────────────── */
 .modal-dialog {
-    margin: 0 auto !important; 
+    margin: 0 auto !important;
     width: 100%;
     max-width: 550px;
     z-index: 9999 !important;
@@ -23,71 +73,139 @@
 }
 
 .modal-content {
-    background-color: #f5f2ed !important;
+    background-color: var(--search-bg) !important;
     border: none;
     border-radius: 0 0 12px 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--search-shadow);
+    transition: box-shadow 0.3s ease;
+    
+    /* 最大高度限制，防止结果过多撑破视口 */
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* 3. 头部区域：黄金比例 Flex 布局 */
+/* ─────────────────────────────────────────────────────────────
+   4. 头部区域
+   ───────────────────────────────────────────────────────────── */
 .modal-header {
     border: none !important;
-    padding: 12px 20px 0; 
+    padding: 12px 20px 0;
     display: flex;
     justify-content: flex-end;
     position: relative;
     z-index: 10001;
+    flex-shrink: 0;
 }
 
-.modal-title { display: none; } 
+.modal-title {
+    display: none;
+}
 
-/* 4. 关闭按钮：【微调】缩小、静止 */
+/* ─────────────────────────────────────────────────────────────
+   5. 关闭按钮：纯 CSS 细线图标
+   ───────────────────────────────────────────────────────────── */
 .modal-header .close {
-    font-family: sans-serif;
-    
-    /* 【核心微调】从 32px 降为 26px，更加精致 */
-    font-size: 26px;      
-    font-weight: 300;     
-    
-    /* 默认颜色：极淡灰 */
-    color: #b0b0b0;          
-    
+    position: relative;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 4px 4px 0 0;
+    background: transparent !important;
+    border: none;
+    cursor: pointer;
     opacity: 1;
     outline: none;
-    cursor: pointer;
     
-    /* 保持大点击区，方便手指点击 */
-    padding: 10px;
-    
-    /* 负边距修正，确保对齐右上角 */
-    margin: -10px -10px 0 0; 
-    
-    line-height: 1;
-    background: transparent !important;
-    
-    /* 只有颜色的轻微过渡，无位移 */
-    transition: color 0.2s;
+    /* 隐藏原有文字 */
+    font-size: 0;
+    color: transparent;
+    overflow: hidden;
 }
 
-/* 【悬停效果】 */
-.modal-header .close:hover {
-    /* 悬停颜色：中性灰 (#777)，淡雅协调 */
-    color: #777; 
-    
-    /* 绝对没有任何动画 */
-    transform: none !important;
+/* 用伪元素绘制 × */
+.modal-header .close::before,
+.modal-header .close::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 1.5px;
+    background-color: var(--search-close);
+    border-radius: 1px;
+    transition: background-color 0.2s ease;
 }
 
-/* 5. 输入区域 */
+.modal-header .close::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.modal-header .close::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.modal-header .close:hover::before,
+.modal-header .close:hover::after {
+    background-color: var(--search-close-hover);
+}
+
+/* 键盘焦点 */
+.modal-header .close:focus-visible {
+    outline: 2px solid var(--search-border);
+    outline-offset: 4px;
+    border-radius: 2px;
+}
+
+.modal-header .close:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. 主体区域
+   ───────────────────────────────────────────────────────────── */
 .modal-body {
-    padding: 20px 40px 40px; 
+    padding: 20px 40px 40px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
-.md-form label { display: none !important; }
+
+/* 滚动条美化 */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--search-divider);
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--search-text-muted);
+}
+
+/* Firefox 滚动条 */
+.modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--search-divider) transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. 搜索表单
+   ───────────────────────────────────────────────────────────── */
+.md-form label {
+    display: none !important;
+}
 
 .md-form {
     position: relative !important;
-    margin-top: 0; 
-    margin-bottom: 30px; 
+    margin-top: 0;
+    margin-bottom: 30px;
 }
 
 /* 标题：关键字 */
@@ -96,105 +214,228 @@
     position: absolute;
     top: -24px;
     left: 2px;
-    color: rgba(0, 0, 0, 0.4); 
+    color: var(--search-text-muted);
     font-size: 13px;
     font-weight: 600;
-    font-family: "Noto Serif SC", serif;
+    font-family: "Noto Serif SC", "Source Han Serif SC", serif;
     letter-spacing: 1px;
     pointer-events: none;
     z-index: 10;
-    line-height: 1.5; 
+    line-height: 1.5;
 }
 
 /* 底部渐变分割线 */
 .md-form::after {
     content: "";
     position: absolute;
-    bottom: -25px;   
-    left: 5%;        
-    width: 90%;      
-    height: 1px;     
+    bottom: -25px;
+    left: 5%;
+    width: 90%;
+    height: 1px;
     background: linear-gradient(
-        to right, 
-        rgba(0, 0, 0, 0), 
-        rgba(0, 0, 0, 0.08), 
-        rgba(0, 0, 0, 0)
+        to right,
+        transparent,
+        var(--search-divider),
+        transparent
     );
     pointer-events: none;
 }
 
-/* 输入框 */
+/* ─────────────────────────────────────────────────────────────
+   8. 输入框
+   ───────────────────────────────────────────────────────────── */
 #local-search-input {
     box-sizing: border-box;
     width: 100%;
-    height: 46px; 
-    background-color: rgba(0, 0, 0, 0.04); 
+    height: 46px;
+    background-color: var(--search-input-bg);
     border: 1px solid transparent;
     border-radius: 6px;
     padding: 0 15px;
-    color: #333;
+    color: var(--search-text);
     font-size: 16px;
-    font-family: "Noto Serif SC", serif;
+    font-family: "Noto Serif SC", "Source Han Serif SC", serif;
     box-shadow: none !important;
     -webkit-text-size-adjust: 100%;
+    -webkit-appearance: none;
+    transition: 
+        background-color 0.2s ease,
+        border-color 0.2s ease;
 }
 
 #local-search-input:focus {
-    background-color: rgba(0, 0, 0, 0.02);
-    border-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--search-input-bg-focus);
+    border-color: var(--search-border);
+    outline: none;
 }
 
-#local-search-input::placeholder { opacity: 0 !important; }
+#local-search-input::placeholder {
+    opacity: 0 !important;
+}
 
-/* 6. 结果列表 */
-.list-group { margin-top: 10px; }
+/* 清除 Safari 搜索框默认样式 */
+#local-search-input::-webkit-search-cancel-button,
+#local-search-input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. 结果列表
+   ───────────────────────────────────────────────────────────── */
+.list-group {
+    margin-top: 10px;
+}
 
 .list-group-item {
+    display: block;
     background: transparent;
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-    padding: 12px 8px;
-    color: rgba(0, 0, 0, 0.6);
-    font-family: "Noto Serif SC", serif;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.06);
+    padding: 14px 10px;
+    color: var(--search-text-soft);
+    font-family: "Noto Serif SC", "Source Han Serif SC", serif;
     font-size: 14px;
-    transition: all 0.2s;
+    line-height: 1.6;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    transition: 
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
 }
 
 .list-group-item:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-    color: #000;
-    border-radius: 4px;
+    background-color: var(--search-hover-bg);
+    color: var(--search-text);
+    text-decoration: none;
 }
 
-/* 关键词颜色 */
-.list-group-item .search-keyword {
-    color: #d65050; 
-    font-weight: bold;
+/* 键盘导航焦点 */
+.list-group-item:focus-visible {
+    outline: 2px solid var(--search-border);
+    outline-offset: -2px;
+    background-color: var(--search-hover-bg);
 }
 
-/* 7. 暗色模式适配 */
-[data-user-color-scheme='dark'] .modal-content { background-color: #1a1a1a !important; }
-[data-user-color-scheme='dark'] .md-form::after {
-    background: linear-gradient(
-        to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)
-    );
+.list-group-item:focus:not(:focus-visible) {
+    outline: none;
 }
-[data-user-color-scheme='dark'] .md-form::before { color: rgba(255, 255, 255, 0.4); } 
-[data-user-color-scheme='dark'] .modal-header .close { color: #666; } 
-[data-user-color-scheme='dark'] .modal-header .close:hover { color: #999; }
-[data-user-color-scheme='dark'] #local-search-input {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #eee;
+
+/* ─────────────────────────────────────────────────────────────
+   10. 搜索结果标题与摘要
+   ───────────────────────────────────────────────────────────── */
+/* 结果标题 */
+.list-group-item .search-result-title,
+.list-group-item strong:first-child,
+.list-group-item > a:first-child {
+    display: block;
+    color: var(--search-text);
+    font-weight: 500;
+    font-size: 15px;
+    margin-bottom: 4px;
+    line-height: 1.4;
 }
-[data-user-color-scheme='dark'] #local-search-input:focus {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
+
+/* 结果摘要文字稍小 */
+.list-group-item .search-result-content,
+.list-group-item p {
+    font-size: 13px;
+    color: var(--search-text-soft);
+    margin: 0;
+    line-height: 1.7;
+    
+    /* 摘要最多显示3行 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
-[data-user-color-scheme='dark'] .list-group-item {
-    border-bottom-color: rgba(255, 255, 255, 0.03);
-    color: rgba(255, 255, 255, 0.6);
+
+/* ─────────────────────────────────────────────────────────────
+   11. 关键词高亮
+   ───────────────────────────────────────────────────────────── */
+.list-group-item .search-keyword,
+.list-group-item mark,
+.list-group-item em {
+    color: var(--search-keyword);
+    font-weight: 600;
+    font-style: normal;
+    background: transparent;
 }
-[data-user-color-scheme='dark'] .list-group-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #fff;
+
+/* ─────────────────────────────────────────────────────────────
+   12. 空状态 / 无结果
+   ───────────────────────────────────────────────────────────── */
+.search-empty,
+.no-result {
+    display: block;
+    text-align: center;
+    color: var(--search-text-muted);
+    font-size: 14px;
+    font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+    padding: 40px 20px;
+    line-height: 1.8;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   13. 响应式适配
+   ───────────────────────────────────────────────────────────── */
+@media screen and (max-width: 576px) {
+    .modal-dialog {
+        max-width: 100%;
+    }
+    
+    .modal-content {
+        border-radius: 0 0 16px 16px;
+        max-height: 85vh;
+    }
+    
+    .modal-body {
+        padding: 16px 24px 32px;
+    }
+    
+    .md-form::before {
+        font-size: 12px;
+        top: -22px;
+    }
+    
+    #local-search-input {
+        height: 44px;
+        font-size: 16px; /* 防止 iOS 缩放 */
+    }
+    
+    .list-group-item {
+        padding: 12px 8px;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   14. 减少动画偏好
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .modal-dialog {
+        transition: none;
+    }
+    
+    .modal-content,
+    .modal-header .close,
+    #local-search-input,
+    .list-group-item {
+        transition: none;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   15. 打印样式（隐藏搜索框）
+   ───────────────────────────────────────────────────────────── */
+@media print {
+    .modal,
+    .modal-backdrop {
+        display: none !important;
+    }
 }
