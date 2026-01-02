@@ -2,8 +2,9 @@
   color: rgba(60,60,60,0.6) !important;
   transition: color 0.25s ease !important;
 }
-.toc-link:hover {
-  color: rgba(50,50,50,0.85) !important;
+.toc-link:hover,
+.tocbot-active-link:hover {
+  color: #49b1f5 !important;
 }
 .tocbot-active-link {
   color: rgba(40,40,40,0.9) !important;
@@ -23,42 +24,43 @@ li.toc-list-item::before {
   width: 5px !important;
   height: 5px !important;
   border-radius: 2.5px !important;
-  background: rgba(60,60,60,0.18) !important;
-  opacity: 0.8 !important;
+  background: rgba(60,60,60,0.2) !important;
+  opacity: 0.85 !important;
   z-index: 99 !important;
   pointer-events: none !important;
-  transition: height 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), border-radius 0.3s ease-out, background 0.3s ease, opacity 0.3s ease !important;
+  transition: top 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), height 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), width 0.3s cubic-bezier(0.34, 1.2, 0.64, 1), border-radius 0.3s ease-out, background 0.3s ease, opacity 0.25s ease !important;
 }
 li.toc-list-item:hover::before {
-  background: rgba(50,50,50,0.28) !important;
+  background: rgba(50,50,50,0.3) !important;
   opacity: 1 !important;
 }
 li.toc-list-item.is-active-li::before {
-  top: 1px !important;
-  width: 5px !important;
+  top: 0.5px !important;
+  width: 4px !important;
   height: 16px !important;
-  border-radius: 2.5px !important;
+  border-radius: 2px !important;
   background: rgba(50,50,50,0.38) !important;
   opacity: 1 !important;
 }
 [data-user-color-scheme='dark'] .toc-link {
   color: rgba(200,200,200,0.55) !important;
 }
-[data-user-color-scheme='dark'] .toc-link:hover {
-  color: rgba(220,220,220,0.8) !important;
+[data-user-color-scheme='dark'] .toc-link:hover,
+[data-user-color-scheme='dark'] .tocbot-active-link:hover {
+  color: #49b1f5 !important;
 }
 [data-user-color-scheme='dark'] .tocbot-active-link {
   color: rgba(235,235,235,0.9) !important;
 }
 [data-user-color-scheme='dark'] li.toc-list-item::before {
-  background: rgba(200,200,200,0.15) !important;
-  opacity: 0.7 !important;
+  background: rgba(200,200,200,0.18) !important;
+  opacity: 0.8 !important;
 }
 [data-user-color-scheme='dark'] li.toc-list-item:hover::before {
   background: rgba(210,210,210,0.28) !important;
   opacity: 1 !important;
 }
 [data-user-color-scheme='dark'] li.toc-list-item.is-active-li::before {
-  background: rgba(210,210,210,0.4) !important;
+  background: rgba(220,220,220,0.38) !important;
   opacity: 1 !important;
 }
