@@ -396,12 +396,16 @@
     }
     
     .modal-body {
-        padding: 16px 24px 32px;
+        padding: 24px 24px 32px;
+    }
+    
+    .md-form {
+        margin-top: 8px;
     }
     
     .md-form::before {
         font-size: 12px;
-        top: -22px;
+        top: -20px;
     }
     
     #local-search-input {
