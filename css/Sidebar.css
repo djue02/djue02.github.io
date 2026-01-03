@@ -13,7 +13,8 @@
     overflow-y: auto;
     overflow-x: hidden;
     
-    background: rgba(248, 249, 251, 0.35);
+    background: rgba(248, 249, 251, 0.75);
+    
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -30,11 +31,118 @@
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    gap: 32px;
 }
 
-//* ---------- 侧边栏文字 ---------- */
+/* ---------- 头像区域 ---------- */
+.sidebar-avatar-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 16px 0;
+    border-bottom: 1px solid rgba(70, 75, 70, 0.08);
+}
+
+.sidebar-avatar-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.sidebar-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 30%;
+    transform: scale(1.15);
+    
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 0 0 1px rgba(70, 75, 70, 0.04),
+        0 0 20px rgba(200, 195, 190, 0.3);
+    
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-avatar-img:hover {
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(70, 75, 70, 0.08),
+        0 0 24px rgba(200, 195, 190, 0.4);
+}
+
+.sidebar-avatar-name {
+    color: rgba(50, 55, 50, 0.9);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+
+.sidebar-avatar-bio {
+    color: #E0A8AC;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    margin: 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ---------- 社交链接 ---------- */
+.sidebar-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+.sidebar-social-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    color: rgba(70, 75, 70, 0.6);
+    font-size: 20px;
+    
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    
+    transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.sidebar-social-link:hover {
+    color: rgba(60, 65, 60, 0.75);
+}
+
+/* ---------- 名字行（名字+邮箱） ---------- */
+.sidebar-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sidebar-name-row .sidebar-social-link {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+}
+
+/* ---------- 侧边栏文字 ---------- */
 .sidebar-text {
     color: rgba(70, 75, 70, 0.6);
     font-size: 16px;
@@ -42,10 +150,6 @@
     margin: 0;
     padding: 6px 0;
     text-align: center;
-}
-
-[data-user-color-scheme="dark"] .sidebar-text {
-    color: rgba(165, 170, 165, 0.7);
 }
 
 /* ---------- 切换按钮 ---------- */
@@ -58,10 +162,11 @@
     width: 24px;
     height: 32px;
     padding: 0;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 0 16px 16px 0;
     
     background: rgba(226, 223, 220, 0.35);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     
     display: flex;
     align-items: center;
@@ -74,11 +179,12 @@
     cursor: pointer;
     
     opacity: 0.6;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sidebar-toggle:hover {
     opacity: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-toggle i {
@@ -115,7 +221,44 @@
 
 /* ---------- 深色模式 ---------- */
 [data-user-color-scheme="dark"] #sidebar {
-    background: rgba(20, 18, 15, 0.4);
+    background: rgba(20, 18, 15, 0.75);
+}
+
+[data-user-color-scheme="dark"] .sidebar-avatar-wrapper {
+    border-bottom: 1px solid rgba(200, 195, 190, 0.1);
+}
+
+[data-user-color-scheme="dark"] .sidebar-avatar-img {
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 0 20px rgba(80, 75, 70, 0.4);
+}
+
+[data-user-color-scheme="dark"] .sidebar-avatar-img:hover {
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 0 24px rgba(80, 75, 70, 0.5);
+}
+
+[data-user-color-scheme="dark"] .sidebar-avatar-bio {
+    color: #E8B4B8;
+}
+
+[data-user-color-scheme="dark"] .sidebar-avatar-name {
+    color: rgba(230, 225, 220, 0.95);
+}
+
+[data-user-color-scheme="dark"] .sidebar-social-link {
+    color: rgba(200, 195, 190, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-user-color-scheme="dark"] .sidebar-social-link:hover {
+    color: rgba(215, 210, 205, 0.85);
 }
 
 [data-user-color-scheme="dark"] .sidebar-text {
@@ -125,6 +268,12 @@
 [data-user-color-scheme="dark"] .sidebar-toggle {
     background: rgba(50, 48, 45, 0.4);
     color: rgba(200, 195, 190, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-user-color-scheme="dark"] .sidebar-toggle:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 [data-user-color-scheme="dark"] .sidebar-toggle i {
@@ -147,6 +296,34 @@
         max-width: 280px;
     }
     
+    .sidebar-content {
+        padding: 40px 16px 32px 16px;
+        gap: 28px;
+    }
+    
+    .sidebar-avatar-container {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .sidebar-avatar-name {
+        font-size: 17px;
+    }
+    
+    .sidebar-avatar-bio {
+        font-size: 12px;
+    }
+    
+    .sidebar-social {
+        gap: 14px;
+    }
+    
+    .sidebar-social-link {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+    
     .sidebar-toggle {
         bottom: 90px;
         width: 22px;
@@ -157,8 +334,13 @@
     }
 }
 
+/* ---------- 无障碍 ---------- */
 @media (prefers-reduced-motion: reduce) {
-    #sidebar, .sidebar-toggle, .sidebar-toggle i, .sidebar-overlay {
+    #sidebar, 
+    .sidebar-toggle, 
+    .sidebar-toggle i, 
+    .sidebar-overlay,
+    .sidebar-avatar-img {
         transition: none;
     }
 }
