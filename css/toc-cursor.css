@@ -4,7 +4,7 @@
 }
 .toc-link:hover,
 .tocbot-active-link:hover {
-  color: #30a9de !important;
+  color: #5bc2e7 !important;
 }
 .tocbot-active-link {
   color: rgba(40,40,40,0.9) !important;
@@ -47,7 +47,7 @@ li.toc-list-item.is-active-li::before {
 }
 [data-user-color-scheme='dark'] .toc-link:hover,
 [data-user-color-scheme='dark'] .tocbot-active-link:hover {
-  color: #30a9de !important;
+  color: #5bc2e7 !important;
 }
 [data-user-color-scheme='dark'] .tocbot-active-link {
   color: rgba(235,235,235,0.9) !important;
