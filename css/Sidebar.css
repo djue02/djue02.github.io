@@ -69,7 +69,8 @@
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.06),
         0 0 0 1px rgba(70, 75, 70, 0.04),
-        0 0 20px rgba(200, 195, 190, 0.3);
+        0 0 30px rgba(180, 170, 160, 0.5),
+        0 0 50px rgba(180, 170, 160, 0.25);
     
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -78,7 +79,8 @@
     box-shadow: 
         0 4px 16px rgba(0, 0, 0, 0.1),
         0 0 0 1px rgba(70, 75, 70, 0.08),
-        0 0 24px rgba(200, 195, 190, 0.4);
+        0 0 35px rgba(180, 170, 160, 0.6),
+        0 0 60px rgba(180, 170, 160, 0.3);
 }
 
 .sidebar-avatar-name {
@@ -235,14 +237,16 @@
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.05),
-        0 0 20px rgba(80, 75, 70, 0.4);
+        0 0 30px rgba(100, 90, 80, 0.5),
+        0 0 50px rgba(100, 90, 80, 0.25);
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-img:hover {
     box-shadow: 
         0 4px 16px rgba(0, 0, 0, 0.4),
         0 0 0 1px rgba(255, 255, 255, 0.08),
-        0 0 24px rgba(80, 75, 70, 0.5);
+        0 0 35px rgba(100, 90, 80, 0.6),
+        0 0 60px rgba(100, 90, 80, 0.3);
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-bio {
