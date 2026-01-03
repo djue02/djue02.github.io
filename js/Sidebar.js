@@ -16,8 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
                 
-                <!-- 占位内容 -->
-                <p class="sidebar-text">功能正在完善中</p>
+                <!-- 友情链接 -->
+                <div class="sidebar-links">
+                    <div class="sidebar-links-btn">
+                        <i class="fas fa-user-friends"></i>
+                        <span>友情链接</span>
+                    </div>
+                    <div class="sidebar-links-list">
+                        <a href="https://linaiai.com" target="_blank" class="sidebar-link-item">
+                            <i class="fas fa-quote-left"></i>
+                            <span>linaiai</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         <button id="sidebar-toggle" class="sidebar-toggle" aria-label="切换侧边栏">
