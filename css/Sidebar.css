@@ -53,7 +53,6 @@
     width: 120px;
     height: 120px;
     margin-bottom: 4px;
-    overflow: hidden;
     border-radius: 50%;
 }
 
@@ -63,24 +62,11 @@
     border-radius: 50%;
     object-fit: cover;
     object-position: center 30%;
-    transform: scale(1.15);
     
-    border: 2px solid rgba(255, 255, 255, 0.6);
+    border: 3px solid rgba(255, 255, 255, 0.8);
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.06),
-        0 0 0 1px rgba(70, 75, 70, 0.04),
-        0 0 30px rgba(180, 170, 160, 0.5),
-        0 0 50px rgba(180, 170, 160, 0.25);
-    
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.sidebar-avatar-img:hover {
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(70, 75, 70, 0.08),
-        0 0 35px rgba(180, 170, 160, 0.6),
-        0 0 60px rgba(180, 170, 160, 0.3);
+        0 0 15px rgba(180, 170, 160, 0.4);
 }
 
 .sidebar-avatar-name {
@@ -233,20 +219,10 @@
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-img {
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.05),
-        0 0 30px rgba(100, 90, 80, 0.5),
-        0 0 50px rgba(100, 90, 80, 0.25);
-}
-
-[data-user-color-scheme="dark"] .sidebar-avatar-img:hover {
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        0 0 35px rgba(100, 90, 80, 0.6),
-        0 0 60px rgba(100, 90, 80, 0.3);
+        0 0 15px rgba(100, 90, 80, 0.4);
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-bio {
