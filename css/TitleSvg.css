@@ -25,7 +25,7 @@
     
     /* 双动画：描边 + 填充分开控制 */
     animation: 
-        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        strokeDraw 10s cubic-bezier(0.4, 0, 0.2, 1) forwards,
         fillIn 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards;
 }
 
@@ -57,7 +57,7 @@
 /* ---------- 悬停效果 ---------- */
 .navbar-brand:hover .title-path {
     animation: 
-        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        strokeDraw 10s cubic-bezier(0.4, 0, 0.2, 1) forwards,
         fillIn 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards,
         gentleGlow 2s ease-in-out infinite 5s;
 }
@@ -75,7 +75,7 @@
 [data-user-color-scheme="dark"] .navbar-brand .title-path {
     stroke: #d0d0d0;
     animation: 
-        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        strokeDraw 10s cubic-bezier(0.4, 0, 0.2, 1) forwards,
         fillInDark 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards;
 }
 
