@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-quote-left"></i>
                             <span>linaiai</span>
                         </a>
+                        <a href="https://sukitao.com" target="_blank" class="sidebar-link-item">
+                            <i class="fas fa-quote-left"></i>
+                            <span>sukitao</span>
+                        </a>
                     </div>
                 </div>
             </div>
