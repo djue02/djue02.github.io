@@ -65,8 +65,8 @@
     
     border: 3px solid rgba(255, 255, 255, 0.8);
     box-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.06),
-        0 0 15px rgba(180, 170, 160, 0.4);
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 0 20px rgba(180, 170, 160, 0.5);
 }
 
 .sidebar-avatar-name {
@@ -114,7 +114,7 @@
 }
 
 .sidebar-social-link:hover {
-    color: rgba(60, 65, 60, 0.75);
+    color: #5BC2E7;
 }
 
 /* ---------- 名字行（名字+邮箱） ---------- */
@@ -191,11 +191,11 @@
     margin-top: 6px;
     
     color: rgba(80, 85, 80, 0.7);
-    font-size: 19px;
+    font-size: 22px;
     text-decoration: none;
     
     border-radius: 8px;
-    transition: color 0.2s ease;
+    transition: color 0.1s ease;
 }
 
 .sidebar-link-item:first-child {
@@ -203,12 +203,17 @@
 }
 
 .sidebar-link-item:hover {
-    color: rgba(60, 65, 60, 0.9);
+    color: #5BC2E7;
+}
+
+.sidebar-link-item:hover i {
+    color: #5BC2E7;
 }
 
 .sidebar-link-item i {
-    font-size: 14px;
+    font-size: 19px;
     color: rgba(80, 85, 80, 0.35);
+    transition: color 0.1s ease;
 }
 
 [data-user-color-scheme="dark"] .sidebar-link-item {
@@ -216,7 +221,11 @@
 }
 
 [data-user-color-scheme="dark"] .sidebar-link-item:hover {
-    color: rgba(230, 225, 220, 0.95);
+    color: #5BC2E7;
+}
+
+[data-user-color-scheme="dark"] .sidebar-link-item:hover i {
+    color: #5BC2E7;
 }
 
 [data-user-color-scheme="dark"] .sidebar-link-item i {
@@ -283,7 +292,7 @@
 }
 
 .sidebar-overlay.active {
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(0, 0, 0, 0.08);
     pointer-events: auto;
 }
 
@@ -301,7 +310,7 @@
     border: 3px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.3),
-        0 0 15px rgba(100, 90, 80, 0.4);
+        0 0 20px rgba(150, 140, 130, 0.5);
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-bio {
@@ -319,7 +328,7 @@
 }
 
 [data-user-color-scheme="dark"] .sidebar-social-link:hover {
-    color: rgba(215, 210, 205, 0.85);
+    color: #5BC2E7;
 }
 
 [data-user-color-scheme="dark"] .sidebar-text {
@@ -340,7 +349,7 @@
 }
 
 [data-user-color-scheme="dark"] .sidebar-overlay.active {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.12);
 }
 
 /* ---------- 移动端 ---------- */
