@@ -240,11 +240,11 @@
     bottom: 32px;
     z-index: 1050;
     
-    padding: 10px 11px 10px 5px;
+    padding: 10px 11px 10px 3px;
     border: none;
     border-radius: 0 40px 40px 0;
     
-    background: rgba(210, 208, 205, 0.4);
+    background: rgba(210, 208, 205, 0.3);
     
     display: flex;
     align-items: center;
@@ -331,6 +331,10 @@
     color: rgba(230, 225, 220, 0.85);
 }
 
+[data-user-color-scheme="dark"] .sidebar-toggle i {
+    text-shadow: 0 0 5px rgba(200, 200, 200, 0.3);
+}
+
 [data-user-color-scheme="dark"] .sidebar-toggle:hover i {
     color: #5BC2E7;
 }
@@ -375,11 +379,12 @@
     }
     
     .sidebar-toggle {
-        bottom: 70px;
-        padding: 7px 10px 7px 4px;
-        font-size: 15px;
-        border-radius: 0 36px 36px 0;
+        bottom: 32px;
+        padding: 10px 11px 10px 3px;
+        font-size: 17px;
+        border-radius: 0 40px 40px 0;
         border: none;
+        background: rgba(210, 208, 205, 0.3);
     }
 }
 
