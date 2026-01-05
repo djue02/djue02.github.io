@@ -441,10 +441,10 @@
 <style>
 .navbar-brand{font-size:0}
 .navbar-brand .title-svg{width:185px;height:36px;overflow:visible;margin-left:-7px;pointer-events:none}
-.navbar-brand .title-path{fill:transparent;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--path-length);stroke-dashoffset:var(--path-length);animation:strokeDraw 2.7s ease-in-out forwards,fillIn .7s ease-out 2s forwards}
+.navbar-brand .title-path{fill:transparent;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--path-length);stroke-dashoffset:var(--path-length);animation:strokeDraw 4s ease-in-out forwards,fillIn .7s ease-out 3s forwards}
 @keyframes strokeDraw{from{stroke-dashoffset:var(--path-length);stroke-opacity:1}to{stroke-dashoffset:0;stroke-opacity:1}}
 @keyframes fillIn{from{fill:transparent}to{fill:rgba(255,255,255,.95);stroke-opacity:.15}}
-[data-user-color-scheme="dark"] .navbar-brand .title-path{stroke:#e0e0e0;animation:strokeDraw 2.7s ease-in-out forwards,fillInDark .7s ease-out 2s forwards}
+[data-user-color-scheme="dark"] .navbar-brand .title-path{stroke:#e0e0e0;animation:strokeDraw 4s ease-in-out forwards,fillInDark .7s ease-out 3s forwards}
 @keyframes fillInDark{from{fill:transparent}to{fill:rgba(224,224,224,.95);stroke-opacity:.15}}
 .navbar-brand .title-path.no-animation{animation:none;stroke-dashoffset:0;stroke-opacity:.15;fill:rgba(255,255,255,.95)}
 [data-user-color-scheme="dark"] .navbar-brand .title-path.no-animation{fill:rgba(224,224,224,.95)}
@@ -453,7 +453,7 @@
 .navbar-brand:hover .title-path.completed,.navbar-brand:hover .title-path.no-animation{animation:gentleGlow 2.5s ease-in-out infinite}
 [data-user-color-scheme="dark"] .navbar-brand:hover .title-path.completed,[data-user-color-scheme="dark"] .navbar-brand:hover .title-path.no-animation{animation:gentleGlowDark 2.5s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.navbar-brand .title-path{animation:none!important;stroke-dashoffset:0;stroke-opacity:.15;fill:rgba(255,255,255,.95)}[data-user-color-scheme="dark"] .navbar-brand .title-path{fill:rgba(224,224,224,.95)}}
-</style>  
+</style>
 
         </div>
       </div>

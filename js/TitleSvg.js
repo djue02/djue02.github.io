@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (navbarBrand.querySelector('.title-svg')) return;
     
     // 配置
-    const STROKE_DURATION = 2700;
+    const STROKE_DURATION = 4000;
     const SESSION_KEY = 'titleAnimationPlayed';
     
     // 检查是否已播放过
