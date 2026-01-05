@@ -1,6 +1,13 @@
 /* ============================================================
    博客标题 SVG 描边动画 - "我不想当ai"
-   修复版：正确的动画时长
+   
+   功能特性：
+   - 描边绘制动画 (2.7s)
+   - 填充淡入效果 (0.7s)
+   - 悬停微光呼吸
+   - 深色模式适配
+   - 减少动画偏好支持
+   - 点击穿透确保链接可用
    ============================================================ */
 
 /* ---------- SVG 容器 ---------- */
@@ -9,6 +16,7 @@
     height: 36px;
     overflow: visible;
     margin-left: -5px;
+    pointer-events: none;  /* 确保点击穿透到父元素链接 */
 }
 
 /* ---------- 描边基础样式 ---------- */
@@ -56,11 +64,7 @@
     }
 }
 
-/* ---------- 悬停效果 ---------- */
-.navbar-brand:hover .title-path.completed {
-    animation: gentleGlow 2.5s ease-in-out infinite;
-}
-
+/* ---------- 悬停发光动画定义 ---------- */
 @keyframes gentleGlow {
     0%, 100% {
         filter: drop-shadow(0 0 0 transparent);
@@ -91,10 +95,6 @@
     }
 }
 
-[data-user-color-scheme="dark"] .navbar-brand:hover .title-path.completed {
-    animation: gentleGlowDark 2.5s ease-in-out infinite;
-}
-
 @keyframes gentleGlowDark {
     0%, 100% {
         filter: drop-shadow(0 0 0 transparent);
@@ -104,19 +104,8 @@
     }
 }
 
-/* ---------- 完成状态 ---------- */
-.navbar-brand .title-path.completed {
-    animation: none;
-    stroke-dashoffset: 0;
-    stroke-opacity: 0.15;
-    fill: rgba(255, 255, 255, 0.95);
-}
-
-[data-user-color-scheme="dark"] .navbar-brand .title-path.completed {
-    fill: rgba(224, 224, 224, 0.95);
-}
-
-/* ---------- 跳过动画（已播放过） ---------- */
+/* ---------- 完成状态 & 跳过动画（合并） ---------- */
+.navbar-brand .title-path.completed,
 .navbar-brand .title-path.no-animation {
     animation: none;
     stroke-dashoffset: 0;
@@ -124,8 +113,20 @@
     fill: rgba(255, 255, 255, 0.95);
 }
 
+[data-user-color-scheme="dark"] .navbar-brand .title-path.completed,
 [data-user-color-scheme="dark"] .navbar-brand .title-path.no-animation {
     fill: rgba(224, 224, 224, 0.95);
+}
+
+/* 悬停发光效果（两种状态都支持） */
+.navbar-brand:hover .title-path.completed,
+.navbar-brand:hover .title-path.no-animation {
+    animation: gentleGlow 2.5s ease-in-out infinite;
+}
+
+[data-user-color-scheme="dark"] .navbar-brand:hover .title-path.completed,
+[data-user-color-scheme="dark"] .navbar-brand:hover .title-path.no-animation {
+    animation: gentleGlowDark 2.5s ease-in-out infinite;
 }
 
 /* ---------- 减少动画偏好 ---------- */
@@ -133,11 +134,11 @@
     .navbar-brand .title-path {
         animation: none !important;
         stroke-dashoffset: 0;
-        stroke-opacity: 0;
-        fill: #fff;
+        stroke-opacity: 0.15;
+        fill: rgba(255, 255, 255, 0.95);
     }
     
     [data-user-color-scheme="dark"] .navbar-brand .title-path {
-        fill: #e0e0e0;
+        fill: rgba(224, 224, 224, 0.95);
     }
 }
