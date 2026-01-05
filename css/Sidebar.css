@@ -399,6 +399,14 @@
         border: none;
         background: rgba(210, 208, 205, 0.3);
     }
+    
+    .sidebar-toggle:hover i {
+        color: inherit;
+    }
+    
+    .sidebar-toggle:active i {
+        color: #5BC2E7;
+    }
 }
 
 /* ---------- 无障碍 ---------- */

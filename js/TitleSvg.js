@@ -1,4 +1,4 @@
-// 博客标题 SVG 描边动画
+// 博客标题 SVG 描边动画 - 修复版
 document.addEventListener('DOMContentLoaded', function() {
     const navbarBrand = document.querySelector('.navbar-brand');
     
@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // 检查动画是否已经播放过
     const hasPlayed = sessionStorage.getItem('titleAnimationPlayed');
     
+    // 动画配置
+    const STROKE_DURATION = 2700;  // 描边时长 2.7秒
+    const FILL_DELAY = 2000;       // 填充开始时间
+    
     // 替换为 SVG
     navbarBrand.innerHTML = `
         <svg class="title-svg" viewBox="0 0 224.496 43.824" xmlns="http://www.w3.org/2000/svg">
@@ -14,20 +18,33 @@ document.addEventListener('DOMContentLoaded', function() {
         </svg>
     `;
     
-    // 获取路径长度
     const path = navbarBrand.querySelector('.title-path');
-    if (path) {
-        const len = path.getTotalLength();
-        path.style.setProperty('--path-length', len);
-        
-        // 如果已经播放过，跳过动画
-        if (hasPlayed) {
-            path.classList.add('no-animation');
-        }
+    if (!path) return;
+    
+    // 获取并设置路径长度
+    const pathLength = path.getTotalLength();
+    path.style.setProperty('--path-length', pathLength);
+    
+    // 如果已经播放过，直接显示最终状态
+    if (hasPlayed) {
+        path.classList.add('no-animation');
+        return;
     }
     
-    // 如果没有播放过，标记动画已播放
-    if (!hasPlayed) {
-        sessionStorage.setItem('titleAnimationPlayed', 'true');
-    }
+    // 开始动画
+    path.classList.add('animating');
+    
+    // 在描边快完成时添加填充动画
+    setTimeout(() => {
+        path.classList.add('fill-stage');
+    }, FILL_DELAY);
+    
+    // 动画完成后切换到完成状态
+    setTimeout(() => {
+        path.classList.remove('animating', 'fill-stage');
+        path.classList.add('completed');
+    }, STROKE_DURATION);  // 7秒时动画完成
+    
+    // 标记动画已播放
+    sessionStorage.setItem('titleAnimationPlayed', 'true');
 });
