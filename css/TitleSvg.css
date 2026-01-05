@@ -1,148 +1,123 @@
 /* ============================================================
    博客标题 SVG 描边动画 - "我不想当ai"
-   
-   功能特性：
-   - 描边绘制动画 (2.7s)
-   - 填充淡入效果 (0.7s)
-   - 悬停微光呼吸
-   - 深色模式适配
-   - 减少动画偏好支持
-   - 点击穿透确保链接可用
+   优化版：流畅、从容、有呼吸感
    ============================================================ */
 
 /* ---------- SVG 容器 ---------- */
-.navbar-brand {
-    font-size: 0;  /* 隐藏原始文字，防止闪现 */
-}
-
 .navbar-brand .title-svg {
-    width: 185px;
+    width: 160px;
     height: 36px;
     overflow: visible;
-    margin-left: -7px;
-    pointer-events: none;  /* 确保点击穿透到父元素链接 */
 }
 
-/* ---------- 描边基础样式 ---------- */
+/* ---------- 描边动画核心 ---------- */
 .navbar-brand .title-path {
     fill: transparent;
     stroke: #fff;
-    stroke-width: 1.5;
+    stroke-width: 0.8;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: var(--path-length);
-    stroke-dashoffset: var(--path-length);
-}
-
-/* ---------- 动画状态由 JS 控制 ---------- */
-.navbar-brand .title-path.animating {
-    animation: strokeDraw 2.7s ease-in-out forwards;
-}
-
-.navbar-brand .title-path.animating.fill-stage {
+    
+    /* 描边动画 */
+    stroke-dasharray: var(--path-length, 5000);
+    stroke-dashoffset: var(--path-length, 5000);
+    
+    /* 双动画：描边 + 填充分开控制 */
     animation: 
-        strokeDraw 2.7s ease-in-out forwards,
-        fillIn 0.7s ease-out forwards;
+        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        fillIn 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards;
 }
 
-/* 描边动画 - 简单的 0 到 path-length */
+/* 描边动画 - 慢慢画出 */
 @keyframes strokeDraw {
-    from {
-        stroke-dashoffset: var(--path-length);
+    0% {
+        stroke-dashoffset: var(--path-length, 5000);
+        stroke-opacity: 0.6;
+    }
+    5% {
         stroke-opacity: 1;
     }
-    to {
+    100% {
         stroke-dashoffset: 0;
         stroke-opacity: 1;
     }
 }
 
-/* 填充淡入 */
+/* 填充动画 - 淡入 */
 @keyframes fillIn {
-    from {
+    0% {
         fill: transparent;
     }
-    to {
+    100% {
         fill: rgba(255, 255, 255, 0.95);
-        stroke-opacity: 0.15;
     }
 }
 
-/* ---------- 悬停发光动画定义 ---------- */
+/* ---------- 悬停效果 ---------- */
+.navbar-brand:hover .title-path {
+    animation: 
+        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        fillIn 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards,
+        gentleGlow 2s ease-in-out infinite 5s;
+}
+
 @keyframes gentleGlow {
     0%, 100% {
-        filter: drop-shadow(0 0 0 transparent);
+        filter: none;
     }
     50% {
-        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.25));
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
     }
 }
 
 /* ---------- 深色模式 ---------- */
 [data-user-color-scheme="dark"] .navbar-brand .title-path {
-    stroke: #e0e0e0;
-}
-
-[data-user-color-scheme="dark"] .navbar-brand .title-path.animating.fill-stage {
+    stroke: #d0d0d0;
     animation: 
-        strokeDraw 2.7s ease-in-out forwards,
-        fillInDark 0.7s ease-out forwards;
+        strokeDraw 8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+        fillInDark 1.3s cubic-bezier(0.4, 0, 0.2, 1) 3.7s forwards;
 }
 
 @keyframes fillInDark {
-    from {
+    0% {
         fill: transparent;
     }
-    to {
-        fill: rgba(224, 224, 224, 0.95);
-        stroke-opacity: 0.15;
+    100% {
+        fill: rgba(208, 208, 208, 0.95);
     }
 }
 
-@keyframes gentleGlowDark {
-    0%, 100% {
-        filter: drop-shadow(0 0 0 transparent);
-    }
-    50% {
-        filter: drop-shadow(0 0 4px rgba(224, 224, 224, 0.2));
-    }
-}
-
-/* ---------- 完成状态 & 跳过动画（合并） ---------- */
-.navbar-brand .title-path.completed,
+/* ---------- 已播放过动画，直接显示 ---------- */
 .navbar-brand .title-path.no-animation {
     animation: none;
     stroke-dashoffset: 0;
-    stroke-opacity: 0.15;
     fill: rgba(255, 255, 255, 0.95);
 }
 
-[data-user-color-scheme="dark"] .navbar-brand .title-path.completed,
 [data-user-color-scheme="dark"] .navbar-brand .title-path.no-animation {
-    fill: rgba(224, 224, 224, 0.95);
+    fill: rgba(208, 208, 208, 0.95);
 }
 
-/* 悬停发光效果（两种状态都支持） */
-.navbar-brand:hover .title-path.completed,
-.navbar-brand:hover .title-path.no-animation {
-    animation: gentleGlow 2.5s ease-in-out infinite;
+/* ---------- 跳过动画（已播放过） ---------- */
+.navbar-brand .title-path.no-animation {
+    animation: none;
+    stroke-dashoffset: 0;
+    fill: rgba(255, 255, 255, 0.95);
 }
 
-[data-user-color-scheme="dark"] .navbar-brand:hover .title-path.completed,
-[data-user-color-scheme="dark"] .navbar-brand:hover .title-path.no-animation {
-    animation: gentleGlowDark 2.5s ease-in-out infinite;
+[data-user-color-scheme="dark"] .navbar-brand .title-path.no-animation {
+    fill: rgba(208, 208, 208, 0.95);
 }
 
 /* ---------- 减少动画偏好 ---------- */
 @media (prefers-reduced-motion: reduce) {
     .navbar-brand .title-path {
-        animation: none !important;
+        animation: none;
         stroke-dashoffset: 0;
-        stroke-opacity: 0.15;
-        fill: rgba(255, 255, 255, 0.95);
+        fill: #fff;
     }
     
     [data-user-color-scheme="dark"] .navbar-brand .title-path {
-        fill: rgba(224, 224, 224, 0.95);
+        fill: #d0d0d0;
     }
 }
