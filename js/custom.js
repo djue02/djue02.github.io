@@ -5,3 +5,4 @@ jQuery(document).ready(function($) {
     // 2. 关闭搜索框的浏览器自动填充/历史记录 (新增的代码)
     $("#local-search-input").attr("autocomplete", "off");
 });
+
