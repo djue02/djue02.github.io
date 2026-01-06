@@ -18,6 +18,25 @@
   cursor: pointer;              /* 保持鼠标指针为手型 */
 }
 
+/* 强制修改列表悬浮样式 */
+a.list-group-item:hover,
+.list-group-item:hover {
+    /* 1. 之前设置的文字颜色 (蓝色) */
+    color: #5BC2E7 !important;
+    
+    /* 2. 新增：背景色强制透明 (白天黑夜都生效) */
+    background-color: transparent !important;
+    
+    /* 可选：如果你想把鼠标放上去时的边框颜色也去掉，可以加上这一行 */
+    /* border-color: transparent !important; */
+}
+
+/* 强制统一“最后更新时间”提示条的竖线颜色 */
+.note-info {
+    /* 设定为你指定的蓝色 #5BC2E7，!important 确保白天黑夜都生效 */
+    border-left-color: #5BC2E7 !important;
+}
+
 #reading-track {
   position: fixed;
   bottom: 0;
