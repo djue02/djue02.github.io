@@ -27,7 +27,7 @@
 <meta property="og:description" content="&#x2F;* 使用更高优先级覆盖 FrostedGlassBg.css *&#x2F; #board#board {   background: #5BC2E7 !important;   backdrop-filter: none !important;   -webkit-backdrop-filter: none !important;   border-radius: 0 !important;   bo">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2025-01-03T08:44:56.000Z">
-<meta property="article:modified_time" content="2026-01-03T06:48:51.073Z">
+<meta property="article:modified_time" content="2026-01-06T11:39:55.755Z">
 <meta property="article:author" content="角角子">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -468,8 +468,23 @@
   border: none !important;
 }
 
+/* 暗黑模式 - 匹配 Fluid 的选择器 */
+html[data-user-color-scheme="dark"] #board#board {
+  background: #5BC2E7 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 @media (max-width: 767px) {
   #board#board {
+    background: #5BC2E7 !important;
+    border-radius: 0 !important;
+  }
+  
+  html[data-user-color-scheme="dark"] #board#board {
     background: #5BC2E7 !important;
     border-radius: 0 !important;
   }
@@ -480,10 +495,14 @@
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+
+/* 隐藏回到顶部按钮 */
+#scroll-top-button {
+  display: none !important;
+}
 </style>
 
 <div style="width: 100%; height: 600px; background: #5BC2E7;"></div>
-
   </div>
 
   

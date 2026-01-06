@@ -10,6 +10,14 @@
   display: none !important;
 }
 
+/* 缩小向下滚动箭头的点击范围 */
+.scroll-down-bar {
+  width: 60px !important;       /* 限制宽度，只覆盖箭头区域 */
+  left: 50% !important;         /* 强制水平居中 */
+  transform: translateX(-50%);  /* 修正居中时的偏移 */
+  cursor: pointer;              /* 保持鼠标指针为手型 */
+}
+
 #reading-track {
   position: fixed;
   bottom: 0;
