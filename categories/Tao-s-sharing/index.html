@@ -111,7 +111,32 @@
 
 
   
-<meta name="generator" content="Hexo 8.1.1"></head>
+<meta name="generator" content="Hexo 8.1.1"><style>
+.subtitle-wrap {
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+}
+.subtitle-intro {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.5s ease, top 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.55em;
+  line-height: 1.8;
+  max-width: 80vw;
+  white-space: nowrap;
+  pointer-events: none;
+  margin-top: 8px;
+}
+.subtitle-wrap.open .subtitle-intro {
+  opacity: 1;
+}
+</style>
+</head>
 
 
 <body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
@@ -362,7 +387,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="桃之夭夭，灼灼其华">桃之夭夭，灼灼其华</span>
+            <span id="subtitle"><div class="subtitle-wrap"><div class="subtitle-text">桃之夭夭，灼灼其华</div><div class="subtitle-intro">这里是专栏介绍文字</div></div></span>
           
         </div>
 
@@ -584,5 +609,26 @@
   <noscript>
     <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
+<script>
+(function() {
+  var checkTyped = setInterval(function() {
+    var el = document.getElementById("subtitle");
+    if (el && el._typed) {
+      el._typed.destroy();
+      clearInterval(checkTyped);
+    }
+  }, 100);
+  setTimeout(function() { clearInterval(checkTyped); }, 3000);
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var wrap = document.querySelector(".subtitle-wrap");
+    if (wrap) {
+      wrap.addEventListener("click", function() {
+        wrap.classList.toggle("open");
+      });
+    }
+  });
+})();
+</script>
 </body>
 </html>
