@@ -27,7 +27,7 @@
 <meta property="og:description" content="拯救”纯图片 PDF”：用 OCR 技术让文档秒变 AI 友好的可搜索神器最近和朋友聊起处理复杂文档的头疼事，意外发现很多人面对一种特定格式的文件时依然在用”笨办法”——那就是由一堆扫描件或图片拼接而成的 “纯图片 PDF” 。 这种文件的痛点非常明显：你无法选中文字，无法复制，想要找某个特定段落时，只能像看实体书一样一页页肉眼去翻。在现在这个动辄需要把资料”喂”给 Gemini 等 AI 工具进">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-03-26T15:08:00.000Z">
-<meta property="article:modified_time" content="2026-03-29T11:18:37.000Z">
+<meta property="article:modified_time" content="2026-03-29T11:18:38.000Z">
 <meta property="article:author" content="角角子">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -601,22 +601,7 @@
           {"serverURL":"https://comment.icome.world","path":"window.location.pathname","meta":["nick","mail"],"requiredMeta":["nick","mail"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"login":"disable"},
           {
             el: '#waline',
-            path: window.location.pathname,
-            imageUploader: function(file) {
-              var formData = new FormData();
-              formData.append('image', file);
-              return fetch('https://api.imgbb.com/1/upload?key=71de7a48dbd352fc1427d32157dd302f', {
-                method: 'POST',
-                body: formData
-              })
-              .then(function(res) { return res.json(); })
-              .then(function(data) {
-                if (data.success) {
-                  return data.data.url;
-                }
-                throw new Error('上传失败');
-              });
-            }
+            path: window.location.pathname
           }
         )
         Waline.init(options);

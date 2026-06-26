@@ -78,7 +78,7 @@
 }
 
 .sidebar-avatar-bio {
-    color: #E0A8AC;
+    color: #5F7A5F;
     font-size: 13px;
     font-weight: 400;
     letter-spacing: 0.1em;
@@ -318,7 +318,7 @@
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-bio {
-    color: #E8B4B8;
+    color: #8FB48F;
 }
 
 [data-user-color-scheme="dark"] .sidebar-avatar-name {
