@@ -120,7 +120,7 @@
 .tooltip-rightmenu:not(.show-tooltip){visibility:hidden;opacity:0}
 </style>
 <style id="life-loader-style">
-/* 首帧即在场:盖住装台中的页面 */
+/* 首帧即在场:与生命体同生,盖住装台中的页面 */
 #life-loader {
   position: fixed;
   inset: 0;
@@ -256,17 +256,44 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
 
   /* ==================== 开机(仅在页面真正可见后调用) ==================== */
   function boot() {
-    var t0 = Date.now();
-    var tShown = -1; /* -1 = 尚未被绘制;>=0 = 首帧时刻(不可用 0 作哨兵) */
+    var tShown = -1; /* -1 = 尚无任何一帧被渲染;>=0 = 首帧时刻 */
     var done = false;
 
-    /* ---- 会话频控:记账发生在"可见"之后,预渲染副本丢账的问题就此根治 ---- */
+    /* ---- 多信号预判(裁决于首帧之前;输出严格二元) ---- */
+    var warm = false;
+    /* ① 会话内已播过 */
+    try { warm = !!sessionStorage.getItem('lifeLoader.seen'); } catch (e) {}
+    /* ② HTML 命中缓存 / ③ 前进后退 —— 首帧前即可读取的导航物证 */
     try {
-      if (sessionStorage.getItem('lifeLoader.seen')) { removeNow(); return; }
-      sessionStorage.setItem('lifeLoader.seen', '1');
-    } catch (e) { /* 隐私模式等:当作首访 */ }
+      var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+      if (nav) {
+        if (nav.deliveryType === 'cache') warm = true;
+        if (nav.transferSize === 0 && nav.decodedBodySize > 0) warm = true;
+        if (nav.type === 'back_forward') warm = true;
+      }
+    } catch (e) {}
+    /* ④ 站内来路:新标签打开的内链,会话新、缓存热 */
+    try {
+      if (document.referrer === location.origin ||
+          document.referrer.indexOf(location.origin + '/') === 0) warm = true;
+    } catch (e) {}
+    /* ⑤ 近时到访:仅一枚时间戳,无任何个体特征;不想留痕,删除本 try 段即可 */
+    try {
+      var last = +localStorage.getItem('lifeLoader.lastVisit') || 0;
+      if (last && Date.now() - last < 30 * 60 * 1000) warm = true;
+    } catch (e) {}
+    /* ⑥ 省流量模式:少打扰即尊重 */
+    try {
+      if (navigator.connection && navigator.connection.saveData) warm = true;
+    } catch (e) {}
 
-    /* ---- 随机基因 ---- */
+    /* 记账(无论判定如何;发生在"可见"之后,预渲染丢账已根治) */
+    try { sessionStorage.setItem('lifeLoader.seen', '1'); } catch (e) {}
+    try { localStorage.setItem('lifeLoader.lastVisit', String(Date.now())); } catch (e) {}
+
+    if (warm) { removeNow(); return; }
+
+    /* ---- 随机基因:生命体与首帧同生 ---- */
     function rand(a, b) { return a + Math.random() * (b - a); }
     function blobRadius() {
       var a = rand(40, 60), b = rand(40, 60), c = rand(40, 60), d = rand(40, 60);
@@ -285,25 +312,25 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
         '--rot:' + rand(6, 14).toFixed(1) + 'deg;' +
         '--rotn:' + (-rand(5, 12)).toFixed(1) + 'deg;';
     }
-    el.classList.add('is-live'); /* 生命自可见时刻开始 */
+    el.classList.add('is-live');
 
-    /* 首个真实渲染帧打点:MIN_SHOW 从"被看见"起算 */
+    /* 首帧打点:二元判定线就划在这里 */
     if (window.requestAnimationFrame) {
       requestAnimationFrame(function () { if (!done) tShown = Date.now(); });
     }
 
+    /* ---- 告别 ---- */
     function hide() {
       if (done) return;
       done = true;
-      if (tShown < 0) { removeNow(); return; } /* 从未被绘制:静默让路(已记账) */
-      el.classList.add('is-done');
+      if (tShown < 0) { removeNow(); return; } /* 没有:首帧前移除,零痕迹 */
+      el.classList.add('is-done');             /* 有:完整仪式 */
       el.addEventListener('transitionend', function () { removeNow(); }, { once: true });
       setTimeout(removeNow, 1300); /* transitionend 偶发不触发时的保险 */
     }
     function scheduleHide() {
       if (done) return;
-      /* 尚未被绘制而就绪已至(预渲染激活/后台备好):立即静默收场,
-         移除发生在首帧渲染之前,零闪现——绝不客串 600ms 再硬切 */
+      /* 首帧未画而就绪已至 → 立即静默;否则从被看见起陪满 MIN_SHOW */
       var wait = tShown >= 0 ? Math.max(0, MIN_SHOW - (Date.now() - tShown)) : 0;
       setTimeout(hide, wait);
     }
@@ -318,7 +345,6 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
         if (m && m[1] && m[1] !== 'none') url = m[1];
       }
       if (!url) {
-        /* 本页没有可辨识的关键图:退回等待整页 load */
         if (document.readyState === 'complete') { scheduleHide(); }
         else { window.addEventListener('load', scheduleHide, { once: true }); }
         return;
@@ -340,9 +366,7 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
     setTimeout(hide, MAX_SHOW);
   }
 
-  /* ==================== 可见性闸门 ====================
-     预渲染 / 后台标签页里,一切按兵不动;
-     页面真正被看见的那一刻才开机 */
+  /* ==================== 可见性闸门:预渲染/后台按兵不动 ==================== */
   if (document.prerendering) {
     document.addEventListener('prerenderingchange', boot, { once: true });
   } else if (document.visibilityState === 'hidden') {
