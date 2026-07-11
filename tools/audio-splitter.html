@@ -116,10 +116,11 @@
 
   
 <!-- hexo injector head_end start --><style id="rm-critical">
-#rightmenu-wrapper:not(.show){visibility:hidden;opacity:0;pointer-events:none}
+#rightmenu-wrapper:not(.show){visibility:hidden;pointer-events:none}
 .tooltip-rightmenu:not(.show-tooltip){visibility:hidden;opacity:0}
 </style>
 <style id="life-loader-style">
+/* 首帧即在场:盖住装台中的页面 */
 #life-loader {
   position: fixed;
   inset: 0;
@@ -129,44 +130,42 @@
   justify-content: center;
   background: #F4F6F7;
   contain: layout paint;
-  /* 初始:完全透明且不拦截交互,等待"是否需要出现"的裁决 */
+}
+/* 告别:生命体聚拢迸发后,整体缓缓隐去 */
+#life-loader.is-done {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .25s ease-out, visibility .25s;
-}
-/* 现身:宽限期超时,页面确实慢,才浮现陪伴 */
-#life-loader.is-live { opacity: 1; visibility: visible; pointer-events: auto; }
-/* 告别:比现身更舒缓 */
-#life-loader.is-done {
-  opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity .45s cubic-bezier(.4, 0, .2, 1) .12s, visibility .45s .12s;
 }
 
-#life-loader .lf-stage { position: relative; width: 64px; height: 64px; transform: scale(0); }
-#life-loader .lf-body { position: absolute; inset: 0; will-change: transform; }
+#life-loader .lf-stage {
+  position: relative; width: 64px; height: 64px;
+  animation: lf-wake .45s cubic-bezier(.3, 1.25, .4, 1) both; /* 苏醒:首帧起从一粒点绽放 */
+}
+#life-loader .lf-body {
+  position: absolute; inset: 0; will-change: transform;
+  animation: lf-breath var(--breath, 2.1s) infinite;
+}
 #life-loader .lf-blob {
   position: absolute; inset: 4px; background: #1C1D21;
   border-radius: var(--m0, 46% 54% 57% 43% / 45% 48% 52% 55%);
   will-change: transform;
+  animation: lf-morph var(--morph, 3.6s) cubic-bezier(.45, .05, .55, .95) infinite;
 }
 #life-loader .lf-core {
   position: absolute; width: 34%; height: 34%; top: 21%; left: 25%;
   background: rgba(244, 246, 247, .26); /* 浅色:发光的核 */
   border-radius: 55% 45% 48% 52% / 50% 55% 45% 50%;
   will-change: transform;
+  animation: lf-counter var(--breath, 2.1s) infinite;
 }
 #life-loader .lf-burst {
   position: absolute; inset: 0; border: 1.5px solid #1C1D21;
   border-radius: 50%; opacity: 0;
   will-change: transform, opacity;
 }
-
-/* 生命活动只在现身后开始:快速加载连一帧动画都不消耗 */
-#life-loader.is-live .lf-stage { animation: lf-wake .45s cubic-bezier(.3, 1.25, .4, 1) both; }
-#life-loader.is-live .lf-body { animation: lf-breath var(--breath, 2.1s) infinite; }
-#life-loader.is-live .lf-blob { animation: lf-morph var(--morph, 3.6s) cubic-bezier(.45, .05, .55, .95) infinite; }
-#life-loader.is-live .lf-core { animation: lf-counter var(--breath, 2.1s) infinite; }
+/* (苏醒动画已并入上方 .lf-stage 规则) */
 
 /* 深色:乌木底 + 月白生命体(Fluid 切换 data-user-color-scheme) */
 html[data-user-color-scheme="dark"] #life-loader { background: #141519; }
@@ -204,7 +203,7 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
   80%      { border-radius: var(--m3, 55% 45% 42% 58% / 46% 54% 47% 53%); transform: rotate(calc(var(--rot, 10deg) * .4)); }
 }
 
-/* 退场:形变原地凝固(不跳变),身体聚拢 → 迸出涟漪 → 舒张消散 */
+/* 退场:形变凝固,身体聚拢 → 迸出涟漪 → 舒张消散 */
 #life-loader.is-done .lf-blob,
 #life-loader.is-done .lf-core { animation-play-state: paused; }
 #life-loader.is-done .lf-body { animation: lf-exit .5s cubic-bezier(.55, -.25, .35, 1) forwards; }
@@ -220,13 +219,11 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #life-loader.is-live .lf-stage, #life-loader.is-live .lf-body,
-  #life-loader.is-live .lf-blob, #life-loader.is-live .lf-core,
-  #life-loader .lf-burst,
+  #life-loader .lf-stage, #life-loader .lf-body, #life-loader .lf-blob,
+  #life-loader .lf-core, #life-loader .lf-burst,
   #life-loader.is-done .lf-body, #life-loader.is-done .lf-burst { animation: none; }
-  #life-loader.is-live .lf-stage { transform: scale(1); }
   #life-loader .lf-blob { border-radius: 50%; }
-  #life-loader, #life-loader.is-done { transition-delay: 0s, 0s; transition-duration: .2s, .2s; }
+  #life-loader.is-done { transition-delay: 0s, 0s; transition-duration: .2s, .2s; }
 }
 </style>
 <!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
@@ -246,13 +243,12 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
   var el = document.getElementById('life-loader');
   if (!el) return;
 
-  var GRACE = 300;        /* 宽限期:页面在此时限内就绪则全程无感 */
-  var MIN_VISIBLE = 1000; /* 一旦"被看见",至少停留这么久再告别 */
-  var MAX_SHOW = 6000;    /* 兜底:资源卡死也强制收场 */
+  var MIN_SHOW = 600;  /* 叙事底线:诞生 + 一口呼吸(从被看见起算) */
+  var MAX_SHOW = 6000; /* 兜底:关键图卡死也强制收场 */
 
+  var t0 = Date.now();
   var tShown = 0;
   var done = false;
-  var graceTimer = null;
 
   function removeNow() {
     if (el.parentNode) el.parentNode.removeChild(el);
@@ -260,7 +256,18 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
     if (style && style.parentNode) style.parentNode.removeChild(style);
   }
 
-  /* ---- 随机基因:只在真正要现身的那一刻诞生 ---- */
+  /* ---- 会话频控:首访有仪式,回访零打扰 ----
+     同一浏览器会话内只在第一个页面播放;后续站内翻页时
+     资产已在缓存、首绘本就完整,加载器在首帧绘制前静默移除。
+     不记录任何个体信息,标签页关闭即忘。
+     想恢复"每页都播":删除本段到"频控段结束"即可。 */
+  try {
+    if (sessionStorage.getItem('lifeLoader.seen')) { removeNow(); return; }
+    sessionStorage.setItem('lifeLoader.seen', '1');
+  } catch (e) { /* 隐私模式等:当作首访 */ }
+  /* ---- 频控段结束 ---- */
+
+  /* ---- 随机基因:首帧即注入,生命体立刻开始呼吸 ---- */
   function rand(a, b) { return a + Math.random() * (b - a); }
   function blobRadius() {
     var a = rand(40, 60), b = rand(40, 60), c = rand(40, 60), d = rand(40, 60);
@@ -269,7 +276,7 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
            c.toFixed(0) + '% ' + d.toFixed(0) + '% ' +
            (100 - d).toFixed(0) + '% ' + (100 - c).toFixed(0) + '%';
   }
-  function injectGene() {
+  (function injectGene() {
     var stage = el.querySelector('.lf-stage');
     if (!stage) return;
     stage.style.cssText += ';' +
@@ -281,48 +288,57 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
       '--morph:' + rand(3.2, 4.2).toFixed(2) + 's;' +
       '--rot:' + rand(6, 14).toFixed(1) + 'deg;' +
       '--rotn:' + (-rand(5, 12)).toFixed(1) + 'deg;';
-  }
+  })();
 
-  /* ---- 现身:宽限期超时,页面确实慢 ---- */
-  function reveal() {
-    graceTimer = null;
-    if (done) return;
-    injectGene();
-    el.classList.add('is-live');
-    /* 在首个真实渲染帧上打点:渲染阻塞期间 rAF 不会执行,
-       tShown 记录的是"被看见"的时刻,而非"加上类"的时刻 */
-    if (window.requestAnimationFrame) {
-      requestAnimationFrame(function () { if (!done) tShown = Date.now(); });
-    } else {
-      tShown = Date.now();
-    }
+  /* 在首个真实渲染帧上打点:MIN_SHOW 从"被看见"起算 */
+  if (window.requestAnimationFrame) {
+    requestAnimationFrame(function () { if (!done) tShown = Date.now(); });
   }
 
   /* ---- 告别 ---- */
   function hide() {
     if (done) return;
     done = true;
-    if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; }
-    if (!tShown) { removeNow(); return; } /* 从未被看见:静默离场,访客无感 */
     el.classList.add('is-done');
     el.addEventListener('transitionend', function () { removeNow(); }, { once: true });
-    /* transitionend 偶发不触发时的保险 */
-    setTimeout(removeNow, 1300);
+    setTimeout(removeNow, 1300); /* transitionend 偶发不触发时的保险 */
   }
-
-  /* ---- 就绪:正文可读(DOMContentLoaded),不等图片 ---- */
-  function onReady() {
+  function scheduleHide() {
     if (done) return;
-    if (!tShown) { hide(); return; } /* 尚未被看见(含就绪时还没画出首帧)→ 静默无感 */
-    var wait = Math.max(0, MIN_VISIBLE - (Date.now() - tShown));
+    var seenAt = tShown || t0;
+    var wait = Math.max(0, MIN_SHOW - (Date.now() - seenAt));
     setTimeout(hide, wait);
   }
 
-  graceTimer = setTimeout(reveal, GRACE);
+  /* ---- 就绪判定:DCL 之后,再等首屏关键图(banner 背景)落地 ----
+     动画时长由此追随真实加载:图好,才落幕 */
+  function waitCriticalImage() {
+    var url = null;
+    var banner = document.getElementById('banner') || document.querySelector('.banner');
+    if (banner) {
+      var bg = getComputedStyle(banner).backgroundImage || '';
+      var m = bg.match(/url\(["']?(.*?)["']?\)/);
+      if (m && m[1] && m[1] !== 'none') url = m[1];
+    }
+    if (!url) {
+      /* 本页没有可辨识的关键图:退回等待整页 load */
+      if (document.readyState === 'complete') { scheduleHide(); }
+      else { window.addEventListener('load', scheduleHide, { once: true }); }
+      return;
+    }
+    var img = new Image();
+    var settled = false;
+    function go() { if (settled) return; settled = true; scheduleHide(); }
+    img.onload = go;
+    img.onerror = go; /* 图挂了也不劫持访客 */
+    img.src = url;
+    if (img.complete) go(); /* 缓存命中:立即放行 */
+  }
+
   if (document.readyState !== 'loading') {
-    onReady();
+    waitCriticalImage();
   } else {
-    document.addEventListener('DOMContentLoaded', onReady);
+    document.addEventListener('DOMContentLoaded', waitCriticalImage);
   }
   setTimeout(hide, MAX_SHOW);
 })();
