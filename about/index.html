@@ -278,7 +278,6 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
   function injectGene() {
     var stage = el.querySelector('.lf-stage');
     if (!stage) return;
-    /* 批量注入:单次 cssText 写入,样式只失效一次 */
     stage.style.cssText += ';' +
       '--m0:' + blobRadius() + ';' +
       '--m1:' + blobRadius() + ';' +
@@ -296,9 +295,8 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
     if (done) return;
     injectGene();
     el.classList.add('is-live');
-    /* 在首个真实渲染帧上打点:渲染被 head 外链 CSS 阻塞期间,
-       rAF 不会执行,因此 tShown 记录的是"被看见"的时刻,
-       而不是"加上类"的时刻——慢速网络下两者可相差数秒 */
+    /* 在首个真实渲染帧上打点:渲染阻塞期间 rAF 不会执行,
+       tShown 记录的是"被看见"的时刻,而非"加上类"的时刻 */
     if (window.requestAnimationFrame) {
       requestAnimationFrame(function () { if (!done) tShown = Date.now(); });
     } else {
@@ -311,7 +309,7 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
     if (done) return;
     done = true;
     if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; }
-    if (!tShown) { removeNow(); return; } /* 从未现身:静默离场,访客无感 */
+    if (!tShown) { removeNow(); return; } /* 从未被看见:静默离场,访客无感 */
     el.classList.add('is-done');
     el.addEventListener('transitionend', function () { removeNow(); }, { once: true });
     /* transitionend 偶发不触发时的保险 */

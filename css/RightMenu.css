@@ -2,9 +2,9 @@
    右键菜单 - 月白×乌木配色 优化版 v2
    配色:#f5f2ed (月白) / #13100c (乌木)
    变更:
-   - 开合改为 .show 类驱动(配合新 JS),打开与关闭都有过渡,
-     并移除脆弱的 [style*="display: block"] 属性选择器方案
-   - transform-origin 由 JS 动态设置,菜单从光标角落生长
+   - 开合改为 .show 类驱动(配合新 JS),macOS 原生语义:
+     打开瞬现、关闭 0.15s 淡出;并移除脆弱的
+     [style*="display: block"] 属性选择器方案
    - 新增底部快捷键提示样式(.rm-hint,替代全屏 toast)
    - 菜单限高 + 可滚动,小屏不溢出
    ============================================================ */
@@ -62,7 +62,7 @@
     --tooltip-shadow: rgba(0, 0, 0, 0.3);
 }
 
-/* ---------- 菜单容器:类驱动开合,打开关闭都有过渡 ---------- */
+/* ---------- 菜单容器:macOS 原生开合语义(瞬现 / 轻淡收场) ---------- */
 div#rightmenu-wrapper {
     position: fixed;
     z-index: 2147483647;
@@ -70,15 +70,11 @@ div#rightmenu-wrapper {
     -webkit-user-select: none;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(0.92) translateY(-4px);
-    transform-origin: top left; /* 实际原点由 JS 按光标角落动态设置 */
-    /* 淡入淡出不放在这里:祖先 opacity<1 会在过渡期间制造 backdrop root,
-       切断玻璃采样,造成"先清晰后模糊"的闪现;
-       opacity 移至面板(ul)自身,transform 不影响采样 */
-    /* 基态过渡 = 关闭动画:退场比入场更快、更利落 */
-    transition:
-        transform 0.12s cubic-bezier(0.4, 0, 1, 1),
-        visibility 0.12s;
+    /* mac 语义:出现即完整形态,无缩放生长。
+       (怀念旧的"生长"入场时告诉我,可切回带弹性的版本)
+       淡入淡出不放在 wrapper:祖先 opacity<1 会在过渡期间制造
+       backdrop root,切断玻璃采样;opacity 由面板(ul)自持 */
+    transition: visibility 0.15s; /* 基态过渡 = 关闭:visibility 等淡出播完再隐藏 */
     /* 注意:此处绝不能加 will-change / translateZ(0) 之类"硬件加速"——
        它们会让 wrapper 成为 backdrop root,玻璃将永远失效 */
 }
@@ -86,21 +82,17 @@ div#rightmenu-wrapper {
 div#rightmenu-wrapper.show {
     visibility: visible;
     pointer-events: auto;
-    transform: none;
-    /* 入场过渡:比退场舒缓,带一点弹性 */
-    transition:
-        transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-        visibility 0.18s;
+    transition: none; /* 瞬现:打开无过渡 */
 }
 
-/* 玻璃自身的淡入淡出:不经过祖先,模糊从第一帧就在场 */
+/* 玻璃:打开瞬现,关闭 0.15s 轻轻隐去(mac 的收场) */
 div#rightmenu-wrapper ul.list-v.rightmenu {
     opacity: 0;
-    transition: opacity 0.1s ease-in; /* 退场淡出:干脆 */
+    transition: opacity 0.15s ease; /* 基态过渡 = 关闭淡出 */
 }
 div#rightmenu-wrapper.show ul.list-v.rightmenu {
     opacity: 1;
-    transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1); /* 入场淡入:舒缓 */
+    transition: none; /* 瞬现 */
 }
 
 /* ---------- 谷歌式"轻柔化"(菜单开启时,页面内容微模糊) ----------

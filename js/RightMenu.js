@@ -8,8 +8,8 @@
  *  - 修复定位测量 bug:旧代码在 display:none 时调用
  *    getBoundingClientRect() 恒为 0,屏幕边缘翻转逻辑从未生效;
  *    现改为"先显示、后测量、再定位",同一帧内完成,无闪烁
- *  - 打开/关闭均有过渡动画,菜单从光标所在角落生长
- *    (动态 transform-origin,配合 CSS 的 .show 状态)
+ *  - macOS 原生开合语义:打开瞬现,关闭 0.15s 淡出;
+ *    贴近屏幕边缘时不做镜像翻转,整体滑移回可视区
  *  - 不再覆写 window.onclick / window.oncontextmenu,
  *    改用 addEventListener,避免与主题脚本互相踩踏
  *  - 新增 Esc / 滚动 / 窗口失焦 / 窗口缩放 时关闭
@@ -67,7 +67,7 @@
     if (!pill || !el) return;
     var firstShow = !pill.classList.contains('on');
     if (firstShow) pill.style.transition = 'none'; /* 首现:原地浮现,不从别处飞来 */
-    /* offset 几何与 transform 无关,免疫入场 scale(0.92) 的坐标污染 */
+    /* offset 几何:布局真值,与 transform 无关 */
     pill.style.width = el.offsetWidth + 'px';
     pill.style.height = el.offsetHeight + 'px';
     pill.style.transform = 'translate(' + el.offsetLeft + 'px, ' + el.offsetTop + 'px)';
@@ -151,24 +151,18 @@
       topLine.hidden = (!copyItem || copyItem.hidden) && (!downloadItem || downloadItem.hidden);
     }
 
-    /* ---- 定位:先显示后测量 ----
-       用 offsetWidth/offsetHeight 而非 getBoundingClientRect():
-       后者会被入场 transition 起点的 scale(0.92) 污染,
-       测得尺寸偏小约 8%,边缘翻转阈值因此系统性失准;
-       offset 尺寸是布局真值,与 transform 无关 */
+    /* ---- 定位:macOS 原生语义 ----
+       意图始终是"左上角贴光标、向右下展开";
+       贴近屏幕边缘时不做镜像翻转,而是整体滑移回可视区
+       (mac 的菜单从不翻转,只被"推"回屏幕;
+        测量用 offset 尺寸,布局真值,与 transform 无关) */
     wrapper.classList.add('show');
     var mw = content.offsetWidth, mh = content.offsetHeight;
     var vw = window.innerWidth, vh = window.innerHeight, pad = 8;
-    var flipX = e.clientX + mw > vw - pad;
-    var flipY = e.clientY + mh > vh - pad;
-    var left = flipX ? e.clientX - mw : e.clientX;
-    var top = flipY ? e.clientY - mh : e.clientY;
-    left = Math.max(pad, Math.min(left, vw - mw - pad));
-    top = Math.max(pad, Math.min(top, vh - mh - pad));
+    var left = Math.max(pad, Math.min(e.clientX, vw - mw - pad));
+    var top = Math.max(pad, Math.min(e.clientY, vh - mh - pad));
     wrapper.style.left = left + 'px';
     wrapper.style.top = top + 'px';
-    /* 从光标所在角落生长:翻转到哪边,原点就在哪个角 */
-    wrapper.style.transformOrigin = (flipY ? 'bottom' : 'top') + ' ' + (flipX ? 'right' : 'left');
 
     soften(USE_PAGE_SOFTEN); /* 真玻璃模式下为 false,页面保持清澈 */
     hidePill(); /* 新一次会话:高亮清零,等待首次悬停原地浮现 */
