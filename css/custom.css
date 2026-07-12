@@ -43,6 +43,16 @@ a.list-group-item:hover,
     border-left: 3px solid #5BC2E7 !important;
 }
 
+/* ============================================================
+   马里奥阅读进度条 v2.1
+   ------------------------------------------------------------
+   · 雪碧图: /img/mario-runner.png（1:1 重装箱版：源图完整像素，
+     零重采样、零调色板压缩，7 帧等宽装箱 31×41）
+   · 帧序 = 站立 / 跑1 / 跑2 / 起跳 / 滞空 / 落地 / 庆祝
+   · 位移、跳跃、朝向全部由 JS（rAF + transform）驱动
+   · 想变大：改 --mario-scale（整数倍最锐利）
+   ============================================================ */
+
 #reading-track {
   position: fixed;
   bottom: 0;
@@ -51,153 +61,111 @@ a.list-group-item:hover,
   height: 3px;
   background: rgba(0, 0, 0, 0.1);
   z-index: 9999;
-}
-
-@media (prefers-color-scheme: dark) {
-  #reading-track {
-    background: rgba(255, 255, 255, 0.15);
-  }
-  #reading-bar {
-    background: rgba(255, 255, 255, 0.4);
-  }
-}
-
-[data-user-color-scheme="dark"] #reading-track {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-[data-user-color-scheme="dark"] #reading-bar {
-  background: rgba(255, 255, 255, 0.4);
+  pointer-events: none;   /* 修复旧版：轨道 3px + 马里奥上方隐形区域挡住页面点击 */
 }
 
 #reading-bar {
+  width: 100%;
   height: 100%;
-  width: 0;
   background: rgba(100, 100, 100, 0.3);
-  transition: width 0.1s linear;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
 }
 
 #pixel-runner {
+  --mario-scale: 1;                            /* ← 想大一号改成 2；整数倍不糊 */
+  --mario-w: 31px;                             /* 单帧格宽（雪碧图 1× 逻辑像素） */
+  --mario-h: 41px;                             /* 单帧格高 */
   position: absolute;
-  bottom: -35px;
-  left: -15px;
-  width: 28px;  /*根据图片像素计算， 210÷7＝30 但是有裁切有问题 */
-  height: 115px;
-  image-rendering: pixelated;
-  transition: left 0.1s linear;
-  background-image: url("/img/阅读条.png");
-  background-size: 210px 115px;
-  background-position: 0 0;
+  left: 0;
+  bottom: 0;
+  width: calc(var(--mario-w) * var(--mario-scale));
+  height: calc(var(--mario-h) * var(--mario-scale));
+  will-change: transform;
+  pointer-events: none;                        /* 容器不吃点击，只让身体本体吃 */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#pixel-runner .mario-flip,
+#pixel-runner .mario-air,
+#pixel-runner .mario-sprite {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 朝向层：JS 写 scaleX(±1) */
+#pixel-runner .mario-flip {
+  will-change: transform;
+  transform: scaleX(1);                        /* 初始值内联，防止首帧空白 */
+}
+
+/* 跳跃/前倾层：JS 写 translate3d + rotate */
+#pixel-runner .mario-air {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+/* 帧层：JS 按 0..6 步进 background-position-x（7 帧 = 6 步） */
+#pixel-runner .mario-sprite {
+  background-image: url('/img/mario-runner.png');
   background-repeat: no-repeat;
+  background-size: 700% 100%;
+  background-position: 0% 0%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;                /* Firefox 兼容 */
+  cursor: pointer;
+  pointer-events: auto;                        /* 彩蛋：点身体会跳 */
 }
 
-#pixel-runner.ready {
-  animation: mario-ready 0.6s ease-out;
+/* 尘土：落地/疾跑时 JS 触发，steps() 保持像素味 */
+#pixel-runner .mario-dust {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  opacity: 0;
+  color: rgba(120, 120, 120, 0.55);
+  pointer-events: none;
+}
+#pixel-runner .mario-dust.play {
+  animation: mario-dust-puff 0.3s steps(3, end) forwards;
+}
+#pixel-runner .mario-dust.big.play {
+  animation-name: mario-dust-puff-big;
+  animation-duration: 0.38s;
 }
 
-#pixel-runner.idle {
-  animation: none;
-  background-position: 0 0;
+@keyframes mario-dust-puff {
+  0%   { opacity: 0.8; box-shadow: -3px 0 0 currentColor, 3px 0 0 currentColor; }
+  60%  { opacity: 0.5; box-shadow: -7px -2px 0 currentColor, 7px -2px 0 currentColor; }
+  100% { opacity: 0;   box-shadow: -10px -3px 0 currentColor, 10px -3px 0 currentColor; }
+}
+@keyframes mario-dust-puff-big {
+  0%   { opacity: 0.9;  box-shadow: -3px 0 0 currentColor, 3px 0 0 currentColor, 0 -2px 0 currentColor; }
+  60%  { opacity: 0.55; box-shadow: -9px -3px 0 currentColor, 9px -3px 0 currentColor, 0 -6px 0 currentColor; }
+  100% { opacity: 0;    box-shadow: -13px -4px 0 currentColor, 13px -4px 0 currentColor, 0 -9px 0 currentColor; }
 }
 
-#pixel-runner.running {
-  animation: mario-run 0.18s steps(1) infinite;
+/* ---------- 深浅色适配 ----------
+   跟随系统，但被 Fluid 手动开关（data-user-color-scheme）覆盖，
+   修复旧版“系统深 + 手动浅”时轨道仍是深色的错乱 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-user-color-scheme="light"]) #reading-track { background: rgba(255, 255, 255, 0.15); }
+  :root:not([data-user-color-scheme="light"]) #reading-bar   { background: rgba(255, 255, 255, 0.4); }
+  :root:not([data-user-color-scheme="light"]) #pixel-runner .mario-dust { color: rgba(210, 210, 210, 0.45); }
 }
+[data-user-color-scheme="dark"] #reading-track { background: rgba(255, 255, 255, 0.15) !important; }
+[data-user-color-scheme="dark"] #reading-bar   { background: rgba(255, 255, 255, 0.4) !important; }
+[data-user-color-scheme="dark"] #pixel-runner .mario-dust { color: rgba(210, 210, 210, 0.45) !important; }
+[data-user-color-scheme="light"] #reading-track { background: rgba(0, 0, 0, 0.1) !important; }
+[data-user-color-scheme="light"] #reading-bar   { background: rgba(100, 100, 100, 0.3) !important; }
 
-#pixel-runner.running.fast {
-  animation: mario-run 0.1s steps(1) infinite;
-}
-
-#pixel-runner.running.superfast {
-  animation: mario-run 0.05s steps(1) infinite;
-}
-
-#pixel-runner.jumping.low-jump {
-  animation: 
-    mario-jump-sprite-low 0.32s steps(1) forwards,
-    mario-jump-move-low 0.32s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
-}
-
-#pixel-runner.jumping {
-  animation: 
-    mario-jump-sprite-normal 0.42s steps(1) forwards,
-    mario-jump-move-normal 0.42s cubic-bezier(0.2, 0.85, 0.35, 1) forwards;
-}
-
-#pixel-runner.jumping.high-jump {
-  animation: 
-    mario-jump-sprite-high 0.52s steps(1) forwards,
-    mario-jump-move-high 0.52s cubic-bezier(0.15, 0.9, 0.3, 1) forwards;
-}
-
-#pixel-runner.celebrate {
-  animation: 
-    mario-celebrate 0.35s steps(1) infinite,
-    mario-celebrate-bounce 0.2s cubic-bezier(0.5, 0, 0.5, 1.5) infinite;
-}
-
-@keyframes mario-ready {
-  0% { transform: translateY(0); }
-  30% { transform: translateY(-5px); }
-  100% { transform: translateY(0); }
-}
-
-@keyframes mario-run {
-  0%, 100% { background-position: -30px 0; }
-  50% { background-position: -60px 0; }
-}
-
-@keyframes mario-jump-sprite-low {
-  0%, 8% { background-position: -90px 0; }
-  12%, 80% { background-position: -120px 0; }
-  85%, 95% { background-position: -150px 0; }
-  100% { background-position: 0 0; }
-}
-
-@keyframes mario-jump-move-low {
-  0% { transform: translateY(0); }
-  30% { transform: translateY(-10px); }
-  45%, 55% { transform: translateY(-12px); }
-  70% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
-}
-
-@keyframes mario-jump-sprite-normal {
-  0%, 10% { background-position: -90px 0; }
-  15%, 75% { background-position: -120px 0; }
-  82%, 93% { background-position: -150px 0; }
-  100% { background-position: 0 0; }
-}
-
-@keyframes mario-jump-move-normal {
-  0% { transform: translateY(0); }
-  28% { transform: translateY(-18px); }
-  42%, 55% { transform: translateY(-22px); }
-  72% { transform: translateY(-12px); }
-  100% { transform: translateY(0); }
-}
-
-@keyframes mario-jump-sprite-high {
-  0%, 12% { background-position: -90px 0; }
-  18%, 72% { background-position: -120px 0; }
-  80%, 92% { background-position: -150px 0; }
-  100% { background-position: 0 0; }
-}
-
-@keyframes mario-jump-move-high {
-  0% { transform: translateY(0); }
-  25% { transform: translateY(-28px); }
-  40%, 52% { transform: translateY(-34px); }
-  70% { transform: translateY(-18px); }
-  100% { transform: translateY(0); }
-}
-
-@keyframes mario-celebrate {
-  0%, 100% { background-position: -180px 0; }
-  50% { background-position: 0 0; }
-}
-
-@keyframes mario-celebrate-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+/* 尊重减少动效偏好：JS 侧同步降级为静态定位 */
+@media (prefers-reduced-motion: reduce) {
+  #pixel-runner .mario-dust { display: none; }
 }
