@@ -79,16 +79,19 @@ __whenReady(function () {
   flip.appendChild(airbox);
   runner.appendChild(flip);
 
+  /* 尘土挂在 track 上（世界坐标），不再是 runner 的子元素——
+     否则尘土会跟着马里奥一起平移，"拖尾"变成"黏在脚上" */
   var dustPool = [], dustIdx = 0;
-  for (var i = 0; i < 4; i++) {
-    var d = el('mario-dust');
-    runner.appendChild(d);
-    dustPool.push(d);
-  }
 
   track.appendChild(bar);
+  for (var i = 0; i < 4; i++) {
+    var d = el('mario-dust');
+    track.appendChild(d);          /* 在 runner 之前插入 → 绘制在马里奥身后 */
+    dustPool.push(d);
+  }
   track.appendChild(runner);
-  document.body.appendChild(track);
+  /* body 挂载在初始化末尾、与测量/定位同一同步任务内完成——浏览器不会在任务
+     中间绘制，首帧即正确，无需任何隐藏机制 */
 
   /* ---------- 常量 ---------- */
   var F_IDLE = 0, F_RUN1 = 1, F_RUN2 = 2, F_RISE = 3, F_AIR = 4, F_LAND = 5, F_CHEER = 6;
@@ -102,23 +105,26 @@ __whenReady(function () {
 
   /* ---------- 状态 ---------- */
   var target = 0, disp = 0, vel = 0;
-  var y = 0, vy = 0, airborne = false, jumpT = 0;
+  var y = 0, vy = 0, airborne = false;
   var facing = 1, shownFacing = 1, lean = 0;
   var runToggle = false, runTimer = 0;
   var landUntil = 0, runDustAt = 0, jumpCdAt = 0;
   var cheering = false, cheerHops = 0, cheerHopAt = 0, cheerFlipAt = 0, cheerOn = true;
   var lastInput = 0, lastFrame = -1;
-  var trackW = 0, marioW = 0;
+  var trackW = 0, marioW = 0, lastCx = 0;
   var rafId = 0, lastT = 0;
-  /* restored：浏览器 scroll restoration 完成前，屏蔽跳跃触发，防止首次 scroll 事件被误当追赶跳 */
+  /* ---- 刷新方案：旧方案骨架（隐藏启动 + 四路 reveal）+ 一条守则 ----
+     restored / shown / revealTimer：excerpt 版原样——readyState 已 complete 立即现身；
+       否则 restore scroll 120ms 去抖后现身；load / 800ms 兜底。
+     lastY：守则基线。scrollY 没动的 scroll 事件一律无视——它们只来自文档高度
+       变化（图片/评论/字体加载），百分比被稀释但页面没动；站着不动是唯一
+       不可见的处理。这正是旧方案时代"现身后向左漂移"的根治，仅 3 行。
+     bootQuietUntil：现身后 600ms 内不触发跳跃（由 reveal 设置） */
   var restored = (document.readyState === 'complete');
-  /* shown：runner 是否已解除隐藏。所有 writeX 和主循环启动都推迟到 shown 变 true 后，
-     确保用户能看到的第一帧就是正确位置，不存在"先出现在 0% 再瞬移"的中间态 */
   var shown = false;
-  /* revealRaf：restore 可能分多阶段触发多次 scroll 事件。每次 scroll 都重置一个
-     2 帧 rAF 链，链完成才 reveal——rAF 只会在所有排队的 scroll task 处理完后触发，
-     所以 rAF 到达 = restore 一定稳定了 */
-  var revealRaf = 0;
+  var revealTimer = 0;
+  var lastY = 0;
+  var bootQuietUntil = 0;
 
   /* ---------- 工具 ---------- */
   function progress() {
@@ -149,30 +155,34 @@ __whenReady(function () {
   function puff(big) {
     var p = dustPool[dustIdx++ % dustPool.length];
     p.classList.remove('play', 'big');
+    p.style.left = lastCx.toFixed(1) + 'px';   /* 固定在落点，不随马里奥平移 */
     void p.offsetWidth;
     if (big) p.classList.add('big');
     p.classList.add('play');
   }
 
-  function launch(v) { airborne = true; vy = v; jumpT = 0; }
+  function launch(v) { airborne = true; vy = v; }
 
   function writeX() {
     var half = marioW / 2;
     var cx = (disp / 100) * trackW;
     if (cx < half) cx = half;
     if (cx > trackW - half) cx = trackW - half;
+    lastCx = cx;
     runner.style.transform = 'translate3d(' + (cx - half).toFixed(1) + 'px,0,0)';
     bar.style.transform = 'scaleX(' + (disp / 100).toFixed(4) + ')';
   }
 
-  /* 首次显示：hidden 期间从不 writeX，只有到 reveal 才把最新 progress() snap 进去
-     并解除隐藏。writeX 先跑 + void offsetWidth 强制 flush 到合成层，然后再改
-     visibility/opacity，确保 reveal 帧看到的一定是当前位置的 transform */
+  /* 首次显示（旧方案）：hidden 期间从不写 transform；reveal 读取此刻最新 progress()、
+     写入位置、void offsetWidth 强制 flush 到合成层，然后才解除隐藏——
+     可见的第一帧必然在正确位置 */
   function reveal() {
     if (shown) return;
-    if (revealRaf) { cancelAnimationFrame(revealRaf); revealRaf = 0; }
+    if (revealTimer) { clearTimeout(revealTimer); revealTimer = 0; }
     shown = true;
     restored = true;
+    bootQuietUntil = performance.now() + 600;
+    lastY = window.scrollY || document.documentElement.scrollTop || 0;
     prevTarget = target = disp = progress();
     vel = 0;
     writeX();
@@ -192,7 +202,7 @@ __whenReady(function () {
   /* ---------- 主循环 ---------- */
   function loop(t) {
     rafId = 0;
-    var dt = lastT ? Math.min(t - lastT, 64) / 1000 : 1 / 60;
+    var dt = lastT ? Math.min(Math.max(t - lastT, 0.5), 64) / 1000 : 1 / 60;  /* 下限 0.5ms：个别浏览器会给重复 rAF 时间戳，dt=0 会让 vel 算出 NaN */
     lastT = t;
 
     var k  = 1 - Math.exp(-dt * 1000 / TAU);
@@ -207,7 +217,8 @@ __whenReady(function () {
     else if (vel < -1.2) facing = -1;
 
     if (!cheering && target >= CHEER_IN && disp >= 98) {
-      cheering = true; cheerHops = 3; cheerHopAt = t; cheerFlipAt = t; cheerOn = true;
+      cheering = true; cheerHops = 3; cheerHopAt = t;
+      cheerOn = true; cheerFlipAt = t + 300;   /* 首次翻转推后 300ms，开场即举手帧 */
     } else if (cheering && target < CHEER_OUT) {
       cheering = false;
     }
@@ -218,11 +229,10 @@ __whenReady(function () {
       var g = (Math.abs(vy) < 80) ? GRAV * 0.65 : GRAV;
       vy -= g * dt;
       y += vy * dt;
-      jumpT += dt;
       if (y <= 0) {
         y = 0; airborne = false;
         var impact = -vy; vy = 0;
-        if (impact > 420 && !reduced) {
+        if (impact > 390 && !reduced) {          /* 390：让点击彩蛋（起跳 400）也有落地反馈 */
           puff(impact > 760);
           landUntil = t + 95;
         }
@@ -287,9 +297,7 @@ __whenReady(function () {
   }
 
   function wake() {
-    /* hidden 期间彻底不启动主循环。onResize/ResizeObserver 在页面加载中会被 body 高度变化
-       反复触发，这道防护确保它们不会在 reveal 之前偷偷跑一遍 writeX/airbox transform */
-    if (!shown) return;
+    if (!shown) return;   /* 隐藏期不启动主循环 */
     if (!rafId) { lastT = 0; rafId = requestAnimationFrame(loop); }
   }
 
@@ -297,33 +305,38 @@ __whenReady(function () {
   var prevTarget = 0;
 
   window.addEventListener('scroll', function () {
+    /* 唯一守则：scrollY 没有真实位移的 scroll 事件一律无视。
+       这类事件只来自文档高度变化（图片/评论/字体加载）——百分比被稀释但页面
+       没动，站着不动是唯一不可见的处理；数值的"过时"会在下一次真实滚动时
+       随运动无感刷新。真实位移（用户滚动/restore/锚定）则正常映射：
+       页面动他才动、同向同帧，永远协调 */
+    var de = document.documentElement;
+    var y = window.scrollY || de.scrollTop || 0;
+    if (y === lastY) return;
+    lastY = y;
+
     var p = progress();
     var evDelta = p - prevTarget;
     prevTarget = p;
     target = p;
     lastInput = performance.now();
 
-    if (reduced) { renderStatic(); return; }
-
-    /* 恢复期：浏览器可能分多阶段触发 scroll 事件（Chrome 一次，Firefox/Safari 可能两三次）。
-       只更新状态、不 reveal 也不 writeX；每次 scroll 都重置 rAF 链，链走完（2 帧 rAF，
-       约 32ms）才 reveal——rAF 只在所有排队的 scroll task 处理完后触发，链走完就说明
-       restore 一定稳定 */
+    /* 恢复期（旧方案）：只记账、不显示；每个"有真实位移"的 scroll 都重置
+       120ms 计时器，稳定后 reveal。高度稀释事件已被上面的守则挡掉，
+       不会虚假地推迟现身 */
     if (!restored) {
       disp = target; vel = 0;
       if (!shown) {
-        if (revealRaf) cancelAnimationFrame(revealRaf);
-        revealRaf = requestAnimationFrame(function () {
-          revealRaf = requestAnimationFrame(function () {
-            revealRaf = 0;
-            reveal();
-          });
-        });
+        if (revealTimer) clearTimeout(revealTimer);
+        revealTimer = setTimeout(reveal, 120);
       }
       return;
     }
 
-    if (!airborne && !cheering) {
+    if (reduced) { renderStatic(); return; }
+
+    /* 现身后 600ms 内不触发跳跃：迟到的小校正平滑跑过去 */
+    if (!airborne && !cheering && lastInput > bootQuietUntil) {
       var gap = Math.abs(target - disp);
       var now = lastInput;
       if (gap > 7 && now > jumpCdAt) {
@@ -345,46 +358,42 @@ __whenReady(function () {
     wake();
   });
 
+  /* 窗口尺寸变化（拖动窗口/转屏）：用户主动行为，几何和 scrollY 都可能变——
+     同步基线并允许平滑校正 */
   function onResize() {
     measure();
     visibility();
+    lastY = window.scrollY || document.documentElement.scrollTop || 0;
     prevTarget = target = progress();
-    disp = target; vel = 0;   /* 尺寸变化时也就地 snap，避免 body 高度变了触发追赶跳 */
+    if (!shown) { disp = target; vel = 0; return; }
     if (reduced) renderStatic(); else wake();
   }
   window.addEventListener('resize', onResize);
+
+  /* 文档高度变化（图片/评论加载撑高页面）：只更新几何量与可见性，不驱动马里奥。
+     百分比稀释由 scroll handler 的唯一守则处理（scrollY 没动的事件被无视） */
   if (window.ResizeObserver) {
-    new ResizeObserver(onResize).observe(document.body);
+    new ResizeObserver(function () {
+      measure();
+      visibility();
+    }).observe(document.body);
   }
 
-  /* ---------- 初始化 ---------- */
+  /* ---------- 初始化（旧方案）：隐藏启动，reveal 统一定位 ---------- */
+  document.body.appendChild(track);
   measure();
   visibility();
-  /* 无条件先隐藏，且此时不写 transform、不启动主循环。
-     所有位置/主循环启动都由 reveal 统一处理，保证第一帧可见时就是正确位置 */
+  lastY = window.scrollY || document.documentElement.scrollTop || 0;
   runner.style.visibility = 'hidden';
   runner.style.opacity = '0';
   setFrame(F_IDLE);
-  /* 图片延迟加载时如果 measure 太早，宽度可能为 0；等图片就绪后再校一次 */
-  var probe = new Image();
-  probe.onload = function () { measure(); if (shown) writeX(); };
-  probe.src = '/img/mario-runner.png';
 
-  /* reveal 触发时机：
-       1. 脚本运行时 readyState 已 complete → load 已完成，restore 一定完成，立即 reveal
-       2. 否则：scroll 事件 120ms 去抖（restore 引起的 scroll 稳定后触发）
-       3. load 事件兜底
-       4. 800ms 兜底
-     注意：不能用 `progress() > 0.5` 之类的启发式来提前 reveal——浏览器 restore 有时是
-     渐进的（scrollY 会分几步涨到最终值），启发式检查那一刻的 progress() 可能只是中间值，
-     会导致马里奥锁死在错误位置 */
+  /* reveal 路径：readyState 已 complete → 立即；restore scroll 120ms 去抖；
+     load 兜底（Safari 偶尔不为 restore 发 scroll）；800ms 极端兜底 */
   if (restored) {
     reveal();
   } else {
-    var settle = function () {
-      if (shown) return;
-      reveal();
-    };
+    var settle = function () { if (!shown) reveal(); };
     window.addEventListener('load', settle);
     setTimeout(settle, 800);
   }

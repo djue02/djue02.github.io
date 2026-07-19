@@ -1,10 +1,97 @@
+/* ============================================================
+   ScrollAnimation.css · 文章卡片滚动进场 · 编排版
+   ------------------------------------------------------------
+   驱动：同重构版 —— 现代浏览器走 view() 滚动时间线，
+         旧浏览器由 ScrollAnimation.js 的 IntersectionObserver 兜底。
+   本版新增「分通道编排」：
+     清晰度先行 —— 透明度与失焦在进场前半程（entry 50%）内解决，
+                   文字一旦现身就是可读的；
+     位移殿后   —— 上浮走完整进场行程（entry 90%），
+                   并经阻尼曲线重映射：前段快速归位，末段渐近收束。
+   ============================================================ */
+
 .index-card {
-  transition: all 0.5s;
-  transform: scale(calc(1.5 - 0.5 * var(--state)));
-  opacity: var(--state);
+  /* —— 可调参数 —— */
+  --sa-rise: 24px;   /* 进场上浮距离 */
+  --sa-blur: 6px;    /* 进场起始失焦量，呼应毛玻璃；设 0px 即关闭 */
+
   margin-bottom: 2rem;
 }
 
+@media (max-width: 767px) {
+  .index-card {
+    --sa-rise: 16px;
+    --sa-blur: 0px;  /* 移动端关闭模糊，保滚动帧率 */
+  }
+}
+
+/* 保留的原有布局微调 */
 .index-img img {
   margin: 20px 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ---------- 现代路径：滚动驱动 · 双通道 ---------- */
+  @supports (animation-timeline: view()) {
+    .index-card {
+      animation:
+        sa-reveal linear both,
+        sa-settle cubic-bezier(0.22, 1, 0.36, 1) both;
+      /* timeline / range 必须写在 animation 简写之后，否则会被简写重置 */
+      animation-timeline: view(), view();
+      animation-range:
+        entry 0% entry 50%,   /* 清晰度：前半程结清 */
+        entry 0% entry 90%;   /* 位移：全程阻尼收束 */
+    }
+
+    @keyframes sa-reveal {
+      from { opacity: 0; filter: blur(var(--sa-blur)); }
+      to   { opacity: 1; filter: blur(0); }
+    }
+
+    @keyframes sa-settle {
+      from { transform: translateY(var(--sa-rise)); }
+      to   { transform: none; }
+    }
+
+    /* ---------- 可选 · 卡片内部微编排（默认关闭） ----------
+       图与标题作锚随卡片归位，摘要、元信息各自多坠一小段，
+       依次收拢，形成一道很轻的「压缩波」。
+       想试就把下面整段取消注释；只在支持 view() 的浏览器生效，
+       兜底路径维持整卡动画不受影响。
+
+    .index-card { view-timeline: --sa-card block; }
+
+    .index-card .index-excerpt,
+    .index-card .index-btm {
+      animation: sa-lag cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-timeline: --sa-card;
+    }
+    .index-card .index-excerpt { --sa-lag: 8px;  animation-range: entry 0% entry 95%; }
+    .index-card .index-btm     { --sa-lag: 14px; animation-range: entry 0% entry 100%; }
+
+    @keyframes sa-lag {
+      from { transform: translateY(var(--sa-lag)); }
+      to   { transform: none; }
+    }
+    ------------------------------------------------------ */
+  }
+
+  /* ---------- 兜底路径：IntersectionObserver（见同名 JS） ---------- */
+  @supports not (animation-timeline: view()) {
+    html.sa-io .index-card {
+      /* 同一套编排：清晰度 0.45s 先到，位移 0.65s 收尾，同一条阻尼曲线 */
+      transition:
+        opacity   0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        filter    0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html.sa-io .index-card:not(.sa-in) {
+      opacity: 0;
+      transform: translateY(var(--sa-rise));
+      filter: blur(var(--sa-blur));
+    }
+  }
 }

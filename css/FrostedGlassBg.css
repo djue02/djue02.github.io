@@ -1,44 +1,193 @@
+/* ============================================================
+   主面板毛玻璃 · 月白 × 乌木 · 精简定稿版
+   ------------------------------------------------------------
+   要点：首屏不露边（--board-peek: 0）；顶部纵向浓度渐变，
+   深浅头图通吃；渐变发丝描边；移动端降载；无障碍与打印降级。
+   全部可调参数集中在 #board#board 顶部变量区。
+   ============================================================ */
+
 .footer,
 .footer-inner {
   background: transparent !important;
 }
 
-/* 主面板毛玻璃 - 月白 × 黑檀 */
+/* ---------- 本体 · 月白 ---------- */
 #board#board {
-  background: rgba(245, 242, 237, 0.45) !important;
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-top-color: rgba(255, 255, 255, 0.65);
-  box-shadow: 
-    0 12px 48px rgba(80, 60, 40, 0.06),
-    0 4px 12px rgba(0, 0, 0, 0.03),
-    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+  /* 首屏露出高度：0 = 不露边（修复底部突出）。
+     想露一线光设 -0.75rem，回主题原样设 -2rem */
+  --board-peek: 0px;
+
+  /* 浓度：顶端（压在头图上的区段）更透，
+     往下 --board-fade 距离内落到阅读浓度 */
+  --board-alpha-top: 0.3;
+  --board-alpha: 0.45;
+  --board-fade: 240px;
+
+  /* 尺寸随视口宽度连续过渡（手机 ≈14px → 桌面 ≈21px） */
+  --board-radius: clamp(14px, 10px + 0.8vw, 21px);
+  --board-blur:   clamp(14px, 10px + 0.7vw, 22px);
+
+  --board-tint: 245, 242, 237;   /* 月白 */
+  --board-saturate: 140%;
+  --board-bright: 1.02;
+
+  /* 发丝描边三段色（上亮 → 中隐 → 下微亮） */
+  --edge-top: rgba(255, 255, 255, 0.72);
+  --edge-mid: rgba(255, 255, 255, 0.2);
+  --edge-bot: rgba(255, 255, 255, 0.36);
+
+  /* 景深阴影 + 顶部内光 */
+  --shadow-ambient:
+    0 1px 2px rgba(60, 45, 30, 0.04),
+    0 8px 24px rgba(80, 60, 40, 0.055),
+    0 28px 72px rgba(80, 60, 40, 0.07);
+  --glow-top:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 24px 48px -24px rgba(255, 255, 255, 0.16),
     inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
+
+  position: relative;
+  margin-top: var(--board-peek) !important; /* 压过主题的 -2rem 及窄屏 -1rem !important */
+  border-radius: var(--board-radius);
+  background: linear-gradient(
+      to bottom,
+      rgba(var(--board-tint), var(--board-alpha-top)) 0,
+      rgba(var(--board-tint), var(--board-alpha)) var(--board-fade)
+    ) !important;
+  backdrop-filter: blur(var(--board-blur)) saturate(var(--board-saturate)) brightness(var(--board-bright));
+  -webkit-backdrop-filter: blur(var(--board-blur)) saturate(var(--board-saturate)) brightness(var(--board-bright));
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 支持 mask 时被渐变描边替换 */
+  box-shadow: var(--shadow-ambient), var(--glow-top);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
-html[data-user-color-scheme="dark"] #board#board {
-  background: rgba(19, 16, 12, 0.4) !important;
-  backdrop-filter: blur(20px) saturate(110%);
-  -webkit-backdrop-filter: blur(20px) saturate(110%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-top-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.35),
-    0 4px 12px rgba(0, 0, 0, 0.2),
-    inset 0 2px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 767px) {
-  #board#board {
-    background: rgba(245, 242, 237, 0.55) !important;
-    border-radius: 14px;
+/* 连续曲率圆角（Chrome 139+ 渐进增强，其余浏览器维持标准圆角） */
+@supports (corner-shape: squircle) {
+  #board#board,
+  #board#board::before {
+    corner-shape: squircle;
   }
-  
+}
+
+/* ---------- 渐变发丝描边 ---------- */
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  #board#board,
   html[data-user-color-scheme="dark"] #board#board {
-    background: rgba(19, 16, 12, 0.5) !important;
+    border-color: transparent;
   }
+
+  #board#board::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(170deg,
+      var(--edge-top),
+      var(--edge-mid) 38%,
+      var(--edge-mid) 62%,
+      var(--edge-bot));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ---------- 深色模式 · 乌木 ---------- */
+html[data-user-color-scheme="dark"] #board#board {
+  --board-tint: 19, 16, 12;
+  --board-alpha: 0.42;
+  --board-alpha-top: 0.3;
+  --board-saturate: 120%;
+  --board-bright: 0.96;
+
+  --edge-top: rgba(255, 255, 255, 0.26);
+  --edge-mid: rgba(255, 255, 255, 0.07);
+  --edge-bot: rgba(255, 255, 255, 0.12);
+
+  --shadow-ambient:
+    0 1px 2px rgba(0, 0, 0, 0.28),
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 28px 72px rgba(0, 0, 0, 0.42);
+  --glow-top:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 24px 48px -24px rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* ---------- 移动端（< 768px）：提浓度、降负载 ---------- */
+@media (max-width: 767.98px) {
+  #board#board {
+    --board-alpha: 0.56;
+    --board-alpha-top: 0.42;
+    --board-fade: 160px;
+    --board-blur: 12px;
+    --shadow-ambient:
+      0 1px 2px rgba(60, 45, 30, 0.05),
+      0 6px 20px rgba(80, 60, 40, 0.06);
+  }
+  html[data-user-color-scheme="dark"] #board#board {
+    --board-alpha: 0.52;
+    --board-alpha-top: 0.4;
+    --shadow-ambient:
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* ---------- 高分屏真发丝（物理 0.5px） ---------- */
+@media (min-resolution: 2dppx) {
+  #board#board { border-width: 0.5px; }
+
+  @supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+    #board#board::before {
+      inset: -0.5px;
+      padding: 0.5px;
+    }
+  }
+}
+
+/* ---------- 降级 ---------- */
+/* 无 backdrop-filter：转近实体保可读 */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  #board#board,
+  html[data-user-color-scheme="dark"] #board#board {
+    --board-alpha: 0.94;
+    --board-alpha-top: 0.94;
+  }
+}
+
+/* 系统降低透明度 / 提高对比度：转实体并卸掉模糊开销 */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  #board#board,
+  html[data-user-color-scheme="dark"] #board#board {
+    --board-alpha: 0.97;
+    --board-alpha-top: 0.97;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #board#board { transition: none; }
+}
+
+/* 打印 / 导出 PDF：全部清零 */
+@media print {
+  #board#board,
+  html[data-user-color-scheme="dark"] #board#board {
+    background: #fff !important;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    margin-top: 0 !important;
+  }
+
+  #board#board::before { content: none; }
 }

@@ -114,16 +114,16 @@ a.list-group-item:hover,
   background-repeat: no-repeat;
   background-size: 700% 100%;
   background-position: 0% 0%;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;                /* Firefox 兼容 */
+  image-rendering: crisp-edges;                /* 旧版浏览器回退 */
+  image-rendering: pixelated;                  /* 标准值放最后，理解它的浏览器以此为准 */
   cursor: pointer;
   pointer-events: auto;                        /* 彩蛋：点身体会跳 */
 }
 
-/* 尘土：落地/疾跑时 JS 触发，steps() 保持像素味 */
-#pixel-runner .mario-dust {
+/* 尘土：落地/疾跑时 JS 触发，steps() 保持像素味。
+   挂在 track 上（世界坐标），left 由 JS 在喷发瞬间写入落点，不跟随马里奥平移 */
+#reading-track .mario-dust {
   position: absolute;
-  left: 50%;
   bottom: 0;
   width: 3px;
   height: 3px;
@@ -132,10 +132,10 @@ a.list-group-item:hover,
   color: rgba(120, 120, 120, 0.55);
   pointer-events: none;
 }
-#pixel-runner .mario-dust.play {
+#reading-track .mario-dust.play {
   animation: mario-dust-puff 0.3s steps(3, end) forwards;
 }
-#pixel-runner .mario-dust.big.play {
+#reading-track .mario-dust.big.play {
   animation-name: mario-dust-puff-big;
   animation-duration: 0.38s;
 }
@@ -157,15 +157,52 @@ a.list-group-item:hover,
 @media (prefers-color-scheme: dark) {
   :root:not([data-user-color-scheme="light"]) #reading-track { background: rgba(255, 255, 255, 0.15); }
   :root:not([data-user-color-scheme="light"]) #reading-bar   { background: rgba(255, 255, 255, 0.4); }
-  :root:not([data-user-color-scheme="light"]) #pixel-runner .mario-dust { color: rgba(210, 210, 210, 0.45); }
+  :root:not([data-user-color-scheme="light"]) #reading-track .mario-dust { color: rgba(210, 210, 210, 0.45); }
 }
 [data-user-color-scheme="dark"] #reading-track { background: rgba(255, 255, 255, 0.15) !important; }
 [data-user-color-scheme="dark"] #reading-bar   { background: rgba(255, 255, 255, 0.4) !important; }
-[data-user-color-scheme="dark"] #pixel-runner .mario-dust { color: rgba(210, 210, 210, 0.45) !important; }
+[data-user-color-scheme="dark"] #reading-track .mario-dust { color: rgba(210, 210, 210, 0.45) !important; }
 [data-user-color-scheme="light"] #reading-track { background: rgba(0, 0, 0, 0.1) !important; }
 [data-user-color-scheme="light"] #reading-bar   { background: rgba(100, 100, 100, 0.3) !important; }
 
 /* 尊重减少动效偏好：JS 侧同步降级为静态定位 */
 @media (prefers-reduced-motion: reduce) {
-  #pixel-runner .mario-dust { display: none; }
+  #reading-track .mario-dust { display: none; }
+}
+
+/* ============================================================
+   Banner 原生视差（parallax: false + CSS scroll-timeline）
+   ------------------------------------------------------------
+   主题配置 banner.parallax 设为 false —— 关闭 Fluid 那套随滚动改写
+   .side-col 布局 padding 的 JS，正是它让页面几何成为 scrollY 的函数、
+   刷新 restore 时回流上滑。改用原生 scroll-driven animation：视差跑在
+   合成器线程，只动 transform，不碰布局，页面几何与 scrollY 永久脱钩，
+   位移在结构上不可能发生。
+   位移量 --parallax-shift 可调：越大越明显，过大会露出图片边缘（banner
+   通常 60~100vh，12vh 是安全上限附近的舒适值）。
+   不支持 scroll-timeline 的旧浏览器：动画不生效，banner 静止，无副作用。
+   ============================================================ */
+@keyframes banner-parallax {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, var(--parallax-shift, 12vh), 0); }
+}
+
+#banner {
+  animation: banner-parallax linear both;
+  animation-timeline: scroll(root);
+  will-change: transform;
+  transition: none !important;   /* 斩断主题可能加的 transition，防与滚动驱动打架 */
+}
+
+/* 文章卡片始终盖在 banner 之上 */
+#board {
+  position: relative;
+  z-index: 10;
+}
+
+/* 底部刷新上移的防塌陷占位：评论区未加载时先撑住高度，
+   避免它撑开的瞬间把上方内容顶动。只用 min-height，不用
+   content-visibility（那会在滚入滚出时重新渲染，反而制造跳动） */
+#comments, #waline {
+  min-height: 450px;
 }
