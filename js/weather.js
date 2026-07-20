@@ -224,11 +224,16 @@
       e.stopPropagation();
       root.classList.toggle('mw-open');
     });
-    document.addEventListener('click', function () {
-      root.classList.remove('mw-open');
-      var box = root.querySelector('.mw-searchbox');
-      if (box) box.style.display = 'none';
-    });
+    if (!window.__mwDocBound) {
+      window.__mwDocBound = true;
+      document.addEventListener('click', function () {
+        var n = document.getElementById(EL_ID);
+        if (!n) return;
+        n.classList.remove('mw-open');
+        var box = n.querySelector('.mw-searchbox');
+        if (box) box.style.display = 'none';
+      });
+    }
   }
 
   function buildQuery() {

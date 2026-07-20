@@ -9,10 +9,10 @@
    ============================================================ */
 
 #mw-weather {
-  --mw-ink: #2b2b2b;
-  --mw-sub: #9096a0;
+  --mw-ink: #2e2b27;
+  --mw-sub: #99917f;
   --mw-accent: #c45c5c;
-  --mw-panel-bg: rgba(244, 242, 236, .78);   /* 月白玻璃 */
+  --mw-panel-bg: rgba(244, 242, 236, .86);   /* 月白玻璃 */
   --mw-font: "Noto Serif SC", serif;
 
   position: relative;
@@ -45,7 +45,7 @@
 #mw-weather .mw-panel {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 12px);
+  bottom: calc(100% - 6px);
   width: max-content;
   max-width: min(340px, 88vw);
   padding: clamp(12px, 1.6vw, 16px) clamp(16px, 2.2vw, 22px);
@@ -94,12 +94,13 @@
   font-size: .78rem;
   letter-spacing: .05em;
   line-height: 2.05;
-  white-space: nowrap;
+  white-space: normal;
   color: var(--mw-sub);
 }
+#mw-weather .mw-pair { white-space: nowrap; }
 #mw-weather .mw-line .mw-k { color: var(--mw-sub); margin-right: .32em; }
 #mw-weather .mw-line .mw-v { color: var(--mw-ink); font-variant-numeric: tabular-nums; letter-spacing: .03em; }
-#mw-weather .mw-line .mw-dot { color: var(--mw-sub); opacity: .4; margin: 0 .5em; }
+#mw-weather .mw-line .mw-dot { color: var(--mw-sub); opacity: .32; margin: 0 .5em; }
 
 /* ———————————————— 位置校正：一行小注 ———————————————— */
 #mw-weather .mw-fixrow { margin-top: 8px; }
@@ -158,8 +159,8 @@
 
 /* ———————————————— 暗色：乌木玻璃 ———————————————— */
 html[data-user-color-scheme="dark"] #mw-weather {
-  --mw-ink: #e8ecef;
-  --mw-sub: #82878f;
+  --mw-ink: #ecebe6;
+  --mw-sub: #8b8478;
   --mw-panel-bg: rgba(24, 24, 26, .82);
 }
 html[data-user-color-scheme="dark"] #mw-weather .mw-panel {
@@ -178,8 +179,8 @@ html[data-user-color-scheme="dark"] #mw-weather .mw-input {
 }
 @media (prefers-color-scheme: dark) {
   html:not([data-user-color-scheme="light"]) #mw-weather {
-    --mw-ink: #e8ecef;
-    --mw-sub: #82878f;
+    --mw-ink: #ecebe6;
+    --mw-sub: #8b8478;
     --mw-panel-bg: rgba(24, 24, 26, .82);
   }
   html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel {
