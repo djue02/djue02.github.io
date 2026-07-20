@@ -11,7 +11,7 @@
 #mw-weather {
   --mw-ink: #2e2b27;
   --mw-sub: #99917f;
-  --mw-accent: #c45c5c;
+  --mw-accent: #5ac2e7;
   --mw-panel-bg: rgba(244, 242, 236, .86);   /* 月白玻璃 */
   --mw-focus: rgba(46, 43, 39, .38);         /* 聚焦线：墨色微醒 */
   --mw-font: "Noto Serif SC", serif;
@@ -74,7 +74,7 @@
     135deg,
     rgba(255, 255, 255, .62),
     rgba(255, 255, 255, .10) 42%,
-    rgba(196, 92, 92, .11)
+    rgba(90, 194, 231, .11)
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -189,7 +189,7 @@ html[data-user-color-scheme="dark"] #mw-weather .mw-panel::before {
     135deg,
     rgba(255, 255, 255, .16),
     rgba(255, 255, 255, .03) 42%,
-    rgba(196, 92, 92, .14)
+    rgba(90, 194, 231, .14)
   );
 }
 html[data-user-color-scheme="dark"] #mw-weather .mw-input {
@@ -212,7 +212,7 @@ html[data-user-color-scheme="dark"] #mw-weather .mw-input {
       135deg,
       rgba(255, 255, 255, .16),
       rgba(255, 255, 255, .03) 42%,
-      rgba(196, 92, 92, .14)
+      rgba(90, 194, 231, .14)
     );
   }
   html:not([data-user-color-scheme="light"]) #mw-weather .mw-input {

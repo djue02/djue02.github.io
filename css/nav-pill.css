@@ -1,0 +1,60 @@
+/**
+ * nav-pill.css — 导航栏滑块高亮
+ * 配合 nav-pill.js 使用(滑块元素由 JS 注入)
+ */
+
+#navbar .navbar-nav {
+  position: relative; /* 滑块的定位上下文 */
+}
+
+#navbar .navbar-nav > .nav-item > .nav-link {
+  position: relative;
+  z-index: 1; /* 文字与图标压在滑块上层 */
+}
+
+#navbar .nav-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: 8px;
+  background: var(--nav-pill-bg, rgba(0, 0, 0, 0.22));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px); /* 透明导航压在头图上时有轻微玻璃感,不需要可删 */
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition:
+    transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1),
+    width     0.38s cubic-bezier(0.22, 0.61, 0.36, 1),
+    height    0.38s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity   0.22s ease;
+}
+
+#navbar .nav-pill.nav-pill--visible {
+  opacity: 1;
+}
+
+/* 首次出现:只保留淡入,位移与尺寸瞬时落位 */
+#navbar .nav-pill.nav-pill--instant {
+  transition: opacity 0.22s ease;
+}
+
+/*
+ * 下滑后导航栏收起为实底(Fluid 的 .top-nav-collapse),滑块略加深保持存在感。
+ * 墨色在深浅底上都成立:深色底是沉下去的压块,浅色底就是常规的悬停灰;
+ * 若收起态是浅色底且嫌重,降到 rgba(0, 0, 0, 0.07) 左右即可。
+ */
+#navbar.top-nav-collapse {
+  --nav-pill-bg: rgba(0, 0, 0, 0.25);
+}
+
+html[data-user-color-scheme='dark'] #navbar.top-nav-collapse {
+  --nav-pill-bg: rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #navbar .nav-pill {
+    transition: opacity 0.22s ease;
+  }
+}

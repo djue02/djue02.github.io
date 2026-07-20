@@ -72,6 +72,7 @@
 <link rel="stylesheet" href="/css/fluid-search-apple.css">
 <link rel="stylesheet" href="/css/mario.css">
 <link rel="stylesheet" href="/css/weather.css">
+<link rel="stylesheet" href="/css/nav-pill.css">
 
 
 
@@ -113,7 +114,10 @@
 
 
   
-<!-- hexo injector head_end start -->
+<!-- hexo injector head_end start --><style id="rm-critical">
+#rightmenu-wrapper:not(.show){visibility:hidden;pointer-events:none}
+.tooltip-rightmenu:not(.show-tooltip){visibility:hidden;opacity:0}
+</style>
 <style id="life-loader-style">
 /* 首帧即在场:与生命体同生,盖住装台中的页面 */
 #life-loader {
@@ -223,13 +227,10 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
   #life-loader.is-done { transition-delay: 0s, 0s; transition-duration: .2s, .2s; }
 }
 </style>
-<style id="rm-critical">
-#rightmenu-wrapper:not(.show){visibility:hidden;pointer-events:none}
-.tooltip-rightmenu:not(.show-tooltip){visibility:hidden;opacity:0}
-</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
 
 
-<body><!-- hexo injector body_begin start -->
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div>
 <div id="life-loader" aria-hidden="true">
   <div class="lf-stage">
     <div class="lf-body">
@@ -392,7 +393,7 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
   }
 })();
 </script>
-<div id="web_bg"></div><!-- hexo injector body_begin end -->
+<!-- hexo injector body_begin end -->
   <!-- 样式置顶:body 内的 <link> 会阻塞其后内容的渲染,菜单标记在它之后,
      便永远不会以裸 HTML 形态闪现(FOUC 双保险之二;
      之一是 scripts/injector.js 注入 head 的关键隐藏样式) -->
@@ -821,6 +822,7 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
 <script src="/js/about.js"></script>
 <script src="/js/footer-video.js"></script>
 <script src="/js/weather.js"></script>
+<script src="/js/nav-pill.js"></script>
 
 
 
