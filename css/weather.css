@@ -1,0 +1,110 @@
+@import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.8.0/font/qweather-icons.css");
+
+/* ============================================================
+   weather.css — 和风富数据组件 (月白 × 乌木)
+   数据来自你的 Cloudflare Worker；天气图标用 QWeather-Icons。
+   头部常显：图标 · 城市 · 天气 · 温度
+   悬停/点按展开：体感 湿度 风 / 空气 / 生活指数
+   ============================================================ */
+
+#mw-weather {
+  --mw-ink: #2b2b2b;                       /* 乌木 */
+  --mw-sub: #8a8f99;                       /* 次要灰 */
+  --mw-accent: #c45c5c;                    /* 玫瑰点缀（温度） */
+  --mw-panel-bg: rgba(238, 241, 245, .82); /* 月白玻璃 */
+  --mw-font: "Noto Serif SC", serif;
+
+  position: relative;
+  display: inline-block;
+  font-family: var(--mw-font);
+}
+
+/* —— 头部（可点、可键盘聚焦）—— */
+#mw-weather .mw-head {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .34em;
+  font-size: .84rem;
+  letter-spacing: .02em;
+  color: var(--mw-sub);
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+#mw-weather.mw-ready .mw-head { opacity: 1; }
+
+#mw-weather .mw-ico  { color: var(--mw-ink); font-size: 1.05em; line-height: 1; }
+#mw-weather .mw-city { color: var(--mw-ink); }
+#mw-weather .mw-desc { color: var(--mw-sub); transition: color .3s ease; }
+#mw-weather .mw-temp { color: var(--mw-accent); font-variant-numeric: tabular-nums; }
+#mw-weather .mw-sep  { color: var(--mw-sub); opacity: .45; }
+#mw-weather .mw-head:hover .mw-desc { color: var(--mw-ink); }
+
+/* —— 展开面板 —— */
+#mw-weather .mw-panel {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);                /* 向上弹出 */
+  width: max-content;
+  max-width: min(300px, 82vw);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--mw-panel-bg);
+  -webkit-backdrop-filter: saturate(150%) blur(10px);
+  backdrop-filter: saturate(150%) blur(10px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .10);
+  font-size: .76rem;
+  color: var(--mw-sub);
+  opacity: 0;
+  transform: translateY(4px);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease, visibility .25s;
+  z-index: 50;
+}
+#mw-weather:hover .mw-panel,
+#mw-weather.mw-open .mw-panel {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#mw-weather .mw-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .1em .9em;
+  line-height: 1.95;
+}
+#mw-weather .mw-row + .mw-row {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(138, 143, 153, .18);
+}
+#mw-weather .mw-row b { color: var(--mw-ink); font-weight: 500; }   /* 数值/等级用乌木强调 */
+#mw-weather .mw-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: .4em;
+  vertical-align: middle;
+}
+
+/* —— 挂载位置 —— */
+#mw-weather.mw--footer { display: block; margin-top: .5em; }
+#mw-weather.mw--fixed  { position: fixed; left: 16px; bottom: 14px; z-index: 90; }
+
+/* —— 暗色 —— */
+html[data-user-color-scheme="dark"] #mw-weather {
+  --mw-ink: #e8ecef;
+  --mw-sub: #868b94;
+  --mw-panel-bg: rgba(28, 28, 30, .82);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-user-color-scheme="light"]) #mw-weather {
+    --mw-ink: #e8ecef;
+    --mw-sub: #868b94;
+    --mw-panel-bg: rgba(28, 28, 30, .82);
+  }
+}

@@ -1,5 +1,5 @@
 /**
- * 页脚诗句点击播放视频
+ * 页脚诗句点击播放视频（自适应比例，无黑边版）
  * for Hexo Fluid
  *
  * 用法：
@@ -34,16 +34,31 @@
         opacity:0;transition:opacity .35s ease;
       }
       #poem-mask.show{opacity:1;}
+      /* 盒子不写死比例，用 fit-content 裹住视频真实尺寸 —— 无黑边 */
       #poem-box{
         position:relative;
-        width:min(88vw,880px);aspect-ratio:16/9;background:#000;
+        background:#000;
         border-radius:14px;overflow:hidden;
         box-shadow:0 24px 64px rgba(0,0,0,.45);
         transform:scale(.96);
         transition:transform .35s cubic-bezier(.22,1,.36,1);
+        line-height:0;font-size:0;
       }
       #poem-mask.show #poem-box{transform:scale(1);}
-      #poem-box video,#poem-box iframe{width:100%;height:100%;border:0;display:block;}
+      /* video 按自身比例缩放，宽高各受屏幕约束 */
+      #poem-box video{
+        display:block;
+        width:auto;height:auto;
+        max-width:min(88vw,440px);
+        max-height:88vh;
+      }
+      /* iframe 无固有尺寸，仍给一个 9:16 框 */
+      #poem-box iframe{
+        display:block;border:0;
+        width:min(88vw,440px);
+        aspect-ratio:9/16;
+        max-height:88vh;
+      }
       #poem-close{
         position:absolute;top:10px;right:10px;z-index:2;
         width:32px;height:32px;border:0;border-radius:50%;
