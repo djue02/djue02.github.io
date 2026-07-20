@@ -1,5 +1,5 @@
 /**
- * 页脚诗句点击播放视频（自适应比例，无黑边版）
+ * 页脚诗句点击播放视频（自适应比例 · 无黑边 · 无横屏闪烁）
  * for Hexo Fluid
  *
  * 用法：
@@ -34,18 +34,18 @@
         opacity:0;transition:opacity .35s ease;
       }
       #poem-mask.show{opacity:1;}
-      /* 盒子不写死比例，用 fit-content 裹住视频真实尺寸 —— 无黑边 */
+      /* 盒子默认隐藏，等视频元数据就绪（拿到真实宽高）再露出 —— 杜绝 300x150 横框闪烁 */
       #poem-box{
         position:relative;
         background:#000;
         border-radius:14px;overflow:hidden;
         box-shadow:0 24px 64px rgba(0,0,0,.45);
-        transform:scale(.96);
-        transition:transform .35s cubic-bezier(.22,1,.36,1);
+        opacity:0;transform:scale(.96);
+        transition:opacity .3s ease,transform .35s cubic-bezier(.22,1,.36,1);
         line-height:0;font-size:0;
       }
-      #poem-mask.show #poem-box{transform:scale(1);}
-      /* video 按自身比例缩放，宽高各受屏幕约束 */
+      #poem-box.ready{opacity:1;transform:scale(1);}
+      /* video 按自身比例缩放，宽高各受屏幕约束 —— 无黑边 */
       #poem-box video{
         display:block;
         width:auto;height:auto;
@@ -84,7 +84,27 @@
     mask.innerHTML = `<div id="poem-box"><button id="poem-close" aria-label="关闭">✕</button>${inner}</div>`;
     document.body.appendChild(mask);
     document.body.style.overflow = 'hidden';
+
+    // 遮罩立即淡入，点击有即时反馈
     requestAnimationFrame(() => mask.classList.add('show'));
+
+    // 盒子等元数据就绪再出场
+    const box = mask.querySelector('#poem-box');
+    const video = mask.querySelector('video');
+    const reveal = () => box && box.classList.add('ready');
+
+    if (video) {
+      if (video.readyState >= 1) {
+        // 元数据已在缓存里，直接显示
+        requestAnimationFrame(reveal);
+      } else {
+        video.addEventListener('loadedmetadata', reveal, { once: true });
+        video.addEventListener('error', reveal, { once: true }); // 加载失败也别卡住界面
+        setTimeout(reveal, 3000); // 兜底：3 秒还没元数据就先显示
+      }
+    } else {
+      requestAnimationFrame(reveal); // iframe 没有元数据事件，直接显示
+    }
 
     mask.addEventListener('click', function (e) {
       if (e.target === mask || e.target.id === 'poem-close') close();
@@ -96,6 +116,8 @@
     const m = mask;
     mask = null;
     m.classList.remove('show');
+    const box = m.querySelector('#poem-box');
+    if (box) box.classList.remove('ready');
     document.body.style.overflow = '';
     setTimeout(function () { m.remove(); }, 350); // 移除即停止播放
   }
