@@ -79,7 +79,3 @@ a.list-group-item:hover,
 #comments, #waline {
   min-height: 450px;
 }
-
-#subtitle .accent-char{
-  color:#c45c5c;
-}
