@@ -1,17 +1,17 @@
 @import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.8.0/font/qweather-icons.css");
 
 /* ============================================================
-   weather.css — 和风富数据组件 (月白 × 乌木) · 面板精修版
-   头部常显：图标 · 城市 · 天气 · 温度
-   悬停/点按展开：体感 湿度 风 ｜ 空气 ｜ 穿衣 洗车 感冒
+   weather.css — 和风富数据组件 (月白 × 乌木) · 静默清单版
+   头部：图标 · 城市 · 天气 · 温度
+   面板：左标签右数值的对齐清单，无彩色装饰，细线分区
    ============================================================ */
 
 #mw-weather {
-  --mw-ink: #2b2b2b;                       /* 乌木 */
-  --mw-sub: #8a8f99;                       /* 次要灰 */
-  --mw-accent: #c45c5c;                    /* 玫瑰点缀（温度） */
-  --mw-line: rgba(43, 43, 43, .08);        /* 分隔线 */
-  --mw-panel-bg: rgba(243, 245, 248, .88); /* 月白玻璃 */
+  --mw-ink: #2b2b2b;
+  --mw-sub: #9096a0;
+  --mw-accent: #c45c5c;
+  --mw-line: rgba(43, 43, 43, .07);
+  --mw-panel-bg: rgba(250, 251, 252, .94);
   --mw-font: "Noto Serif SC", serif;
 
   position: relative;
@@ -45,132 +45,101 @@
   position: absolute;
   left: 0;
   bottom: calc(100% + 10px);
-  width: max-content;
-  min-width: 220px;
-  max-width: min(320px, 88vw);
-  padding: 14px 16px 12px;
-  border-radius: 14px;
+  width: 188px;
+  max-width: 88vw;
+  padding: 6px 14px;
+  border-radius: 12px;
   background: var(--mw-panel-bg);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
-  border: 1px solid rgba(255, 255, 255, .55);
-  box-shadow:
-    0 1px 2px  rgba(0, 0, 0, .04),
-    0 10px 32px rgba(0, 0, 0, .09);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--mw-line);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .07);
   opacity: 0;
-  transform: translateY(5px) scale(.985);
+  transform: translateY(4px);
   transform-origin: bottom left;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .22s ease, transform .22s cubic-bezier(.32,.72,.35,1), visibility .22s;
+  transition: opacity .2s ease, transform .2s ease, visibility .2s;
   z-index: 50;
 }
 #mw-weather:hover .mw-panel,
 #mw-weather.mw-open .mw-panel {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   visibility: visible;
   pointer-events: auto;
 }
 
-/* 弹性换行网格：每格按内容自适应宽度，不够放就自动换行，文字永不截断 */
-#mw-weather .mw-grid {
+/* 行：标签靠左灰、数值靠右墨，一行一条 */
+#mw-weather .mw-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 16px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 0;
+  font-size: .78rem;
+  line-height: 1.5;
 }
-#mw-weather .mw-item { min-width: 0; flex: 0 0 auto; }
 #mw-weather .mw-k {
-  display: block;
-  font-size: .68rem;
-  letter-spacing: .06em;
   color: var(--mw-sub);
-  margin-bottom: 2px;
+  font-size: .72rem;
+  letter-spacing: .05em;
   white-space: nowrap;
 }
 #mw-weather .mw-v {
-  display: block;
-  font-size: .8rem;
   color: var(--mw-ink);
   font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
   white-space: nowrap;
+  text-align: right;
 }
 
-/* 分区之间：细线 + 呼吸 */
-#mw-weather .mw-block + .mw-block {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--mw-line);
-}
-
-/* 空气行：小圆点 + 数值等级 */
-#mw-weather .mw-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  margin-right: .45em;
-  vertical-align: 1px;
-}
+/* 分区：细线 */
+#mw-weather .mw-block { padding: 4px 0; }
+#mw-weather .mw-block + .mw-block { border-top: 1px solid var(--mw-line); }
 
 /* ———————————————— 位置校正 ———————————————— */
-#mw-weather .mw-fixrow { padding-top: 10px; }
+#mw-weather .mw-fixrow { padding: 8px 0 9px; }
 #mw-weather .mw-fixlink {
   all: unset;
   cursor: pointer;
   display: inline-block;
-  font-size: .68rem;
+  font-size: .66rem;
+  letter-spacing: .04em;
   color: var(--mw-sub);
-  opacity: .75;
-  letter-spacing: .02em;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  transition: opacity .2s ease, text-decoration-color .2s ease;
+  opacity: .6;
+  transition: opacity .2s ease;
 }
-#mw-weather .mw-fixlink:hover {
-  opacity: 1;
-  text-decoration-color: currentColor;
-}
+#mw-weather .mw-fixlink:hover { opacity: 1; }
 #mw-weather .mw-reset { display: block; margin-top: 4px; }
 
 #mw-weather .mw-searchbox { margin-top: 8px; }
 #mw-weather .mw-input {
   width: 100%;
   box-sizing: border-box;
-  padding: 6px 9px;
-  font-size: .76rem;
+  padding: 5px 8px;
+  font-size: .74rem;
   font-family: var(--mw-font);
   color: var(--mw-ink);
-  background: rgba(255, 255, 255, .55);
+  background: transparent;
   border: 1px solid var(--mw-line);
-  border-radius: 8px;
+  border-radius: 7px;
   outline: none;
   transition: border-color .2s ease;
 }
-#mw-weather .mw-input:focus { border-color: var(--mw-accent); }
-#mw-weather .mw-input::placeholder { color: var(--mw-sub); opacity: .7; }
+#mw-weather .mw-input:focus { border-color: rgba(43, 43, 43, .22); }
+#mw-weather .mw-input::placeholder { color: var(--mw-sub); opacity: .6; }
 
-#mw-weather .mw-results {
-  margin-top: 4px;
-  max-height: 150px;
-  overflow-y: auto;
-}
+#mw-weather .mw-results { margin-top: 3px; max-height: 150px; overflow-y: auto; }
 #mw-weather .mw-result,
 #mw-weather .mw-hint {
   padding: 5px 6px;
-  font-size: .74rem;
+  font-size: .72rem;
   border-radius: 6px;
 }
-#mw-weather .mw-hint { color: var(--mw-sub); opacity: .7; }
-#mw-weather .mw-result {
-  color: var(--mw-ink);
-  cursor: pointer;
-}
-#mw-weather .mw-result:hover { background: rgba(196, 92, 92, .1); }
-
-html[data-user-color-scheme="dark"] #mw-weather .mw-input { background: rgba(255, 255, 255, .06); }
-@media (prefers-color-scheme: dark) {
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-input { background: rgba(255, 255, 255, .06); }
-}
+#mw-weather .mw-hint { color: var(--mw-sub); opacity: .65; }
+#mw-weather .mw-result { color: var(--mw-ink); cursor: pointer; }
+#mw-weather .mw-result:hover { background: rgba(43, 43, 43, .05); }
 
 /* ———————————————— 挂载位置 ———————————————— */
 #mw-weather.mw--footer { display: block; margin-top: .5em; }
@@ -179,29 +148,25 @@ html[data-user-color-scheme="dark"] #mw-weather .mw-input { background: rgba(255
 /* ———————————————— 暗色 ———————————————— */
 html[data-user-color-scheme="dark"] #mw-weather {
   --mw-ink: #e8ecef;
-  --mw-sub: #868b94;
-  --mw-line: rgba(232, 236, 239, .10);
-  --mw-panel-bg: rgba(30, 30, 33, .86);
+  --mw-sub: #82878f;
+  --mw-line: rgba(232, 236, 239, .09);
+  --mw-panel-bg: rgba(29, 29, 32, .94);
 }
 html[data-user-color-scheme="dark"] #mw-weather .mw-panel {
-  border-color: rgba(255, 255, 255, .08);
-  box-shadow:
-    0 1px 2px  rgba(0, 0, 0, .30),
-    0 10px 32px rgba(0, 0, 0, .38);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
 }
+html[data-user-color-scheme="dark"] #mw-weather .mw-result:hover { background: rgba(232, 236, 239, .06); }
 @media (prefers-color-scheme: dark) {
   html:not([data-user-color-scheme="light"]) #mw-weather {
     --mw-ink: #e8ecef;
-    --mw-sub: #868b94;
-    --mw-line: rgba(232, 236, 239, .10);
-    --mw-panel-bg: rgba(30, 30, 33, .86);
+    --mw-sub: #82878f;
+    --mw-line: rgba(232, 236, 239, .09);
+    --mw-panel-bg: rgba(29, 29, 32, .94);
   }
   html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel {
-    border-color: rgba(255, 255, 255, .08);
-    box-shadow:
-      0 1px 2px  rgba(0, 0, 0, .30),
-      0 10px 32px rgba(0, 0, 0, .38);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
   }
+  html:not([data-user-color-scheme="light"]) #mw-weather .mw-result:hover { background: rgba(232, 236, 239, .06); }
 }
 
 @media (prefers-reduced-motion: reduce) {
