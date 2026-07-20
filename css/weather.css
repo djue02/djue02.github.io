@@ -1,17 +1,18 @@
 @import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.8.0/font/qweather-icons.css");
 
 /* ============================================================
-   weather.css — 和风富数据组件 (月白 × 乌木) · 静默清单版
-   头部：图标 · 城市 · 天气 · 温度
-   面板：左标签右数值的对齐清单，无彩色装饰，细线分区
+   weather.css — 和风富数据组件 · 随你博客的版本
+   设计语言对齐站内：
+   · 页脚同款居中排版 + 间隔点「·」文风（6k 字 · 5 文 · …）
+   · #board 同款毛玻璃 + mask-composite 渐变描边
+   · clamp() 流体圆角/模糊；玫瑰色只作描边里的一缕暗示
    ============================================================ */
 
 #mw-weather {
   --mw-ink: #2b2b2b;
   --mw-sub: #9096a0;
   --mw-accent: #c45c5c;
-  --mw-line: rgba(43, 43, 43, .07);
-  --mw-panel-bg: rgba(250, 251, 252, .94);
+  --mw-panel-bg: rgba(244, 242, 236, .78);   /* 月白玻璃 */
   --mw-font: "Noto Serif SC", serif;
 
   position: relative;
@@ -19,7 +20,7 @@
   font-family: var(--mw-font);
 }
 
-/* ———————————————— 头部 ———————————————— */
+/* ———————————————— 头部（不变，与页脚同排版） ———————————————— */
 #mw-weather .mw-head {
   all: unset;
   cursor: pointer;
@@ -40,135 +41,163 @@
 #mw-weather .mw-temp { color: var(--mw-accent); font-variant-numeric: tabular-nums; }
 #mw-weather .mw-sep  { color: var(--mw-sub); opacity: .45; }
 
-/* ———————————————— 面板 ———————————————— */
+/* ———————————————— 面板：居中文流，像页脚的一段小注 ———————————————— */
 #mw-weather .mw-panel {
   position: absolute;
-  left: 0;
-  bottom: calc(100% + 10px);
-  width: 188px;
-  max-width: 88vw;
-  padding: 6px 14px;
-  border-radius: 12px;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  width: max-content;
+  max-width: min(340px, 88vw);
+  padding: clamp(12px, 1.6vw, 16px) clamp(16px, 2.2vw, 22px);
+  border-radius: clamp(12px, 1.4vw, 16px);
   background: var(--mw-panel-bg);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--mw-line);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, .07);
+  -webkit-backdrop-filter: blur(clamp(10px, 1.6vw, 16px)) saturate(120%);
+  backdrop-filter: blur(clamp(10px, 1.6vw, 16px)) saturate(120%);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .07);
+  text-align: center;
   opacity: 0;
-  transform: translateY(4px);
-  transform-origin: bottom left;
+  transform: translate(-50%, 4px);
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  transition: opacity .22s ease, transform .22s ease, visibility .22s;
   z-index: 50;
+}
+/* #board 同款：mask-composite 渐变描边，玫瑰只在光里若隐若现 */
+#mw-weather .mw-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, .62),
+    rgba(255, 255, 255, .10) 42%,
+    rgba(196, 92, 92, .16)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 #mw-weather:hover .mw-panel,
 #mw-weather.mw-open .mw-panel {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
   visibility: visible;
   pointer-events: auto;
 }
 
-/* 行：标签靠左灰、数值靠右墨，一行一条 */
-#mw-weather .mw-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 7px 0;
+/* 行：居中一行文字，词与词之间用「·」呼应页脚 */
+#mw-weather .mw-line {
   font-size: .78rem;
-  line-height: 1.5;
-}
-#mw-weather .mw-k {
-  color: var(--mw-sub);
-  font-size: .72rem;
   letter-spacing: .05em;
+  line-height: 2.05;
   white-space: nowrap;
+  color: var(--mw-sub);
 }
-#mw-weather .mw-v {
-  color: var(--mw-ink);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .02em;
-  white-space: nowrap;
-  text-align: right;
-}
+#mw-weather .mw-line .mw-k { color: var(--mw-sub); margin-right: .32em; }
+#mw-weather .mw-line .mw-v { color: var(--mw-ink); font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+#mw-weather .mw-line .mw-dot { color: var(--mw-sub); opacity: .4; margin: 0 .5em; }
 
-/* 分区：细线 */
-#mw-weather .mw-block { padding: 4px 0; }
-#mw-weather .mw-block + .mw-block { border-top: 1px solid var(--mw-line); }
-
-/* ———————————————— 位置校正 ———————————————— */
-#mw-weather .mw-fixrow { padding: 8px 0 9px; }
+/* ———————————————— 位置校正：一行小注 ———————————————— */
+#mw-weather .mw-fixrow { margin-top: 8px; }
 #mw-weather .mw-fixlink {
   all: unset;
   cursor: pointer;
   display: inline-block;
-  font-size: .66rem;
-  letter-spacing: .04em;
+  font-size: .64rem;
+  letter-spacing: .08em;
   color: var(--mw-sub);
-  opacity: .6;
+  opacity: .55;
   transition: opacity .2s ease;
 }
 #mw-weather .mw-fixlink:hover { opacity: 1; }
-#mw-weather .mw-reset { display: block; margin-top: 4px; }
+#mw-weather .mw-reset { margin-left: 1em; }
 
 #mw-weather .mw-searchbox { margin-top: 8px; }
 #mw-weather .mw-input {
-  width: 100%;
+  width: 170px;
+  max-width: 100%;
   box-sizing: border-box;
-  padding: 5px 8px;
+  padding: 5px 10px;
   font-size: .74rem;
   font-family: var(--mw-font);
+  text-align: center;
+  letter-spacing: .05em;
   color: var(--mw-ink);
   background: transparent;
-  border: 1px solid var(--mw-line);
-  border-radius: 7px;
+  border: none;
+  border-bottom: 1px solid rgba(43, 43, 43, .14);
+  border-radius: 0;
   outline: none;
-  transition: border-color .2s ease;
+  transition: border-color .25s ease;
 }
-#mw-weather .mw-input:focus { border-color: rgba(43, 43, 43, .22); }
-#mw-weather .mw-input::placeholder { color: var(--mw-sub); opacity: .6; }
+#mw-weather .mw-input:focus { border-bottom-color: var(--mw-accent); }
+#mw-weather .mw-input::placeholder { color: var(--mw-sub); opacity: .55; }
 
-#mw-weather .mw-results { margin-top: 3px; max-height: 150px; overflow-y: auto; }
+#mw-weather .mw-results { margin-top: 5px; max-height: 150px; overflow-y: auto; }
 #mw-weather .mw-result,
 #mw-weather .mw-hint {
-  padding: 5px 6px;
+  padding: 4px 6px;
   font-size: .72rem;
+  letter-spacing: .04em;
   border-radius: 6px;
 }
-#mw-weather .mw-hint { color: var(--mw-sub); opacity: .65; }
+#mw-weather .mw-hint { color: var(--mw-sub); opacity: .6; }
 #mw-weather .mw-result { color: var(--mw-ink); cursor: pointer; }
-#mw-weather .mw-result:hover { background: rgba(43, 43, 43, .05); }
+#mw-weather .mw-result:hover { color: var(--mw-accent); }
 
 /* ———————————————— 挂载位置 ———————————————— */
 #mw-weather.mw--footer { display: block; margin-top: .5em; }
 #mw-weather.mw--fixed  { position: fixed; left: 16px; bottom: 14px; z-index: 90; }
+#mw-weather.mw--fixed .mw-panel { left: 0; transform: translate(0, 4px); }
+#mw-weather.mw--fixed:hover .mw-panel,
+#mw-weather.mw--fixed.mw-open .mw-panel { transform: translate(0, 0); }
 
-/* ———————————————— 暗色 ———————————————— */
+/* ———————————————— 暗色：乌木玻璃 ———————————————— */
 html[data-user-color-scheme="dark"] #mw-weather {
   --mw-ink: #e8ecef;
   --mw-sub: #82878f;
-  --mw-line: rgba(232, 236, 239, .09);
-  --mw-panel-bg: rgba(29, 29, 32, .94);
+  --mw-panel-bg: rgba(24, 24, 26, .82);
 }
 html[data-user-color-scheme="dark"] #mw-weather .mw-panel {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .42);
 }
-html[data-user-color-scheme="dark"] #mw-weather .mw-result:hover { background: rgba(232, 236, 239, .06); }
+html[data-user-color-scheme="dark"] #mw-weather .mw-panel::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, .16),
+    rgba(255, 255, 255, .03) 42%,
+    rgba(196, 92, 92, .20)
+  );
+}
+html[data-user-color-scheme="dark"] #mw-weather .mw-input {
+  border-bottom-color: rgba(232, 236, 239, .14);
+}
 @media (prefers-color-scheme: dark) {
   html:not([data-user-color-scheme="light"]) #mw-weather {
     --mw-ink: #e8ecef;
     --mw-sub: #82878f;
-    --mw-line: rgba(232, 236, 239, .09);
-    --mw-panel-bg: rgba(29, 29, 32, .94);
+    --mw-panel-bg: rgba(24, 24, 26, .82);
   }
   html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel {
-    box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, .42);
   }
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-result:hover { background: rgba(232, 236, 239, .06); }
+  html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel::before {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, .16),
+      rgba(255, 255, 255, .03) 42%,
+      rgba(196, 92, 92, .20)
+    );
+  }
+  html:not([data-user-color-scheme="light"]) #mw-weather .mw-input {
+    border-bottom-color: rgba(232, 236, 239, .14);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #mw-weather .mw-panel { transition: opacity .15s ease; transform: none; }
+  #mw-weather .mw-panel { transition: opacity .15s ease; }
 }

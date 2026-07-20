@@ -54,14 +54,22 @@
   }
   function sep() { return el('span', 'mw-sep', '·'); }
 
-  // 一行：标签左 · 数值右
-  function row(label, value, title) {
-    var r = el('div', 'mw-row');
-    r.appendChild(el('span', 'mw-k', label));
-    var v = el('span', 'mw-v', value);
-    r.appendChild(v);
-    if (title) r.title = title;
-    return r;
+  // 「标签 值」一组词
+  function pair(label, value, title) {
+    var s = el('span', 'mw-pair');
+    s.appendChild(el('span', 'mw-k', label));
+    s.appendChild(el('span', 'mw-v', value));
+    if (title) s.title = title;
+    return s;
+  }
+  // 一行文流：词与词之间用「·」
+  function line(pairs) {
+    var l = el('div', 'mw-line');
+    pairs.forEach(function (p, i) {
+      if (i) l.appendChild(el('span', 'mw-dot', '\u00b7'));
+      l.appendChild(p);
+    });
+    return l;
   }
 
   function mountNode() {
@@ -83,7 +91,7 @@
 
   function buildFixRow() {
     var manual = readManualLoc();
-    var wrap = el('div', 'mw-block mw-fixrow');
+    var wrap = el('div', 'mw-fixrow');
 
     var link = el('button', 'mw-fixlink', manual ? '位置：' + manual.city + '（重选）' : '位置不对？点此修正');
     link.type = 'button';
@@ -182,31 +190,30 @@
 
     var panel = el('div', 'mw-panel');
 
-    // 块 1：体感 / 湿度 / 风
-    var b1 = el('div', 'mw-block');
-    if (d.now.feelsLike != null) b1.appendChild(row('体感', Math.round(+d.now.feelsLike) + '°'));
-    if (d.now.humidity  != null) b1.appendChild(row('湿度', d.now.humidity + '%'));
-    if (d.now.windDir)           b1.appendChild(row('风', d.now.windDir + ' ' + (d.now.windScale || '—') + ' 级'));
-    if (b1.childNodes.length) panel.appendChild(b1);
+    // 第一行：体感 · 湿度 · 风
+    var l1 = [];
+    if (d.now.feelsLike != null) l1.push(pair('体感', Math.round(+d.now.feelsLike) + '°'));
+    if (d.now.humidity  != null) l1.push(pair('湿度', d.now.humidity + '%'));
+    if (d.now.windDir)           l1.push(pair(d.now.windDir, (d.now.windScale || '—') + ' 级'));
+    if (l1.length) panel.appendChild(line(l1));
 
-    // 块 2：空气（数值 + 等级，无彩色装饰）
+    // 第二行：空气
     if (d.aqi && d.aqi.value) {
-      var b2 = el('div', 'mw-block');
-      b2.appendChild(row('空气', d.aqi.value + (d.aqi.category ? ' ' + d.aqi.category : ''),
-        d.aqi.primary ? '主要污染物 ' + d.aqi.primary : ''));
-      panel.appendChild(b2);
+      panel.appendChild(line([
+        pair('空气', d.aqi.value + (d.aqi.category ? ' ' + d.aqi.category : ''),
+          d.aqi.primary ? '主要污染物 ' + d.aqi.primary : '')
+      ]));
     }
 
-    // 块 3：生活指数（穿衣映射为衣着建议）
+    // 第三行：穿衣 · 洗车 · 感冒
     if (d.indices && d.indices.length) {
-      var b3 = el('div', 'mw-block');
-      d.indices.forEach(function (it) {
+      var l3 = d.indices.map(function (it) {
         var label = it.name.replace('指数', '');
         var value = it.category || '—';
         if (it.type === '3' && DRESS[value]) value = DRESS[value];
-        b3.appendChild(row(label, value, it.text || ''));
+        return pair(label, value, it.text || '');
       });
-      panel.appendChild(b3);
+      panel.appendChild(line(l3));
     }
 
     panel.appendChild(buildFixRow());
