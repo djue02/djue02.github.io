@@ -36,10 +36,9 @@
 
 #mw-weather .mw-ico  { color: var(--mw-ink); font-size: 1.05em; line-height: 1; }
 #mw-weather .mw-city { color: var(--mw-ink); }
-#mw-weather .mw-desc { color: var(--mw-sub); transition: color .3s ease; }
+#mw-weather .mw-desc { color: var(--mw-sub); }
 #mw-weather .mw-temp { color: var(--mw-accent); font-variant-numeric: tabular-nums; }
 #mw-weather .mw-sep  { color: var(--mw-sub); opacity: .45; }
-#mw-weather .mw-head:hover .mw-desc { color: var(--mw-ink); }
 
 /* ———————————————— 面板 ———————————————— */
 #mw-weather .mw-panel {
@@ -112,6 +111,66 @@
   border-radius: 50%;
   margin-right: .45em;
   vertical-align: 1px;
+}
+
+/* ———————————————— 位置校正 ———————————————— */
+#mw-weather .mw-fixrow { padding-top: 10px; }
+#mw-weather .mw-fixlink {
+  all: unset;
+  cursor: pointer;
+  display: inline-block;
+  font-size: .68rem;
+  color: var(--mw-sub);
+  opacity: .75;
+  letter-spacing: .02em;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: opacity .2s ease, text-decoration-color .2s ease;
+}
+#mw-weather .mw-fixlink:hover {
+  opacity: 1;
+  text-decoration-color: currentColor;
+}
+#mw-weather .mw-reset { display: block; margin-top: 4px; }
+
+#mw-weather .mw-searchbox { margin-top: 8px; }
+#mw-weather .mw-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 9px;
+  font-size: .76rem;
+  font-family: var(--mw-font);
+  color: var(--mw-ink);
+  background: rgba(255, 255, 255, .55);
+  border: 1px solid var(--mw-line);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color .2s ease;
+}
+#mw-weather .mw-input:focus { border-color: var(--mw-accent); }
+#mw-weather .mw-input::placeholder { color: var(--mw-sub); opacity: .7; }
+
+#mw-weather .mw-results {
+  margin-top: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+#mw-weather .mw-result,
+#mw-weather .mw-hint {
+  padding: 5px 6px;
+  font-size: .74rem;
+  border-radius: 6px;
+}
+#mw-weather .mw-hint { color: var(--mw-sub); opacity: .7; }
+#mw-weather .mw-result {
+  color: var(--mw-ink);
+  cursor: pointer;
+}
+#mw-weather .mw-result:hover { background: rgba(196, 92, 92, .1); }
+
+html[data-user-color-scheme="dark"] #mw-weather .mw-input { background: rgba(255, 255, 255, .06); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-user-color-scheme="light"]) #mw-weather .mw-input { background: rgba(255, 255, 255, .06); }
 }
 
 /* ———————————————— 挂载位置 ———————————————— */
