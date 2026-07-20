@@ -1,17 +1,17 @@
 @import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.8.0/font/qweather-icons.css");
 
 /* ============================================================
-   weather.css — 和风富数据组件 (月白 × 乌木)
-   数据来自你的 Cloudflare Worker；天气图标用 QWeather-Icons。
+   weather.css — 和风富数据组件 (月白 × 乌木) · 面板精修版
    头部常显：图标 · 城市 · 天气 · 温度
-   悬停/点按展开：体感 湿度 风 / 空气 / 生活指数
+   悬停/点按展开：体感 湿度 风 ｜ 空气 ｜ 穿衣 洗车 感冒
    ============================================================ */
 
 #mw-weather {
   --mw-ink: #2b2b2b;                       /* 乌木 */
   --mw-sub: #8a8f99;                       /* 次要灰 */
   --mw-accent: #c45c5c;                    /* 玫瑰点缀（温度） */
-  --mw-panel-bg: rgba(238, 241, 245, .82); /* 月白玻璃 */
+  --mw-line: rgba(43, 43, 43, .08);        /* 分隔线 */
+  --mw-panel-bg: rgba(243, 245, 248, .88); /* 月白玻璃 */
   --mw-font: "Noto Serif SC", serif;
 
   position: relative;
@@ -19,7 +19,7 @@
   font-family: var(--mw-font);
 }
 
-/* —— 头部（可点、可键盘聚焦）—— */
+/* ———————————————— 头部 ———————————————— */
 #mw-weather .mw-head {
   all: unset;
   cursor: pointer;
@@ -41,70 +41,111 @@
 #mw-weather .mw-sep  { color: var(--mw-sub); opacity: .45; }
 #mw-weather .mw-head:hover .mw-desc { color: var(--mw-ink); }
 
-/* —— 展开面板 —— */
+/* ———————————————— 面板 ———————————————— */
 #mw-weather .mw-panel {
   position: absolute;
   left: 0;
-  bottom: calc(100% + 8px);                /* 向上弹出 */
-  width: max-content;
-  max-width: min(300px, 82vw);
-  padding: 10px 12px;
-  border-radius: 12px;
+  bottom: calc(100% + 10px);
+  width: 236px;
+  max-width: 84vw;
+  padding: 14px 16px 12px;
+  border-radius: 14px;
   background: var(--mw-panel-bg);
-  -webkit-backdrop-filter: saturate(150%) blur(10px);
-  backdrop-filter: saturate(150%) blur(10px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, .10);
-  font-size: .76rem;
-  color: var(--mw-sub);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  border: 1px solid rgba(255, 255, 255, .55);
+  box-shadow:
+    0 1px 2px  rgba(0, 0, 0, .04),
+    0 10px 32px rgba(0, 0, 0, .09);
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(5px) scale(.985);
+  transform-origin: bottom left;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .25s ease, transform .25s ease, visibility .25s;
+  transition: opacity .22s ease, transform .22s cubic-bezier(.32,.72,.35,1), visibility .22s;
   z-index: 50;
 }
 #mw-weather:hover .mw-panel,
 #mw-weather.mw-open .mw-panel {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   visibility: visible;
   pointer-events: auto;
 }
 
-#mw-weather .mw-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .1em .9em;
-  line-height: 1.95;
+/* 三列网格：标签在上、值在下，纵向节奏统一 */
+#mw-weather .mw-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 8px;
 }
-#mw-weather .mw-row + .mw-row {
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px solid rgba(138, 143, 153, .18);
+#mw-weather .mw-item { min-width: 0; }
+#mw-weather .mw-k {
+  display: block;
+  font-size: .68rem;
+  letter-spacing: .06em;
+  color: var(--mw-sub);
+  margin-bottom: 2px;
+  white-space: nowrap;
 }
-#mw-weather .mw-row b { color: var(--mw-ink); font-weight: 500; }   /* 数值/等级用乌木强调 */
-#mw-weather .mw-dot {
-  display: inline-block;
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  margin-right: .4em;
-  vertical-align: middle;
+#mw-weather .mw-v {
+  display: block;
+  font-size: .8rem;
+  color: var(--mw-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* —— 挂载位置 —— */
+/* 分区之间：细线 + 呼吸 */
+#mw-weather .mw-block + .mw-block {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--mw-line);
+}
+
+/* 空气行：小圆点 + 数值等级 */
+#mw-weather .mw-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-right: .45em;
+  vertical-align: 1px;
+}
+
+/* ———————————————— 挂载位置 ———————————————— */
 #mw-weather.mw--footer { display: block; margin-top: .5em; }
 #mw-weather.mw--fixed  { position: fixed; left: 16px; bottom: 14px; z-index: 90; }
 
-/* —— 暗色 —— */
+/* ———————————————— 暗色 ———————————————— */
 html[data-user-color-scheme="dark"] #mw-weather {
   --mw-ink: #e8ecef;
   --mw-sub: #868b94;
-  --mw-panel-bg: rgba(28, 28, 30, .82);
+  --mw-line: rgba(232, 236, 239, .10);
+  --mw-panel-bg: rgba(30, 30, 33, .86);
+}
+html[data-user-color-scheme="dark"] #mw-weather .mw-panel {
+  border-color: rgba(255, 255, 255, .08);
+  box-shadow:
+    0 1px 2px  rgba(0, 0, 0, .30),
+    0 10px 32px rgba(0, 0, 0, .38);
 }
 @media (prefers-color-scheme: dark) {
   html:not([data-user-color-scheme="light"]) #mw-weather {
     --mw-ink: #e8ecef;
     --mw-sub: #868b94;
-    --mw-panel-bg: rgba(28, 28, 30, .82);
+    --mw-line: rgba(232, 236, 239, .10);
+    --mw-panel-bg: rgba(30, 30, 33, .86);
   }
+  html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel {
+    border-color: rgba(255, 255, 255, .08);
+    box-shadow:
+      0 1px 2px  rgba(0, 0, 0, .30),
+      0 10px 32px rgba(0, 0, 0, .38);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mw-weather .mw-panel { transition: opacity .15s ease; transform: none; }
 }
