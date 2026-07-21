@@ -1,225 +1,145 @@
-@import url("https://registry.npmmirror.com/qweather-icons/1.8.0/files/font/qweather-icons.css");
+@import url("/custom/fonts/qweather-icons.css");
 
 /* ============================================================
-   weather.css — 和风富数据组件 · 随你博客的版本
-   设计语言对齐站内：
-   · 页脚同款居中排版 + 间隔点「·」文风（6k 字 · 5 文 · …）
-   · #board 同款毛玻璃 + mask-composite 渐变描边
-   · clamp() 流体圆角/模糊；玫瑰色只作描边里的一缕暗示
+   weather.css — 和风富数据组件 · 侧边栏行内版
+   不再有悬浮面板：头部一行常显，点击后详情在原地展开。
+   颜色承接侧边栏的灰墨体系；交互悬停用侧边栏同款天青蓝。
+   图标字体本地自托管（/custom/fonts/），不依赖任何 CDN。
    ============================================================ */
 
 #mw-weather {
-  --mw-ink: #2e2b27;
-  --mw-sub: #99917f;
-  --mw-panel-bg: rgba(244, 242, 236, .86);   /* 月白玻璃 */
-  --mw-focus: rgba(46, 43, 39, .38);         /* 聚焦线：墨色微醒 */
-  --mw-font: "Noto Serif SC", serif;
-
-  position: relative;
-  display: inline-block;
-  font-family: var(--mw-font);
+  width: 100%;
+  text-align: center;
+  font-family: inherit;
+  color: rgba(70, 75, 70, 0.7);
 }
 
-/* ———————————————— 头部（不变，与页脚同排版） ———————————————— */
+/* ———————————————— 头部 ———————————————— */
 #mw-weather .mw-head {
   all: unset;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: .34em;
-  font-size: .84rem;
-  letter-spacing: .02em;
+  font-size: 13px;
+  letter-spacing: .04em;
   color: inherit;
   opacity: 0;
   transition: opacity .5s ease;
 }
-#mw-weather.mw--fixed .mw-head { color: var(--mw-ink); }
 #mw-weather.mw-ready .mw-head { opacity: 1; }
 
-#mw-weather .mw-ico  { color: inherit; font-size: 1.05em; line-height: 1; }
-#mw-weather .mw-city { color: inherit; }
-#mw-weather .mw-desc { color: inherit; }
-#mw-weather .mw-temp { color: inherit; font-variant-numeric: tabular-nums; }
-#mw-weather .mw-sep  { color: inherit; opacity: .5; }
+#mw-weather .mw-ico {
+  font-size: 1.1em;
+  line-height: 1;
+  transition: color .25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#mw-weather .mw-head:hover .mw-ico { color: #5BC2E7; }   /* 与侧边栏交互同语言 */
+#mw-weather .mw-temp { font-variant-numeric: tabular-nums; }
+#mw-weather .mw-sep  { opacity: .5; }
 
-/* ———————————————— 面板：居中文流，像页脚的一段小注 ———————————————— */
-#mw-weather .mw-panel {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 4px);
-  width: max-content;
-  max-width: min(340px, 88vw);
-  padding: clamp(12px, 1.6vw, 16px) clamp(16px, 2.2vw, 22px);
-  border-radius: clamp(12px, 1.4vw, 16px);
-  background: var(--mw-panel-bg);
-  -webkit-backdrop-filter: blur(clamp(10px, 1.6vw, 16px)) saturate(120%);
-  backdrop-filter: blur(clamp(10px, 1.6vw, 16px)) saturate(120%);
-  box-shadow: 0 10px 34px rgba(0, 0, 0, .07);
-  text-align: center;
+/* ———————————————— 行内展开详情（grid-rows 高度动画） ———————————————— */
+#mw-weather .mw-detail {
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
-  transform: translate(-50%, 4px);
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity .22s ease, transform .22s ease, visibility .22s;
-  z-index: 50;
+  transition: grid-template-rows .32s cubic-bezier(0.4, 0, 0.2, 1), opacity .28s ease;
 }
-/* #board 同款：mask-composite 渐变描边，玫瑰只在光里若隐若现 */
-#mw-weather .mw-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, .62),
-    rgba(255, 255, 255, .10) 42%,
-    rgba(255, 255, 255, .26)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-}
-#mw-weather:hover .mw-panel,
-#mw-weather.mw-open .mw-panel {
+#mw-weather.mw-open .mw-detail {
+  grid-template-rows: 1fr;
   opacity: 1;
-  transform: translate(-50%, 0);
-  visibility: visible;
-  pointer-events: auto;
+}
+#mw-weather .mw-detail-inner {
+  overflow: hidden;
+  min-height: 0;
+  padding-top: 2px;
 }
 
-/* 行：居中一行文字，词与词之间用「·」呼应页脚 */
 #mw-weather .mw-line {
-  font-size: .78rem;
+  font-size: 12px;
   letter-spacing: .05em;
-  line-height: 2.05;
+  line-height: 2.1;
   white-space: normal;
-  color: var(--mw-sub);
 }
 #mw-weather .mw-pair { white-space: nowrap; }
-#mw-weather .mw-line .mw-k { color: var(--mw-sub); margin-right: .32em; }
-#mw-weather .mw-line .mw-v { color: var(--mw-ink); font-variant-numeric: tabular-nums; letter-spacing: .03em; }
-#mw-weather .mw-line .mw-dot { color: var(--mw-sub); opacity: .32; margin: 0 .5em; }
+#mw-weather .mw-k { opacity: .55; margin-right: .3em; }
+#mw-weather .mw-v { font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+#mw-weather .mw-dot { opacity: .3; margin: 0 .45em; }
 
-/* ———————————————— 位置校正：一行小注 ———————————————— */
-#mw-weather .mw-fixrow { margin-top: 8px; }
+/* ———————————————— 位置校正 ———————————————— */
+#mw-weather .mw-fixrow { margin-top: 6px; }
 #mw-weather .mw-fixlink {
   all: unset;
   cursor: pointer;
   display: inline-block;
-  font-size: .64rem;
+  font-size: 10.5px;
   letter-spacing: .08em;
-  color: var(--mw-sub);
-  opacity: .55;
-  transition: opacity .2s ease;
+  color: inherit;
+  opacity: .5;
+  transition: color .2s ease, opacity .2s ease;
 }
-#mw-weather .mw-fixlink:hover { opacity: 1; }
+#mw-weather .mw-fixlink:hover { color: #5BC2E7; opacity: 1; }
 #mw-weather .mw-reset { margin-left: 1em; }
 
-#mw-weather .mw-searchbox { margin: 8px 0 4px; }
+#mw-weather .mw-searchbox { margin: 6px auto 2px; }
 #mw-weather .mw-input {
-  width: 170px;
+  width: 150px;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 5px 10px;
-  font-size: .74rem;
-  font-family: var(--mw-font);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: inherit;
   text-align: center;
   letter-spacing: .05em;
-  color: var(--mw-ink);
+  color: inherit;
+  caret-color: currentColor;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(43, 43, 43, .14);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
   border-radius: 0;
   outline: none;
-  caret-color: var(--mw-ink);
   transition: border-color .25s ease;
 }
-#mw-weather .mw-input:focus { border-bottom-color: var(--mw-focus); }
-#mw-weather .mw-input::placeholder { color: var(--mw-sub); opacity: .55; }
+#mw-weather .mw-input:focus { border-bottom-color: color-mix(in srgb, currentColor 48%, transparent); }
+#mw-weather .mw-input::placeholder { color: inherit; opacity: .45; }
 
 #mw-weather .mw-results {
-  margin-top: 5px;
-  max-height: 150px;
+  margin-top: 4px;
+  max-height: 132px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(46, 43, 39, .18) transparent;
+  scrollbar-color: color-mix(in srgb, currentColor 22%, transparent) transparent;
 }
 #mw-weather .mw-result,
 #mw-weather .mw-hint {
   padding: 4px 6px;
-  font-size: .72rem;
+  font-size: 11.5px;
   letter-spacing: .04em;
   border-radius: 6px;
 }
-#mw-weather .mw-hint { color: var(--mw-sub); opacity: .6; }
-#mw-weather .mw-result { color: var(--mw-ink); cursor: pointer; }
-#mw-weather .mw-result:hover { background: rgba(46, 43, 39, .05); }
+#mw-weather .mw-hint { opacity: .55; }
+#mw-weather .mw-result { cursor: pointer; transition: color .15s ease; }
+#mw-weather .mw-result:hover { color: #5BC2E7; }
 
 #mw-weather .mw-head:focus-visible,
 #mw-weather .mw-fixlink:focus-visible {
-  outline: 1px solid rgba(46, 43, 39, .25);
+  outline: 1px solid color-mix(in srgb, currentColor 32%, transparent);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
-/* ———————————————— 挂载位置 ———————————————— */
-#mw-weather.mw--footer { display: block; margin-top: .5em; }
-#mw-weather.mw--fixed  { position: fixed; left: 16px; bottom: 14px; z-index: 90; }
-#mw-weather.mw--fixed .mw-panel { left: 0; transform: translate(0, 4px); }
-#mw-weather.mw--fixed:hover .mw-panel,
-#mw-weather.mw--fixed.mw-open .mw-panel { transform: translate(0, 0); }
-
-/* ———————————————— 暗色：乌木玻璃 ———————————————— */
-html[data-user-color-scheme="dark"] #mw-weather {
-  --mw-ink: #ecebe6;
-  --mw-sub: #8b8478;
-  --mw-panel-bg: rgba(24, 24, 26, .82);
-  --mw-focus: rgba(236, 235, 230, .34);
+/* ———————————————— 深色 ———————————————— */
+[data-user-color-scheme="dark"] #mw-weather {
+  color: rgba(200, 195, 190, 0.75);
 }
-html[data-user-color-scheme="dark"] #mw-weather .mw-result:hover { background: rgba(236, 235, 230, .06); }
-html[data-user-color-scheme="dark"] #mw-weather .mw-results { scrollbar-color: rgba(236, 235, 230, .16) transparent; }
-html[data-user-color-scheme="dark"] #mw-weather .mw-panel {
-  box-shadow: 0 10px 34px rgba(0, 0, 0, .42);
-}
-html[data-user-color-scheme="dark"] #mw-weather .mw-panel::before {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, .16),
-    rgba(255, 255, 255, .03) 42%,
-    rgba(255, 255, 255, .09)
-  );
-}
-html[data-user-color-scheme="dark"] #mw-weather .mw-input {
-  border-bottom-color: rgba(232, 236, 239, .14);
-}
-@media (prefers-color-scheme: dark) {
-  html:not([data-user-color-scheme="light"]) #mw-weather {
-    --mw-ink: #ecebe6;
-    --mw-sub: #8b8478;
-    --mw-panel-bg: rgba(24, 24, 26, .82);
-    --mw-focus: rgba(236, 235, 230, .34);
-  }
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-result:hover { background: rgba(236, 235, 230, .06); }
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-results { scrollbar-color: rgba(236, 235, 230, .16) transparent; }
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel {
-    box-shadow: 0 10px 34px rgba(0, 0, 0, .42);
-  }
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-panel::before {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, .16),
-      rgba(255, 255, 255, .03) 42%,
-      rgba(255, 255, 255, .09)
-    );
-  }
-  html:not([data-user-color-scheme="light"]) #mw-weather .mw-input {
-    border-bottom-color: rgba(232, 236, 239, .14);
-  }
+[data-user-color-scheme="dark"] #mw-weather .mw-head:hover .mw-ico,
+[data-user-color-scheme="dark"] #mw-weather .mw-fixlink:hover,
+[data-user-color-scheme="dark"] #mw-weather .mw-result:hover {
+  color: #5BC2E7;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #mw-weather .mw-panel { transition: opacity .15s ease; }
+  #mw-weather .mw-detail,
+  #mw-weather .mw-head,
+  #mw-weather .mw-ico { transition: none; }
 }

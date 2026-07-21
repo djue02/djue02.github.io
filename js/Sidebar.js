@@ -34,6 +34,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                     </div>
                 </div>
+
+                <!-- 底部：一言 + 天气 -->
+                <div class="sidebar-bottom">
+                    <div class="sidebar-hitokoto">
+                        <p id="hitokoto-text" class="sidebar-hitokoto-text"></p>
+                        <p id="hitokoto-from" class="sidebar-hitokoto-from"></p>
+                    </div>
+                    <div id="sidebar-weather-slot"></div>
+                </div>
             </div>
         </div>
         <button id="sidebar-toggle" class="sidebar-toggle" aria-label="切换侧边栏">

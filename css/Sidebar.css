@@ -435,3 +435,55 @@
         transition: none;
     }
 }
+
+/* ============================================================
+   底部区（天气 + 一言）
+   ============================================================ */
+.sidebar-bottom {
+    width: 100%;
+    margin-top: auto;              /* 沉到侧边栏底部 */
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    border-top: 1px solid rgba(70, 75, 70, 0.08);
+}
+
+/* ---------- 一言 ---------- */
+.sidebar-hitokoto {
+    width: 100%;
+    text-align: center;
+    padding: 0 4px;
+}
+
+.sidebar-hitokoto-text {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.9;
+    letter-spacing: 0.06em;
+    color: rgba(70, 75, 70, 0.55);
+}
+
+.sidebar-hitokoto-from {
+    margin: 4px 0 0;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(70, 75, 70, 0.38);
+}
+
+.sidebar-hitokoto-text:empty,
+.sidebar-hitokoto-from:empty { display: none; }
+
+/* ---------- 深色 ---------- */
+[data-user-color-scheme="dark"] .sidebar-bottom {
+    border-top: 1px solid rgba(200, 195, 190, 0.1);
+}
+
+[data-user-color-scheme="dark"] .sidebar-hitokoto-text {
+    color: rgba(200, 195, 190, 0.6);
+}
+
+[data-user-color-scheme="dark"] .sidebar-hitokoto-from {
+    color: rgba(200, 195, 190, 0.4);
+}
