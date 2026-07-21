@@ -1,21 +1,24 @@
 /**
- * 页脚诗句点击播放视频（自适应比例 · 无黑边 · 无横屏闪烁）
+ * 页脚诗句点击播放视频
+ * 视频尺寸固定 1080x1920（9:16 竖屏），盒子写死比例，点开即正确
+ * 无需 +faststart，无横框、无黑边
  * for Hexo Fluid
  *
  * 用法：
  *   1. 把诗句 <span> 加上 id="footer-poem"
  *   2. 本文件放到 source/js/footer-video.js
  *   3. _config.fluid.yml 里 custom_js 追加 - /js/footer-video.js
+ *
+ * 换了不同比例的视频？只改下面 ASPECT 一处即可（宽/高，如竖屏 '9/16'、横屏 '16/9'）
  */
 (function () {
   'use strict';
 
   // ============ 配置区 ============
-  // 本地 mp4：放 source/videos/ 下，写成 '/videos/xxx.mp4'
-  // B站/YouTube：清空 VIDEO_SRC，填 IFRAME_SRC
-  const VIDEO_SRC  = '/videos/鹧鸪天·桂花.mp4';
-  const IFRAME_SRC = ''; // 例：'//player.bilibili.com/player.html?bvid=BVxxxx&autoplay=1&high_quality=1&danmaku=0'
-  const POEM_SEL   = '#footer-poem';
+  const VIDEO_SRC = '/videos/鹧鸪天·桂花.mp4'; // 放 source/videos/ 下
+  const ASPECT    = '9 / 16';             // 视频宽高比：你的是 1080x1920 = 9/16
+  const MAX_W     = 440;                  // 竖屏时盒子最大宽度(px)，太宽会顶屏
+  const POEM_SEL  = '#footer-poem';
   // ================================
 
   // ---- 样式（只注入一次，pjax 换页不受影响）----
@@ -34,9 +37,12 @@
         opacity:0;transition:opacity .35s ease;
       }
       #poem-mask.show{opacity:1;}
-      /* 盒子默认隐藏，等视频元数据就绪（拿到真实宽高）再露出 —— 杜绝 300x150 横框闪烁 */
+      /* 比例写死，从第一帧起就是正确的竖屏尺寸 */
       #poem-box{
         position:relative;
+        width:min(88vw, ${MAX_W}px);
+        aspect-ratio:${ASPECT};
+        max-height:88vh;
         background:#000;
         border-radius:14px;overflow:hidden;
         box-shadow:0 24px 64px rgba(0,0,0,.45);
@@ -44,21 +50,8 @@
         transition:opacity .3s ease,transform .35s cubic-bezier(.22,1,.36,1);
         line-height:0;font-size:0;
       }
-      #poem-box.ready{opacity:1;transform:scale(1);}
-      /* video 按自身比例缩放，宽高各受屏幕约束 —— 无黑边 */
-      #poem-box video{
-        display:block;
-        width:auto;height:auto;
-        max-width:min(88vw,440px);
-        max-height:88vh;
-      }
-      /* iframe 无固有尺寸，仍给一个 9:16 框 */
-      #poem-box iframe{
-        display:block;border:0;
-        width:min(88vw,440px);
-        aspect-ratio:9/16;
-        max-height:88vh;
-      }
+      #poem-mask.show #poem-box{opacity:1;transform:scale(1);}
+      #poem-box video{display:block;width:100%;height:100%;object-fit:cover;}
       #poem-close{
         position:absolute;top:10px;right:10px;z-index:2;
         width:32px;height:32px;border:0;border-radius:50%;
@@ -78,37 +71,19 @@
     if (mask) return;
     mask = document.createElement('div');
     mask.id = 'poem-mask';
-    const inner = IFRAME_SRC
-      ? `<iframe src="${IFRAME_SRC}" allow="autoplay; fullscreen" allowfullscreen></iframe>`
-      : `<video src="${VIDEO_SRC}" controls autoplay playsinline></video>`;
-    mask.innerHTML = `<div id="poem-box"><button id="poem-close" aria-label="关闭">✕</button>${inner}</div>`;
+    mask.innerHTML =
+      `<div id="poem-box">` +
+        `<button id="poem-close" aria-label="关闭">✕</button>` +
+        `<video src="${VIDEO_SRC}" controls autoplay playsinline></video>` +
+      `</div>`;
     document.body.appendChild(mask);
     document.body.style.overflow = 'hidden';
 
-    // 遮罩立即淡入，点击有即时反馈（捕获局部引用，避免与 close 竞态）
     const m = mask;
-    requestAnimationFrame(() => m.classList.add('show'));
+    requestAnimationFrame(() => m.classList.add('show')); // 盒子与遮罩一起淡入
 
-    // 盒子等元数据就绪再出场
-    const box = mask.querySelector('#poem-box');
-    const video = mask.querySelector('video');
-    const reveal = () => box && box.classList.add('ready');
-
-    if (video) {
-      if (video.readyState >= 1) {
-        // 元数据已在缓存里，直接显示
-        requestAnimationFrame(reveal);
-      } else {
-        video.addEventListener('loadedmetadata', reveal, { once: true });
-        video.addEventListener('error', reveal, { once: true }); // 加载失败也别卡住界面
-        setTimeout(reveal, 3000); // 兜底：3 秒还没元数据就先显示
-      }
-    } else {
-      requestAnimationFrame(reveal); // iframe 没有元数据事件，直接显示
-    }
-
-    mask.addEventListener('click', function (e) {
-      if (e.target === mask || e.target.id === 'poem-close') close();
+    m.addEventListener('click', function (e) {
+      if (e.target === m || e.target.id === 'poem-close') close();
     });
   }
 
@@ -117,12 +92,10 @@
     const m = mask;
     mask = null;
     const v = m.querySelector('video');
-    if (v) v.pause(); // 立即静音停播，别让声音拖到淡出结束
+    if (v) v.pause(); // 立即停播，声音不拖尾
     m.classList.remove('show');
-    const box = m.querySelector('#poem-box');
-    if (box) box.classList.remove('ready');
     document.body.style.overflow = '';
-    setTimeout(function () { m.remove(); }, 350); // 动画播完再移除节点
+    setTimeout(function () { m.remove(); }, 350); // 动画播完再移除
   }
 
   // 事件委托到 document，绑一次即可，Fluid 的 pjax 换页也不失效
