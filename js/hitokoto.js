@@ -8,7 +8,7 @@
       if (retries < 20) setTimeout(function () { fill(retries + 1); }, 200);
       return;
     }
-    fetch('https://v1.hitokoto.cn/?c=a&c=b&c=c&c=d&c=e&c=h&c=i&c=j')
+    fetch('https://v1.hitokoto.cn/?c=a&c=b&c=c&c=d&c=k&c=h&c=i&c=j')
       .then(function (res) { return res.json(); })
       .then(function (data) {
         el.textContent = data.hitokoto || '';
