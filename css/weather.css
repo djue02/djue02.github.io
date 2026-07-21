@@ -1,4 +1,4 @@
-@import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.8.0/font/qweather-icons.css");
+@import url("https://registry.npmmirror.com/qweather-icons/1.8.0/files/font/qweather-icons.css");
 
 /* ============================================================
    weather.css — 和风富数据组件 · 随你博客的版本
@@ -11,7 +11,6 @@
 #mw-weather {
   --mw-ink: #2e2b27;
   --mw-sub: #99917f;
-  --mw-accent: #5ac2e7;
   --mw-panel-bg: rgba(244, 242, 236, .86);   /* 月白玻璃 */
   --mw-focus: rgba(46, 43, 39, .38);         /* 聚焦线：墨色微醒 */
   --mw-font: "Noto Serif SC", serif;
@@ -30,17 +29,18 @@
   gap: .34em;
   font-size: .84rem;
   letter-spacing: .02em;
-  color: var(--mw-sub);
+  color: inherit;
   opacity: 0;
   transition: opacity .5s ease;
 }
+#mw-weather.mw--fixed .mw-head { color: var(--mw-ink); }
 #mw-weather.mw-ready .mw-head { opacity: 1; }
 
-#mw-weather .mw-ico  { color: var(--mw-ink); font-size: 1.05em; line-height: 1; }
-#mw-weather .mw-city { color: var(--mw-ink); }
-#mw-weather .mw-desc { color: var(--mw-sub); }
-#mw-weather .mw-temp { color: var(--mw-accent); font-variant-numeric: tabular-nums; }
-#mw-weather .mw-sep  { color: var(--mw-sub); opacity: .45; }
+#mw-weather .mw-ico  { color: inherit; font-size: 1.05em; line-height: 1; }
+#mw-weather .mw-city { color: inherit; }
+#mw-weather .mw-desc { color: inherit; }
+#mw-weather .mw-temp { color: inherit; font-variant-numeric: tabular-nums; }
+#mw-weather .mw-sep  { color: inherit; opacity: .5; }
 
 /* ———————————————— 面板：居中文流，像页脚的一段小注 ———————————————— */
 #mw-weather .mw-panel {
@@ -74,7 +74,7 @@
     135deg,
     rgba(255, 255, 255, .62),
     rgba(255, 255, 255, .10) 42%,
-    rgba(90, 194, 231, .11)
+    rgba(255, 255, 255, .26)
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -189,7 +189,7 @@ html[data-user-color-scheme="dark"] #mw-weather .mw-panel::before {
     135deg,
     rgba(255, 255, 255, .16),
     rgba(255, 255, 255, .03) 42%,
-    rgba(90, 194, 231, .14)
+    rgba(255, 255, 255, .09)
   );
 }
 html[data-user-color-scheme="dark"] #mw-weather .mw-input {
@@ -212,7 +212,7 @@ html[data-user-color-scheme="dark"] #mw-weather .mw-input {
       135deg,
       rgba(255, 255, 255, .16),
       rgba(255, 255, 255, .03) 42%,
-      rgba(90, 194, 231, .14)
+      rgba(255, 255, 255, .09)
     );
   }
   html:not([data-user-color-scheme="light"]) #mw-weather .mw-input {

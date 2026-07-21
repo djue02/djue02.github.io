@@ -220,9 +220,11 @@
     root.appendChild(panel);
     root.classList.add('mw-ready');
 
+    head.setAttribute('aria-expanded', 'false');
     head.addEventListener('click', function (e) {
       e.stopPropagation();
-      root.classList.toggle('mw-open');
+      var open = root.classList.toggle('mw-open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
     if (!window.__mwDocBound) {
       window.__mwDocBound = true;
