@@ -85,8 +85,9 @@
     document.body.appendChild(mask);
     document.body.style.overflow = 'hidden';
 
-    // 遮罩立即淡入，点击有即时反馈
-    requestAnimationFrame(() => mask.classList.add('show'));
+    // 遮罩立即淡入，点击有即时反馈（捕获局部引用，避免与 close 竞态）
+    const m = mask;
+    requestAnimationFrame(() => m.classList.add('show'));
 
     // 盒子等元数据就绪再出场
     const box = mask.querySelector('#poem-box');
@@ -115,11 +116,13 @@
     if (!mask) return;
     const m = mask;
     mask = null;
+    const v = m.querySelector('video');
+    if (v) v.pause(); // 立即静音停播，别让声音拖到淡出结束
     m.classList.remove('show');
     const box = m.querySelector('#poem-box');
     if (box) box.classList.remove('ready');
     document.body.style.overflow = '';
-    setTimeout(function () { m.remove(); }, 350); // 移除即停止播放
+    setTimeout(function () { m.remove(); }, 350); // 动画播完再移除节点
   }
 
   // 事件委托到 document，绑一次即可，Fluid 的 pjax 换页也不失效
