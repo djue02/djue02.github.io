@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音频工具箱</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f7;--surface:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#aeaeb2;
+  --line:rgba(0,0,0,.08);--line2:rgba(0,0,0,.15);--fill:#f0f0f2;
+  --blue:#0071e3;--blue-h:#0077ed;--green:#1a7f5c;--green-bg:#e8f5ef;
+  --red:#c93756;--red-bg:#fbebf0;--amber:#8a5a0a;--amber-bg:#faf1de;
+  --code:#1d1d1f;--code-ink:#e8e8ea;--r:12px;--r2:18px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.5;min-height:100vh;padding:48px 20px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto}
+header{text-align:center;margin-bottom:36px}
+h1{font-size:34px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.sub{font-size:15px;color:var(--ink2)}
+h2{font-size:17px;font-weight:600;margin-bottom:4px}
+.desc{font-size:13px;color:var(--ink2);margin-bottom:16px}
+
+.tabs{display:flex;background:rgba(0,0,0,.05);border-radius:12px;padding:3px;margin-bottom:24px}
+.tab{flex:1;height:38px;border:none;background:transparent;border-radius:9px;font:inherit;font-size:13px;font-weight:500;
+  color:var(--ink2);cursor:pointer;transition:.2s}
+.tab.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.panel{display:none;animation:fade .25s}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+
+.card{background:var(--surface);border-radius:var(--r2);padding:28px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+
+.drop{border:1.5px dashed var(--line2);border-radius:var(--r);padding:36px 20px;text-align:center;cursor:pointer;
+  transition:.2s;background:var(--bg)}
+.drop:hover,.drop.over{border-color:var(--blue);background:#f0f7ff}
+.drop.has{border-style:solid;border-color:var(--line);text-align:left;padding:14px 16px;background:var(--bg);cursor:default}
+.drop.has:hover{border-color:var(--line);background:var(--bg)}
+.dicon{font-size:30px;opacity:.35;margin-bottom:8px}
+.dtext{font-size:14px;color:var(--ink2)}
+.dtext b{color:var(--blue);font-weight:500}
+.dsmall{font-size:12px;color:var(--ink3);margin-top:4px}
+.finfo{display:flex;align-items:center;gap:12px}
+.fico{width:40px;height:40px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fmeta{flex:1;min-width:0}
+.fname{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fdetail{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xbtn{width:30px;height:30px;border:none;background:none;color:var(--ink3);font-size:18px;cursor:pointer;border-radius:8px;flex-shrink:0}
+.xbtn:hover{color:var(--red);background:var(--red-bg)}
+input[type=file]{display:none}
+
+.grid{display:grid;gap:12px;margin-bottom:12px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.fld label{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:6px}
+select,input[type=text]{width:100%;height:40px;padding:0 12px;border:1px solid var(--line2);border-radius:10px;
+  font:inherit;font-size:13px;background:var(--surface);color:var(--ink)}
+input[type=text]{font-family:"SF Mono",Consolas,monospace}
+select:focus,input[type=text]:focus{outline:none;border-color:var(--blue)}
+select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path fill='%236e6e73' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+
+.btn{height:44px;padding:0 24px;border:none;border-radius:12px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-p{background:var(--blue);color:#fff;width:100%}
+.btn-p:hover:not(:disabled){background:var(--blue-h)}
+.btn-p:disabled{background:var(--fill);color:var(--ink3);cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:var(--fill);border:none;border-radius:8px;padding:5px 12px;font:inherit;font-size:11px;color:var(--ink2);cursor:pointer;transition:.15s}
+.chip:hover{background:var(--ink);color:#fff}
+.chip-mono{font-family:"SF Mono",Consolas,monospace}
+
+.status{margin-top:14px;padding:13px 16px;border-radius:10px;font-size:13px;display:none}
+.status.on{display:block}
+.st-i{background:var(--fill);color:var(--ink)}
+.st-ok{background:var(--green-bg);color:var(--green)}
+.st-err{background:var(--red-bg);color:var(--red);word-break:break-word}
+.st-warn{background:var(--amber-bg);color:var(--amber)}
+.errd{margin-top:8px;padding:8px 10px;background:rgba(0,0,0,.05);border-radius:6px;font-family:"SF Mono",Consolas,monospace;font-size:11px;color:var(--ink2);white-space:pre-wrap}
+.prog{height:4px;background:var(--line);border-radius:2px;margin-top:10px;overflow:hidden}
+.prog>div{height:100%;background:var(--blue);width:0;transition:width .3s}
+.spin{display:inline-block;width:12px;height:12px;border:1.5px solid var(--ink3);border-top-color:var(--ink);border-radius:50%;animation:sp .8s linear infinite;margin-right:6px;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.result{display:none;margin-top:14px;padding:20px;background:var(--green-bg);border-radius:var(--r)}
+.result.on{display:block}
+.rt{font-size:14px;font-weight:600;color:var(--green);margin-bottom:8px}
+.ri{font-size:13px;color:var(--ink2);margin-bottom:12px}
+.dl{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--green);color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:500}
+.dl:hover{filter:brightness(1.1)}
+
+.note{margin-top:16px;padding:14px 16px;background:var(--surface);border-radius:var(--r);font-size:12px;color:var(--ink2);line-height:1.7;border:1px solid var(--line)}
+.note b{color:var(--ink)}
+.note code,.hint code{background:var(--fill);padding:1px 6px;border-radius:4px;font-family:"SF Mono",Consolas,monospace;font-size:11px}
+.hint{font-size:12px;color:var(--ink3);margin-top:8px;line-height:1.6}
+
+.cmd{background:var(--code);color:var(--code-ink);border-radius:var(--r);padding:16px 18px;font-family:"SF Mono",Consolas,monospace;
+  font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-all;position:relative;margin-top:12px}
+.cmd .k{color:#8fd4ae}.cmd .s{color:#ffc078}.cmd .c{color:#8a8a8e}
+.copy{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);color:var(--code-ink);border:none;border-radius:7px;
+  padding:5px 12px;font:inherit;font-size:11px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.22)}
+.copy.ok{background:rgba(143,212,174,.3)}
+
+.vwrap{margin-top:16px;background:#000;border-radius:var(--r);overflow:hidden;display:none}
+.vwrap.on{display:block}
+video{width:100%;max-height:420px;display:block;background:#000}
+.vov{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.7);color:#fff;font-family:"SF Mono",Consolas,monospace;font-size:12px;padding:5px 10px;border-radius:6px;pointer-events:none;backdrop-filter:blur(6px)}
+.vrel{position:relative}
+.vbar{background:var(--surface);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2)}
+.vtime{font-family:"SF Mono",Consolas,monospace;color:var(--ink);font-weight:500;background:var(--fill);padding:3px 8px;border-radius:6px}
+.vacts{display:flex;gap:6px;flex-wrap:wrap}
+.vacts button{background:var(--fill);border:none;border-radius:7px;padding:6px 12px;font:inherit;font-size:11px;font-weight:500;color:var(--ink);cursor:pointer}
+.vacts button:hover{background:var(--ink);color:#fff}
+.vfall{background:var(--amber-bg);color:var(--amber);padding:14px;text-align:center;font-size:12px;display:none}
+.vfall.on{display:block}
+
+.wave-wrap{margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--r);display:none}
+.wave-wrap.on{display:block}
+canvas.wave{width:100%;height:80px;display:block;cursor:crosshair}
+.winfo{font-size:11px;color:var(--ink2);margin-top:8px;display:flex;justify-content:space-between;font-family:"SF Mono",Consolas,monospace}
+
+.trow{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end}
+.tarrow{color:var(--ink3);padding-bottom:12px}
+.igroup{position:relative}
+.lrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.lrow label{font-size:12px;font-weight:500;color:var(--ink2)}
+.cvt{background:none;border:none;font-size:11px;color:var(--blue);cursor:pointer;font:inherit;padding:2px 4px}
+.pop{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:10}
+.pop.on{display:block}
+.pop-t{font-size:11px;color:var(--ink2);font-weight:500;margin-bottom:10px;display:flex;justify-content:space-between}
+.pop-x{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:15px;line-height:1;padding:0}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.pgrid label{display:block;font-size:10px;color:var(--ink3);margin-bottom:3px;text-align:center}
+.pgrid input{height:32px;text-align:center;font-size:13px}
+.pres{background:var(--fill);border-radius:8px;padding:8px;margin-bottom:10px;text-align:center;font-family:"SF Mono",Consolas,monospace;font-size:13px}
+.pres small{display:block;font-size:10px;color:var(--ink3);font-family:inherit}
+.pacts{display:flex;gap:6px}
+.pacts button{flex:1;height:30px;border:1px solid var(--line2);border-radius:8px;background:var(--surface);font:inherit;font-size:12px;cursor:pointer}
+.pacts .pri{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+.step{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.snum{width:22px;height:22px;background:var(--ink);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.step span:last-child{font-size:14px;font-weight:600}
+
+.dlcard{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;background:var(--bg);border-radius:var(--r);margin-bottom:10px}
+.dlmeta{flex:1;min-width:0}
+.dlname{font-size:14px;font-weight:600}
+.dldesc{font-size:12px;color:var(--ink2);margin-top:2px}
+.dllink{padding:8px 16px;background:var(--blue);color:#fff;text-decoration:none;border-radius:9px;font-size:13px;font-weight:500;white-space:nowrap;flex-shrink:0}
+.dllink:hover{background:var(--blue-h)}
+.dllink.sec{background:var(--fill);color:var(--ink)}
+.dllink.sec:hover{background:var(--line2)}
+
+.pv-ctrl{display:flex;gap:8px;margin-top:10px}
+.pv-btn{height:32px;padding:0 12px;border:1px solid var(--line2);background:var(--surface);border-radius:8px;font:inherit;font-size:12px;cursor:pointer;color:var(--ink)}
+.pv-btn:hover:not(:disabled){background:var(--fill)}
+.pv-btn:disabled{opacity:.45;cursor:not-allowed}
+
+@media(max-width:600px){body{padding:24px 12px}h1{font-size:26px}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.tab{font-size:11px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>音频工具箱</h1>
+  <p class="sub">在线处理 · 命令生成 · 无损分割 · 全程本地，文件不上传</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-t="online">在线处理</button>
+  <button class="tab" data-t="cmd">大文件命令</button>
+  <button class="tab" data-t="split">音频分割</button>
+  <button class="tab" data-t="setup">获取 ffmpeg</button>
+</div>
+
+<!-- ═══ 在线处理 ═══ -->
+<div class="panel active" id="p-online">
+  <div class="card">
+    <h2>浏览器内直接转换</h2>
+    <p class="desc">音频转格式、视频提取音频，零安装。适合 1.5 GB 以内的文件；更大请用「大文件命令」。</p>
+    <div class="drop" id="oDrop" tabindex="0">
+      <div id="oPh">
+        <div class="dicon">⇪</div>
+        <div class="dtext"><b>选择文件</b> 或拖拽至此</div>
+        <div class="dsmall">音频（MP3/WAV/FLAC/M4A…）或视频（MP4/MOV/WebM…）</div>
+      </div>
+      <div class="finfo" id="oFi" style="display:none">
+        <div class="fico">♪</div>
+        <div class="fmeta"><div class="fname" id="oFn"></div><div class="fdetail" id="oFd"></div></div>
+        <button class="xbtn" id="oX">×</button>
+      </div>
+    </div>
+    <input type="file" id="oFile" accept="audio/*,video/*,.mp3,.wav,.flac,.m4a,.aac,.ogg,.mp4,.mov,.webm,.mkv">
+
+    <div class="grid g3" style="margin-top:16px">
+      <div class="fld"><label>输出格式</label>
+        <select id="oFmt">
+          <option value="wav24">WAV · PCM 24-bit（无损）</option>
+          <option value="wav16" selected>WAV · PCM 16-bit（无损）</option>
+          <option value="flac">FLAC（无损压缩）</option>
+          <option value="mp3">MP3 · 320 kbps</option>
+          <option value="m4a">M4A / AAC · 256 kbps</option>
+          <option value="ogg">OGG Vorbis</option>
+        </select></div>
+      <div class="fld"><label>起始时间（可选）</label><input type="text" id="oStart" placeholder="留空 = 从头"></div>
+      <div class="fld"><label>结束时间（可选）</label><input type="text" id="oEnd" placeholder="留空 = 到尾"></div>
+    </div>
+    <button class="btn btn-p" id="oGo" disabled>开始处理</button>
+    <div class="status" id="oSt"></div>
+    <div class="result" id="oRes">
+      <div class="rt">✓ 处理完成</div><div class="ri" id="oRi"></div>
+      <a class="dl" id="oDl" href="#" download>↓ 下载文件</a>
+    </div>
+  </div>
+  <div class="note"><b>说明</b>：首次使用会加载 ffmpeg 引擎（约 25 MB，仅一次，之后缓存）。所有处理在你的浏览器内完成，文件不会上传。无损格式（WAV/FLAC）保留最高音质；从有损源转出的无损文件音质等于源文件。</div>
+</div>
+
+<!-- ═══ 大文件命令 ═══ -->
+<div class="panel" id="p-cmd">
+  <div class="card">
+    <div class="step"><span class="snum">1</span><span>选择视频 / 音频</span></div>
+    <div class="drop" id="cDrop" tabindex="0">
+      <div id="cPh">
+        <div class="dicon">▶</div>
+        <div class="dtext"><b>选择文件</b> 或拖拽至此</div>
+        <div class="dsmall">任意大小（45 GB+ 亦可），仅流式预览不占内存</div>
+      </div>
+      <div class="finfo" id="cFi" style="display:none">
+        <div class="fico">▶</div>
+        <div class="fmeta"><div class="fname" id="cFn"></div><div class="fdetail" id="cFd"></div></div>
+        <button class="xbtn" id="cX">×</button>
+      </div>
+    </div>
+    <input type="file" id="cFile" accept="video/*,audio/*">
+    <div class="vwrap" id="cVw"><div class="vrel">
+      <video id="cVideo" controls preload="metadata" playsinline></video>
+      <div class="vov" id="cVov">00:00:00.000</div></div>
+      <div class="vfall" id="cVf"><b>⚠ 预览不可用</b>　<span id="cVfr"></span>　命令生成不受影响，可手动填时间。</div>
+      <div class="vbar">
+        <div>当前 <span class="vtime" id="cVt">00:00:00.000</span></div>
+        <div class="vacts">
+          <button id="cCopyT">复制时间</button><button id="cMarkS">标记起始</button>
+          <button id="cMarkE">标记结束</button><button id="cFull">整段</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:14px;display:none" id="cTimeRow">
+      <div class="fld"><label>起始时间</label><input type="text" id="cStart" placeholder="留空 = 从头"></div>
+      <div class="fld"><label>结束时间</label><input type="text" id="cEnd" placeholder="留空 = 到尾"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step"><span class="snum">2</span><span>输出设置</span></div>
+    <div class="grid g3">
+      <div class="fld"><label>输出格式</label>
+        <select id="cFmt">
+          <option value="wav24" selected>WAV · 24-bit 无损</option>
+          <option value="wav16">WAV · 16-bit 无损</option>
+          <option value="wav32">WAV · 32-bit 无损</option>
+          <option value="flac">FLAC 无损压缩</option>
+          <option value="mp3">MP3 · 320 kbps</option>
+          <option value="m4a">M4A / AAC · 256 kbps</option>
+          <option value="copy">流复制（原编码，最快）</option>
+        </select></div>
+      <div class="fld"><label>采样率</label>
+        <select id="cRate"><option value="" selected>保持原始</option><option value="44100">44100 Hz</option><option value="48000">48000 Hz</option><option value="96000">96000 Hz</option></select></div>
+      <div class="fld"><label>声道</label>
+        <select id="cCh"><option value="" selected>保持原始（5.1/7.1）</option><option value="2">立体声</option><option value="1">单声道</option></select></div>
+    </div>
+    <div class="grid g2">
+      <div class="fld"><label>ffmpeg 命令名</label><input type="text" id="cFf" value="ffmpeg"></div>
+      <div class="fld"><label>输出文件名（自定义）</label><input type="text" id="cOut" placeholder="output.wav"></div>
+    </div>
+    <div class="chips">
+      <span style="font-size:11px;color:var(--ink3);align-self:center">快速命名：</span>
+      <button class="chip" data-n="source">源同名</button><button class="chip" data-n="audio">audio</button>
+      <button class="chip" data-n="range">含时间区间</button><button class="chip" data-n="stamp">含时间戳</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step"><span class="snum">3</span><span>ffmpeg 所在目录</span></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="cDir" placeholder="D:\Desktop\ffmpeg-8.1.1-essentials_build\bin" style="flex:1">
+    </div>
+    <div class="chips">
+      <span style="font-size:11px;color:var(--ink3);align-self:center">盘符：</span>
+      <button class="chip chip-mono" data-d="C:">C:</button><button class="chip chip-mono" data-d="D:">D:</button>
+      <button class="chip chip-mono" data-d="E:">E:</button><button class="chip chip-mono" data-d="F:">F:</button>
+      <span style="width:8px"></span>
+      <button class="chip" data-p="D:\Desktop\ffmpeg-8.1.1-essentials_build\bin">ffmpeg 8.1.1 默认</button>
+      <button class="chip" data-p="C:\ffmpeg\bin">C:\ffmpeg\bin</button>
+      <button class="chip" data-p="">清空</button>
+    </div>
+    <div class="hint">浏览器无法读取磁盘绝对路径（安全限制）。直接粘贴路径，或点预设；路径会自动记忆。没装 ffmpeg？去「获取 ffmpeg」标签页。</div>
+  </div>
+
+  <div class="card">
+    <div class="step"><span class="snum">4</span><span>复制到 cmd 运行</span></div>
+    <div class="cmd" id="cCmd"><span class="c">[请先选择文件]</span></div>
+    <div class="hint">路径含中文时先执行 <code>chcp 65001</code>。粘贴回车即可，45 GB 也只占几 MB 内存。</div>
+  </div>
+</div>
+
+<!-- ═══ 音频分割 ═══ -->
+<div class="panel" id="p-split">
+  <div class="card">
+    <div class="step"><span class="snum">1</span><span>选择音频</span></div>
+    <div class="drop" id="sDrop" tabindex="0">
+      <div id="sPh">
+        <div class="dicon">✂</div>
+        <div class="dtext"><b>选择文件</b> 或拖拽至此</div>
+        <div class="dsmall">WAV / FLAC 无损最佳；4 GB 内</div>
+      </div>
+      <div class="finfo" id="sFi" style="display:none">
+        <div class="fico">♪</div>
+        <div class="fmeta"><div class="fname" id="sFn"></div><div class="fdetail" id="sFd"></div></div>
+        <button class="xbtn" id="sX">×</button>
+      </div>
+    </div>
+    <input type="file" id="sFile" accept="audio/*">
+    <div class="wave-wrap" id="sWw">
+      <canvas class="wave" id="sWave"></canvas>
+      <div class="winfo"><span>00:00:00.000</span><span id="sDur">00:00:00.000</span></div>
+      <div class="pv-ctrl">
+        <button class="pv-btn" id="sPlay" disabled>▶ 试听选段</button>
+        <button class="pv-btn" id="sStop" disabled>■ 停止</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="step"><span class="snum">2</span><span>时间区间</span></div>
+    <div class="trow">
+      <div class="igroup">
+        <div class="lrow"><label>起始时间</label><button class="cvt" data-t="s">↺ 分秒换算</button></div>
+        <input type="text" id="sStart" value="00:00:00">
+        <div class="pop" id="popS">
+          <div class="pop-t"><span>分秒 → HH:MM:SS</span><button class="pop-x" data-t="s">×</button></div>
+          <div class="pgrid">
+            <div><label>时</label><input type="number" min="0" data-i="s-h" value="0"></div>
+            <div><label>分</label><input type="number" min="0" data-i="s-m" value="0"></div>
+            <div><label>秒</label><input type="number" min="0" step=".001" data-i="s-s" value="0"></div>
+          </div>
+          <div class="pres"><small>标准格式</small><span data-o="s">00:00:00</span></div>
+          <div class="pacts"><button data-a="c" data-t="s">取消</button><button class="pri" data-a="ok" data-t="s">填入</button></div>
+        </div>
+      </div>
+      <div class="tarrow">→</div>
+      <div class="igroup">
+        <div class="lrow"><label>结束时间</label><button class="cvt" data-t="e">↺ 分秒换算</button></div>
+        <input type="text" id="sEnd" placeholder="00:01:30">
+        <div class="pop" id="popE">
+          <div class="pop-t"><span>分秒 → HH:MM:SS</span><button class="pop-x" data-t="e">×</button></div>
+          <div class="pgrid">
+            <div><label>时</label><input type="number" min="0" data-i="e-h" value="0"></div>
+            <div><label>分</label><input type="number" min="0" data-i="e-m" value="0"></div>
+            <div><label>秒</label><input type="number" min="0" step=".001" data-i="e-s" value="0"></div>
+          </div>
+          <div class="pres"><small>标准格式</small><span data-o="e">00:00:00</span></div>
+          <div class="pacts"><button data-a="c" data-t="e">取消</button><button class="pri" data-a="ok" data-t="e">填入</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="hint">支持 <code>HH:MM:SS</code> / <code>MM:SS</code> / 秒数；波形可拖拽选区；超 60 分用分秒换算。</div>
+    <button class="btn btn-p" id="sGo" disabled style="margin-top:14px">分割并下载</button>
+    <div class="status" id="sSt"></div>
+    <div class="result" id="sRes">
+      <div class="rt">✓ 分割完成</div><div class="ri" id="sRi"></div>
+      <a class="dl" id="sDl" href="#" download>↓ 下载文件</a>
+    </div>
+  </div>
+  <div class="note"><b>无损保证</b>：WAV 走手动 RIFF 解析（保留原位深与多声道），零数据失真。</div>
+</div>
+
+<!-- ═══ 获取 ffmpeg ═══ -->
+<div class="panel" id="p-setup">
+  <div class="card">
+    <h2>方式一 · 一键配置脚本（推荐）</h2>
+    <p class="desc">复制脚本到 PowerShell（Win + X → 终端），自动下载官方 ffmpeg、解压到用户目录并加入 PATH。完成后任意位置直接敲 <code style="background:var(--fill);padding:1px 6px;border-radius:4px;font-size:12px">ffmpeg</code> 即可，无需再 cd 切目录。</p>
+    <div class="cmd" id="psCmd"></div>
+    <div class="hint">脚本来源：gyan.dev 官方 Windows 构建（essentials 版含 AC-3/E-AC-3 杜比解码器）。需要网络；下载约 105 MB。运行后<b>重开一个新的</b>终端窗口生效。</div>
+  </div>
+  <div class="card">
+    <h2>方式二 · 手动下载</h2>
+    <p class="desc">从官方渠道下载压缩包，解压后即可使用（免安装）。</p>
+    <div class="dlcard">
+      <div class="dlmeta"><div class="dlname">gyan.dev（Windows 推荐）</div><div class="dldesc">官方认可的 Windows 构建 · essentials 版约 105 MB</div></div>
+      <a class="dllink" href="https://www.gyan.dev/ffmpeg/builds/" target="_blank" rel="noopener">前往下载</a>
+    </div>
+    <div class="dlcard">
+      <div class="dlmeta"><div class="dlname">BtbN Builds（GitHub）</div><div class="dldesc">全平台每日构建 · full 版含 TrueHD/Atmos 解码</div></div>
+      <a class="dllink sec" href="https://github.com/BtbN/FFmpeg-Builds/releases" target="_blank" rel="noopener">前往下载</a>
+    </div>
+    <div class="dlcard">
+      <div class="dlmeta"><div class="dlname">ffmpeg.org 官网</div><div class="dldesc">官方主页 · 各平台下载入口汇总</div></div>
+      <a class="dllink sec" href="https://ffmpeg.org/download.html" target="_blank" rel="noopener">前往官网</a>
+    </div>
+    <div class="hint">macOS：终端执行 <code>brew install ffmpeg</code>。Linux：<code>sudo apt install ffmpeg</code>。</div>
+  </div>
+  <div class="note"><b>下载哪个版本？</b>Windows 选 gyan.dev 的 <b>release essentials</b>（zip）。解压到任意目录（如 <code>D:\ffmpeg</code>），其中 <code>bin\ffmpeg.exe</code> 就是主程序。若用了方式一的脚本或手动加了 PATH，「大文件命令」里的目录步骤可以留空。</div>
+</div>
+</div>
+
+<script>
+'use strict';
+// ═══ 通用 ═══
+const $=id=>document.getElementById(id);
+function fmtB(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';if(b<1073741824)return(b/1048576).toFixed(1)+' MB';return(b/1073741824).toFixed(2)+' GB'}
+function pT(s){s=(s||'').trim();if(!s)return null;const p=s.split(':').map(x=>x.trim());
+  if(p.length===1){const n=parseFloat(p[0]);return isNaN(n)?null:n}
+  if(p.length===2){const m=parseFloat(p[0]),c=parseFloat(p[1]);return(isNaN(m)||isNaN(c))?null:m*60+c}
+  if(p.length===3){const h=parseFloat(p[0]),m=parseFloat(p[1]),c=parseFloat(p[2]);return(isNaN(h)||isNaN(m)||isNaN(c))?null:h*3600+m*60+c}
+  return null}
+function fT(s){if(s<0||isNaN(s))s=0;const h=Math.floor(s/3600),m=Math.floor(s%3600/60),c=s-h*3600-m*60;
+  return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${c.toFixed(3).padStart(6,'0')}`}
+function fTn(s){const h=Math.floor(s/3600),m=Math.floor(s%3600/60),c=Math.floor(s-h*3600-m*60);
+  return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(c).padStart(2,'0')}`}
+function chName(n){return{1:'单声道',2:'立体声',6:'5.1',8:'7.1'}[n]||n+' 声道'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function q(p){return'"'+p.replace(/"/g,'\\"')+'"'}
+let AC=null;const ctx=()=>AC||(AC=new(window.AudioContext||window.webkitAudioContext)());
+// 格式映射: fmt → {codec args, ext}
+const FMT={wav16:{a:['-c:a','pcm_s16le'],e:'.wav'},wav24:{a:['-c:a','pcm_s24le'],e:'.wav'},wav32:{a:['-c:a','pcm_s32le'],e:'.wav'},
+  flac:{a:['-c:a','flac'],e:'.flac'},mp3:{a:['-c:a','libmp3lame','-b:a','320k'],e:'.mp3'},
+  m4a:{a:['-c:a','aac','-b:a','256k'],e:'.m4a'},ogg:{a:['-c:a','libvorbis','-q:a','7'],e:'.ogg'},copy:{a:['-c:a','copy'],e:''}};
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');$('p-'+t.dataset.t).classList.add('active')}));
+
+function stat(el,txt,cls,spin,det){el.className='status on st-'+cls;
+  el.innerHTML=(spin?'<span class="spin"></span>':'')+txt+(det?`<div class="errd">${esc(det)}</div>`:'')}
+function hstat(el){el.classList.remove('on')}
+function setupDrop(dz,inp,onFile){
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files.length)onFile(e.dataTransfer.files[0])});
+  dz.addEventListener('click',e=>{if(dz.classList.contains('has'))return;if(e.target.closest('.xbtn'))return;inp.click()});
+  inp.addEventListener('change',e=>{if(e.target.files.length)onFile(e.target.files[0])});
+}
+
+// ═══ WAV 解析/写入（分割用）═══
+function parseWAV(ab){const v=new DataView(ab);
+  const rs=(o,l)=>{let s='';for(let i=0;i<l;i++)s+=String.fromCharCode(v.getUint8(o+i));return s};
+  if(rs(0,4)!=='RIFF'||rs(8,4)!=='WAVE')throw new Error('不是有效 WAV');
+  let o=12,fc=null,dc=null;
+  while(o<ab.byteLength-8){const id=rs(o,4),sz=v.getUint32(o+4,true);
+    if(id==='fmt ')fc={o:o+8,s:sz};else if(id==='data')dc={o:o+8,s:sz};
+    o+=8+sz;if(sz%2)o++}
+  if(!fc||!dc)throw new Error('缺少 fmt/data 块');
+  const fo=fc.o;let fmt=v.getUint16(fo,true);const nc=v.getUint16(fo+2,true),sr=v.getUint32(fo+4,true),bps=v.getUint16(fo+14,true);
+  if(fmt===0xFFFE&&fc.s>=40)fmt=v.getUint16(fo+24,true);
+  const Bps=bps/8,N=Math.floor(dc.s/Bps/nc),ch=[];
+  for(let c=0;c<nc;c++)ch.push(new Float32Array(N));
+  const d=dc.o;
+  if(fmt===1){
+    if(bps===16)for(let i=0;i<N;i++)for(let c=0;c<nc;c++)ch[c][i]=v.getInt16(d+(i*nc+c)*2,true)/32768;
+    else if(bps===24)for(let i=0;i<N;i++)for(let c=0;c<nc;c++){const p=d+(i*nc+c)*3;let x=v.getUint8(p)|v.getUint8(p+1)<<8|v.getUint8(p+2)<<16;if(x&0x800000)x|=~0xFFFFFF;ch[c][i]=x/8388608}
+    else if(bps===32)for(let i=0;i<N;i++)for(let c=0;c<nc;c++)ch[c][i]=v.getInt32(d+(i*nc+c)*4,true)/2147483648;
+    else if(bps===8)for(let i=0;i<N;i++)for(let c=0;c<nc;c++)ch[c][i]=(v.getUint8(d+i*nc+c)-128)/128;
+    else throw new Error('不支持位深 '+bps)}
+  else if(fmt===3){
+    if(bps===32)for(let i=0;i<N;i++)for(let c=0;c<nc;c++)ch[c][i]=v.getFloat32(d+(i*nc+c)*4,true);
+    else if(bps===64)for(let i=0;i<N;i++)for(let c=0;c<nc;c++)ch[c][i]=v.getFloat64(d+(i*nc+c)*8,true);
+    else throw new Error('不支持 float '+bps)}
+  else throw new Error('不支持编码 format='+fmt);
+  return{ch,sr,nc,N,dur:N/sr,bps}}
+function writeWAV(ch,sr,bits,s0,s1){const nc=ch.length,L=s1-s0,Bps=bits/8,ds=L*nc*Bps;
+  const ab=new ArrayBuffer(44+ds),v=new DataView(ab);let o=0;
+  const w=s=>{for(let i=0;i<s.length;i++)v.setUint8(o++,s.charCodeAt(i))};
+  w('RIFF');v.setUint32(o,36+ds,true);o+=4;w('WAVEfmt ');v.setUint32(o,16,true);o+=4;
+  v.setUint16(o,1,true);o+=2;v.setUint16(o,nc,true);o+=2;v.setUint32(o,sr,true);o+=4;
+  v.setUint32(o,sr*nc*Bps,true);o+=4;v.setUint16(o,nc*Bps,true);o+=2;v.setUint16(o,bits,true);o+=2;
+  w('data');v.setUint32(o,ds,true);o+=4;
+  for(let i=0;i<L;i++)for(let c=0;c<nc;c++){let x=Math.max(-1,Math.min(1,ch[c][s0+i]));
+    if(bits===16){v.setInt16(o,(x<0?x*0x8000:x*0x7FFF)|0,true);o+=2}
+    else if(bits===24){const y=(x<0?x*0x800000:x*0x7FFFFF)|0;v.setUint8(o++,y&255);v.setUint8(o++,y>>8&255);v.setUint8(o++,y>>16&255)}
+    else{v.setInt32(o,(x<0?x*0x80000000:x*0x7FFFFFFF)|0,true);o+=4}}
+  return ab}
+
+// ═══ Tab1: 在线处理 (ffmpeg.wasm) ═══
+let oF=null,oURL=null,ff=null,ffLoading=null;
+setupDrop($('oDrop'),$('oFile'),f=>{
+  if(f.size>1.8*1073741824){stat($('oSt'),'文件过大','err',false,`${fmtB(f.size)} 超出浏览器内存上限（约 1.8 GB）。请切换到「大文件命令」标签页处理。`);return}
+  oF=f;$('oFn').textContent=f.name;$('oFd').textContent=`${fmtB(f.size)} · ${f.type||'媒体文件'}`;
+  $('oPh').style.display='none';$('oFi').style.display='flex';$('oDrop').classList.add('has');
+  $('oGo').disabled=false;hstat($('oSt'));$('oRes').classList.remove('on')});
+$('oX').addEventListener('click',e=>{e.stopPropagation();oF=null;$('oFile').value='';
+  $('oPh').style.display='block';$('oFi').style.display='none';$('oDrop').classList.remove('has');
+  $('oGo').disabled=true;hstat($('oSt'));$('oRes').classList.remove('on')});
+
+function loadWasm(){
+  if(ff&&ff.isLoaded&&ff.isLoaded())return Promise.resolve(ff);
+  if(ffLoading)return ffLoading;
+  ffLoading=new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@ffmpeg/[email protected]/dist/ffmpeg.min.js';
+    s.onload=async()=>{try{
+      ff=window.FFmpeg.createFFmpeg({log:false,
+        corePath:'https://cdn.jsdelivr.net/npm/@ffmpeg/[email protected]/dist/ffmpeg-core.js',
+        progress:({ratio})=>{const p=document.querySelector('#oSt .prog>div');if(p&&ratio>=0)p.style.width=Math.round(ratio*100)+'%'}});
+      await ff.load();res(ff)}catch(e){ffLoading=null;rej(e)}};
+    s.onerror=()=>{ffLoading=null;rej(new Error('引擎脚本加载失败，请检查网络'))};
+    document.head.appendChild(s)});
+  return ffLoading}
+
+$('oGo').addEventListener('click',async()=>{
+  if(!oF)return;
+  const fmt=FMT[$('oFmt').value],ss=pT($('oStart').value),ee=pT($('oEnd').value);
+  if($('oStart').value.trim()&&ss===null){stat($('oSt'),'起始时间格式无效','err');return}
+  if($('oEnd').value.trim()&&ee===null){stat($('oSt'),'结束时间格式无效','err');return}
+  if(ss!==null&&ee!==null&&ee<=ss){stat($('oSt'),'结束须大于起始','err');return}
+  $('oGo').disabled=true;$('oGo').textContent='处理中...';$('oRes').classList.remove('on');
+  try{
+    stat($('oSt'),'正在加载 ffmpeg 引擎（首次约 25 MB）...','i',true);
+    $('oSt').innerHTML+='<div class="prog"><div></div></div>';
+    const f=await loadWasm();
+    stat($('oSt'),'正在处理...','i',true);$('oSt').innerHTML+='<div class="prog"><div></div></div>';
+    const ext=(oF.name.split('.').pop()||'bin').toLowerCase();
+    const iName='in.'+ext,base=oF.name.replace(/\.[^.]+$/,'');
+    const oExt=fmt.e||'.'+ext;const oName='out'+oExt;
+    f.FS('writeFile',iName,new Uint8Array(await oF.arrayBuffer()));
+    const args=[];
+    if($('oStart').value.trim())args.push('-ss',fT(ss));
+    args.push('-i',iName);
+    if($('oEnd').value.trim())args.push('-to',fT(ee));
+    args.push('-vn',...fmt.a,oName);
+    await f.run(...args);
+    const data=f.FS('readFile',oName);
+    if(oURL)URL.revokeObjectURL(oURL);
+    const blob=new Blob([data.buffer],{type:'application/octet-stream'});
+    oURL=URL.createObjectURL(blob);
+    try{f.FS('unlink',iName);f.FS('unlink',oName)}catch(e){}
+    hstat($('oSt'));
+    $('oRi').innerHTML=`文件名：<b>${esc(base+oExt)}</b><br>大小：${fmtB(blob.size)}`;
+    $('oDl').href=oURL;$('oDl').download=base+oExt;
+    $('oRes').classList.add('on');
+  }catch(e){console.error(e);
+    stat($('oSt'),'处理失败','err',false,(e.message||e)+'\n提示：Worker 报错时请通过 http(s) 访问本页（如部署到网站或 python -m http.server），file:// 下部分浏览器受限。')}
+  finally{$('oGo').disabled=false;$('oGo').textContent='开始处理'}});
+
+// ═══ Tab2: 大文件命令 ═══
+let cF=null,cURL=null;
+setupDrop($('cDrop'),$('cFile'),f=>{
+  cF=f;$('cFn').textContent=f.name;$('cFd').textContent=`${fmtB(f.size)} · ${f.type||'媒体'}`;
+  $('cPh').style.display='none';$('cFi').style.display='flex';$('cDrop').classList.add('has');
+  if(cURL)URL.revokeObjectURL(cURL);cURL=URL.createObjectURL(f);
+  $('cVf').classList.remove('on');$('cVideo').style.display='block';$('cVov').style.display='block';
+  $('cVideo').src=cURL;$('cVw').classList.add('on');$('cTimeRow').style.display='grid';
+  $('cOut').value=f.name.replace(/\.[^.]+$/,'')+curExt();
+  updCmd()});
+$('cX').addEventListener('click',e=>{e.stopPropagation();cF=null;$('cFile').value='';
+  $('cPh').style.display='block';$('cFi').style.display='none';$('cDrop').classList.remove('has');
+  if(cURL){URL.revokeObjectURL(cURL);cURL=null}
+  const v=$('cVideo');v.pause&&v.pause();v.removeAttribute('src');v.load&&v.load();
+  $('cVw').classList.remove('on');$('cTimeRow').style.display='none';
+  $('cStart').value='';$('cEnd').value='';$('cOut').value='';$('cVf').classList.remove('on');updCmd()});
+
+const cV=$('cVideo');
+function updVT(){const t=fT(cV.currentTime);$('cVov').textContent=t;$('cVt').textContent=t}
+cV.addEventListener('timeupdate',updVT);cV.addEventListener('seeked',updVT);
+cV.addEventListener('loadedmetadata',()=>{if(cF&&!isNaN(cV.duration))$('cFd').textContent=`${fmtB(cF.size)} · 时长 ${fT(cV.duration)}`;updVT()});
+cV.addEventListener('loadeddata',()=>{$('cVf').classList.remove('on');cV.style.display='block';$('cVov').style.display='block'});
+cV.addEventListener('error',()=>{if(!cF)return;if(!cV.currentSrc&&!cV.src)return;
+  const e=cV.error;if(e&&e.code===4&&!cV.src)return;
+  let r='';if(e)r={1:'加载取消',2:'网络错误',3:'解码失败（H.265/杜比视界/DTS 可能不受支持）',4:'容器格式不受支持'}[e.code]||'';
+  $('cVfr').textContent=r;$('cVf').classList.add('on');cV.style.display='none';$('cVov').style.display='none'});
+$('cCopyT').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(fT(cV.currentTime));
+  $('cCopyT').textContent='已复制 ✓';setTimeout(()=>$('cCopyT').textContent='复制时间',1200)}catch(e){}});
+$('cMarkS').addEventListener('click',()=>{$('cStart').value=fT(cV.currentTime);updCmd()});
+$('cMarkE').addEventListener('click',()=>{$('cEnd').value=fT(cV.currentTime);updCmd()});
+$('cFull').addEventListener('click',()=>{$('cStart').value='';$('cEnd').value='';updCmd()});
+
+function curExt(){return FMT[$('cFmt').value].e||'.mka'}
+function pad2(n){return String(n).padStart(2,'0')}
+document.querySelectorAll('.chip[data-n]').forEach(b=>b.addEventListener('click',()=>{
+  if(!cF){alert('请先选择文件');return}
+  const base=cF.name.replace(/\.[^.]+$/,''),ext=curExt();let n='';
+  switch(b.dataset.n){
+    case'source':n=base+ext;break;
+    case'audio':n='audio'+ext;break;
+    case'range':{const s=($('cStart').value||'start').replace(/[:.]/g,'-'),e=($('cEnd').value||'end').replace(/[:.]/g,'-');
+      n=`${base}_${s}_${e}${ext}`.replace(/[\\/:*?"<>|\s]/g,'_');break}
+    case'stamp':{const d=new Date();n=`${base}_${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}${ext}`;break}}
+  $('cOut').value=n;updCmd()}));
+document.querySelectorAll('.chip[data-d]').forEach(b=>b.addEventListener('click',()=>{
+  let c=$('cDir').value.trim().replace(/^[A-Za-z]:\\?/,'').replace(/^\\+/,'');
+  $('cDir').value=b.dataset.d+'\\'+c;saveDir();updCmd()}));
+document.querySelectorAll('.chip[data-p]').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.p!==undefined&&b.dataset.n===undefined&&b.dataset.d===undefined){$('cDir').value=b.dataset.p;saveDir();updCmd()}}));
+function saveDir(){try{const v=$('cDir').value.trim();if(v)localStorage.setItem('atk_dir',v)}catch(e){}}
+try{const m=localStorage.getItem('atk_dir');if(m)$('cDir').value=m}catch(e){}
+
+['cFmt','cRate','cCh','cFf','cOut','cDir','cStart','cEnd'].forEach(id=>{
+  $(id).addEventListener('input',()=>{if(id==='cDir')saveDir();updCmd()});
+  $(id).addEventListener('change',()=>{if(id==='cFmt'&&cF&&$('cOut').value){
+    $('cOut').value=$('cOut').value.replace(/\.[^.]+$/,'')+curExt()}updCmd()})});
+
+function hl(line){let h=esc(line);
+  h=h.replace(/^(cd|ffmpeg|chcp)(?=\s|$)/,'<span class="k">$1</span>');
+  h=h.replace(/(\s)(\/d|-ss|-to|-i|-vn|-c:a|-ar|-ac|-b:a|-q:a)(?=\s|$)/g,'$1<span class="k">$2</span>');
+  h=h.replace(/(&quot;[^&]*?&quot;)/g,'<span class="s">$1</span>');return h}
+
+function updCmd(){
+  const box=$('cCmd');
+  if(!cF){box.innerHTML='<span class="c">[请先选择文件]</span>';return}
+  const fmt=FMT[$('cFmt').value];
+  let out=($('cOut').value||'output'+(fmt.e||'.mka')).trim();
+  if(fmt.e&&!out.toLowerCase().endsWith(fmt.e))out=out.replace(/\.[^.]+$/,'')+fmt.e;
+  const parts=[($('cFf').value||'ffmpeg').trim()];
+  const ss=$('cStart').value.trim(),ee=$('cEnd').value.trim();
+  if(ss)parts.push('-ss',ss);
+  parts.push('-i',q(cF.name));
+  if(ee)parts.push('-to',ee);
+  parts.push('-vn',...fmt.a);
+  if($('cRate').value)parts.push('-ar',$('cRate').value);
+  if($('cCh').value)parts.push('-ac',$('cCh').value);
+  parts.push(q(out));
+  const fcmd=parts.join(' ');
+  const dir=$('cDir').value.trim();
+  const cd=dir?'cd /d '+q(dir):'';
+  const full=cd?cd+'\n'+fcmd:fcmd;
+  let html='<button class="copy" id="cCp">复制全部</button>';
+  if(cd)html+=`<span class="c">REM 切到 ffmpeg 目录</span>\n${hl(cd)}\n<span class="c">REM 提取音频</span>\n`;
+  html+=hl(fcmd);
+  box.innerHTML=html;
+  $('cCp').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(full);
+    $('cCp').textContent='已复制 ✓';$('cCp').classList.add('ok');
+    setTimeout(()=>{$('cCp').textContent='复制全部';$('cCp').classList.remove('ok')},1400)}catch(e){}})}
+updCmd();
+
+// ═══ Tab3: 音频分割 ═══
+let sF=null,sD=null,sURL=null,sSrc=null;
+setupDrop($('sDrop'),$('sFile'),async f=>{
+  if(f.size>3.8*1073741824){stat($('sSt'),'文件过大','err',false,`${fmtB(f.size)} 超 4 GB 上限，请用「大文件命令」的 ffmpeg 分割。`);return}
+  sF=f;$('sFn').textContent=f.name;$('sFd').textContent=fmtB(f.size);
+  $('sPh').style.display='none';$('sFi').style.display='flex';$('sDrop').classList.add('has');
+  hstat($('sSt'));$('sRes').classList.remove('on');
+  stat($('sSt'),'正在解码...','i',true);
+  try{
+    const ab=await f.arrayBuffer();
+    const isWav=f.name.toLowerCase().endsWith('.wav')||(ab.byteLength>=12&&String.fromCharCode(...new Uint8Array(ab,0,4))==='RIFF');
+    sD=null;let pe=null;
+    if(isWav){try{sD=parseWAV(ab)}catch(e){pe=e}}
+    if(!sD){try{
+      const buf=await ctx().decodeAudioData(ab.slice(0));
+      const ch=[];for(let c=0;c<buf.numberOfChannels;c++)ch.push(new Float32Array(buf.getChannelData(c)));
+      sD={ch,sr:buf.sampleRate,nc:buf.numberOfChannels,N:buf.length,dur:buf.duration,bps:16};
+    }catch(de){
+      stat($('sSt'),'无法解码','err',false,`decodeAudioData: ${de.name||''} ${de.message||''}`+(pe?`\nWAV 解析: ${pe.message}`:''));
+      clearS();return}}
+    $('sFd').textContent=`${fmtB(f.size)} · ${chName(sD.nc)} · ${sD.sr} Hz · ${sD.bps}-bit · ${fT(sD.dur)}`;
+    $('sEnd').value=fT(sD.dur);$('sDur').textContent=fT(sD.dur);
+    drawWave();$('sWw').classList.add('on');$('sGo').disabled=false;$('sPlay').disabled=false;hstat($('sSt'));
+  }catch(e){stat($('sSt'),'加载失败：'+(e.message||e),'err');clearS()}});
+$('sX').addEventListener('click',e=>{e.stopPropagation();clearS()});
+function clearS(){stopPlay();sF=null;sD=null;$('sFile').value='';
+  $('sPh').style.display='block';$('sFi').style.display='none';$('sDrop').classList.remove('has');
+  $('sWw').classList.remove('on');$('sGo').disabled=true;$('sPlay').disabled=true;$('sStop').disabled=true;
+  $('sRes').classList.remove('on')}
+
+function drawWave(){if(!sD)return;const cv=$('sWave'),dpr=window.devicePixelRatio||1;
+  const W=cv.parentElement.clientWidth-28,H=80;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const c=cv.getContext('2d');c.scale(dpr,dpr);drawWaveBase(c,W,H);drawSel()}
+function drawWaveBase(c,W,H){c.clearRect(0,0,W,H);const d=sD.ch[0],spp=Math.max(1,Math.floor(d.length/W)),mid=H/2;
+  c.fillStyle='#1d1d1f';
+  for(let x=0;x<W;x++){let mn=1,mx=-1;const st=x*spp,en=Math.min(st+spp,d.length);
+    for(let i=st;i<en;i++){const v=d[i];if(v<mn)mn=v;if(v>mx)mx=v}
+    const y1=mid-mx*mid*.9,y2=mid-mn*mid*.9;c.fillRect(x,y1,1,Math.max(1,y2-y1))}}
+function drawSel(){if(!sD)return;const s=pT($('sStart').value),e=pT($('sEnd').value);if(s===null||e===null)return;
+  const cv=$('sWave'),dpr=window.devicePixelRatio||1,W=cv.width/dpr,H=cv.height/dpr,c=cv.getContext('2d');
+  drawWaveBase(c,W,H);
+  const x1=s/sD.dur*W,x2=e/sD.dur*W;
+  c.fillStyle='rgba(0,113,227,.15)';c.fillRect(x1,0,x2-x1,H);
+  c.strokeStyle='#0071e3';c.lineWidth=1.5;c.beginPath();
+  c.moveTo(x1,0);c.lineTo(x1,H);c.moveTo(x2,0);c.lineTo(x2,H);c.stroke()}
+$('sStart').addEventListener('input',drawSel);$('sEnd').addEventListener('input',drawSel);
+let drag=false,dSt=0;
+$('sWave').addEventListener('mousedown',e=>{if(!sD)return;const r=$('sWave').getBoundingClientRect();
+  dSt=(e.clientX-r.left)/r.width;drag=true;const t=dSt*sD.dur;
+  $('sStart').value=fT(t);$('sEnd').value=fT(t);drawSel()});
+$('sWave').addEventListener('mousemove',e=>{if(!drag||!sD)return;const r=$('sWave').getBoundingClientRect();
+  const c=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+  $('sStart').value=fT(Math.min(dSt,c)*sD.dur);$('sEnd').value=fT(Math.max(dSt,c)*sD.dur);drawSel()});
+window.addEventListener('mouseup',()=>drag=false);
+window.addEventListener('resize',()=>{if(sD)drawWave()});
+
+function stopPlay(){if(sSrc){try{sSrc.stop()}catch(e){}sSrc=null}$('sStop').disabled=true}
+$('sPlay').addEventListener('click',()=>{if(!sD)return;
+  const s=pT($('sStart').value),e=pT($('sEnd').value);if(s===null||e===null||e<=s)return;
+  stopPlay();
+  try{const buf=ctx().createBuffer(sD.nc,sD.N,sD.sr);
+    for(let c=0;c<sD.nc;c++)buf.copyToChannel(sD.ch[c],c);
+    const src=ctx().createBufferSource();src.buffer=buf;src.connect(ctx().destination);
+    src.start(0,s,e-s);sSrc=src;$('sStop').disabled=false;
+    src.onended=()=>{if(sSrc===src){sSrc=null;$('sStop').disabled=true}}
+  }catch(x){stat($('sSt'),'试听失败：'+x.message,'err')}});
+$('sStop').addEventListener('click',stopPlay);
+
+// 分秒换算弹窗
+function mkConv(t){const pop=$(t==='s'?'popS':'popE');
+  const hi=pop.querySelector(`[data-i="${t}-h"]`),mi=pop.querySelector(`[data-i="${t}-m"]`),si=pop.querySelector(`[data-i="${t}-s"]`);
+  const out=pop.querySelector(`[data-o="${t}"]`),tgt=$(t==='s'?'sStart':'sEnd');
+  function upd(){const h=Math.max(0,parseFloat(hi.value)||0),m=Math.max(0,parseFloat(mi.value)||0),s=Math.max(0,parseFloat(si.value)||0);
+    const tot=h*3600+m*60+s;out.textContent=s%1===0?fTn(tot):fT(tot)}
+  [hi,mi,si].forEach(x=>x.addEventListener('input',upd));
+  return{open(){const c=pT(tgt.value);
+    if(c!==null&&c>=0){const h=Math.floor(c/3600),m=Math.floor(c%3600/60),s=c-h*3600-m*60;
+      hi.value=h;mi.value=m;si.value=s%1===0?s:s.toFixed(3)}else{hi.value=0;mi.value=0;si.value=0}
+    upd();pop.classList.add('on');mi.focus();mi.select()},
+  close(){pop.classList.remove('on')},
+  ok(){const h=Math.max(0,parseFloat(hi.value)||0),m=Math.max(0,parseFloat(mi.value)||0),s=Math.max(0,parseFloat(si.value)||0);
+    const tot=h*3600+m*60+s;tgt.value=s%1===0?fTn(tot):fT(tot);drawSel();this.close()}}}
+const cvS=mkConv('s'),cvE=mkConv('e');
+document.querySelectorAll('.cvt').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();
+  if(b.dataset.t==='s'){cvE.close();cvS.open()}else{cvS.close();cvE.open()}}));
+document.querySelectorAll('[data-a="ok"]').forEach(b=>b.addEventListener('click',()=>b.dataset.t==='s'?cvS.ok():cvE.ok()));
+document.querySelectorAll('[data-a="c"],.pop-x').forEach(b=>b.addEventListener('click',()=>b.dataset.t==='s'?cvS.close():cvE.close()));
+document.addEventListener('click',e=>{if(!e.target.closest('.igroup')){cvS.close();cvE.close()}});
+
+$('sGo').addEventListener('click',()=>{if(!sD)return;
+  const s=pT($('sStart').value),e=pT($('sEnd').value);
+  if(s===null){stat($('sSt'),'起始时间格式无效','err');return}
+  if(e===null){stat($('sSt'),'结束时间格式无效','err');return}
+  if(e<=s){stat($('sSt'),'结束须大于起始','err');return}
+  if(e>sD.dur+.001){stat($('sSt'),`结束超过总长 ${fT(sD.dur)}`,'err');return}
+  $('sGo').disabled=true;$('sGo').textContent='处理中...';$('sRes').classList.remove('on');
+  setTimeout(()=>{try{
+    stat($('sSt'),'正在写入 WAV...','i',true);
+    const bits=[16,24,32].includes(sD.bps)?sD.bps:24;
+    const s0=Math.max(0,Math.floor(s*sD.sr)),s1=Math.min(sD.N,Math.ceil(e*sD.sr));
+    const ab=writeWAV(sD.ch,sD.sr,bits,s0,s1);
+    if(sURL)URL.revokeObjectURL(sURL);
+    const blob=new Blob([ab],{type:'audio/wav'});sURL=URL.createObjectURL(blob);
+    const out=sF.name.replace(/\.[^.]+$/,'')+'_segment.wav';
+    hstat($('sSt'));
+    $('sRi').innerHTML=`文件名：<b>${esc(out)}</b><br>大小：${fmtB(blob.size)} · 时长 ${(e-s).toFixed(3)} s<br>${sD.sr} Hz · ${chName(sD.nc)} · PCM ${bits}-bit`;
+    $('sDl').href=sURL;$('sDl').download=out;$('sRes').classList.add('on');
+  }catch(x){stat($('sSt'),'失败：'+(x.message||x),'err')}
+  finally{$('sGo').disabled=false;$('sGo').textContent='分割并下载'}},30)});
+
+// ═══ Tab4: 获取 ffmpeg ═══
+const PS=`# ffmpeg 一键配置（Windows PowerShell）
+$u='https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'
+$d="$env:USERPROFILE\\ffmpeg"
+Write-Host '下载中（约 105 MB）...'
+Invoke-WebRequest $u -OutFile "$env:TEMP\\ff.zip"
+Expand-Archive "$env:TEMP\\ff.zip" $d -Force
+$bin=(Get-ChildItem $d -Directory | Select-Object -First 1).FullName + '\\bin'
+$p=[Environment]::GetEnvironmentVariable('Path','User')
+if($p -notlike "*$bin*"){[Environment]::SetEnvironmentVariable('Path',"$p;$bin",'User')}
+Write-Host "完成！ffmpeg 位于 $bin"
+Write-Host '请重新打开一个终端窗口后使用 ffmpeg 命令'`;
+(function(){const box=$('psCmd');
+  box.innerHTML='<button class="copy" id="psCp">复制脚本</button>'+esc(PS).replace(/^(#.*)$/gm,'<span class="c">$1</span>');
+  $('psCp').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(PS);
+    $('psCp').textContent='已复制 ✓';$('psCp').classList.add('ok');
+    setTimeout(()=>{$('psCp').textContent='复制脚本';$('psCp').classList.remove('ok')},1400)}catch(e){}})})();
+</script>
+
+<!-- ═══ 内嵌自适应（仅当作为 iframe 被嵌入时生效；直接打开此页无任何副作用）═══ -->
+<script>
+(function(){
+  if (window.self === window.top) return;            // 非 iframe：不改动、不上报
+  // 嵌入时让高度贴合内容（去掉 100vh 撑高与过大的外边距，避免切回短标签页留白）
+  document.body.style.minHeight = '0';
+  document.body.style.padding   = '24px 16px';
+  var last = 0;
+  function report(){
+    var h = Math.ceil(document.body.getBoundingClientRect().height);
+    if (h && Math.abs(h - last) > 1){
+      last = h;
+      parent.postMessage({ __atk: 'height', height: h }, '*');
+    }
+  }
+  window.addEventListener('load', report);
+  try { new ResizeObserver(report).observe(document.body); } catch(e){}
+  [60, 260, 700, 1400].forEach(function(t){ setTimeout(report, t); }); // 兜底补报
+})();
+</script>
+</body>
+</html>
