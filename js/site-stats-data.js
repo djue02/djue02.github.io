@@ -1,1 +1,1 @@
-var SITE_STATS = { words: "6k", posts: 6 };
+var SITE_STATS = { words: "1k", posts: 2 };
