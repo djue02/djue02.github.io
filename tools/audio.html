@@ -157,6 +157,7 @@ canvas.wave{width:100%;height:80px;display:block;cursor:crosshair}
 
 @media(max-width:600px){body{padding:24px 12px}h1{font-size:26px}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.tab{font-size:11px}}
 </style>
+<script src="/tools/kit.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -758,27 +759,6 @@ Write-Host '请重新打开一个终端窗口后使用 ffmpeg 命令'`;
   $('psCp').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(PS);
     $('psCp').textContent='已复制 ✓';$('psCp').classList.add('ok');
     setTimeout(()=>{$('psCp').textContent='复制脚本';$('psCp').classList.remove('ok')},1400)}catch(e){}})})();
-</script>
-
-<!-- ═══ 内嵌自适应（仅当作为 iframe 被嵌入时生效；直接打开此页无任何副作用）═══ -->
-<script>
-(function(){
-  if (window.self === window.top) return;            // 非 iframe：不改动、不上报
-  // 嵌入时让高度贴合内容（去掉 100vh 撑高与过大的外边距，避免切回短标签页留白）
-  document.body.style.minHeight = '0';
-  document.body.style.padding   = '24px 16px';
-  var last = 0;
-  function report(){
-    var h = Math.ceil(document.body.getBoundingClientRect().height);
-    if (h && Math.abs(h - last) > 1){
-      last = h;
-      parent.postMessage({ __atk: 'height', height: h }, '*');
-    }
-  }
-  window.addEventListener('load', report);
-  try { new ResizeObserver(report).observe(document.body); } catch(e){}
-  [60, 260, 700, 1400].forEach(function(t){ setTimeout(report, t); }); // 兜底补报
-})();
 </script>
 </body>
 </html>

@@ -1,0 +1,73 @@
+/* ═══════════════════════════════════════════════════════════
+ * 导航 · 隐形极简（月白 × 乌木）
+ * ───────────────────────────────────────────────────────────
+ * 顶部：无底色，纯文字悬浮在横幅上
+ * 滚动后（Fluid 会给 #navbar 加 .top-nav-collapse）：
+ *   月白乳玻璃 + 发丝分割线，乌木字，玫瑰 hover
+ * 暗色模式：乌木烟玻璃
+ *
+ * 接入：_config.fluid.yml →
+ *   custom_css:
+ *     - /css/navbar-minimal.css
+ * ═══════════════════════════════════════════════════════════ */
+
+/* ── 顶部悬浮态：彻底透明 ─────────────────────────────── */
+#navbar.navbar {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid transparent;
+  transition: background-color .35s ease,
+              border-color .35s ease,
+              box-shadow .35s ease;
+}
+
+/* ── 纯文字菜单：去图标、上衬线 ───────────────────────── */
+/* 只隐藏带文字的菜单项图标；搜索/换色这类纯图标按钮保留 */
+#navbar .nav-link:has(span) > .iconfont { display: none; }
+
+#navbar .navbar-brand,
+#navbar .nav-link {
+  font-family: "Noto Serif SC", Georgia, "Songti SC", serif;
+  letter-spacing: .06em;
+}
+#navbar .nav-link {
+  font-size: 15px;
+  opacity: .88;
+  transition: opacity .2s ease, color .2s ease;
+}
+#navbar .nav-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 7px;
+  text-decoration-thickness: 1px;
+}
+
+/* ── 滚动后：月白乳玻璃 + 发丝线 ──────────────────────── */
+#navbar.top-nav-collapse {
+  background: rgba(250, 249, 246, .72) !important;
+  -webkit-backdrop-filter: saturate(160%) blur(18px);
+  backdrop-filter: saturate(160%) blur(18px);
+  border-bottom-color: rgba(43, 43, 43, .08);
+  box-shadow: none !important;
+}
+#navbar.top-nav-collapse .navbar-brand,
+#navbar.top-nav-collapse .nav-link { color: #2b2b2b !important; }
+#navbar.top-nav-collapse .nav-link:hover { color: #c45c5c !important; }
+/* 汉堡三线跟随变乌木色 */
+#navbar.top-nav-collapse .animated-icon span { background: #2b2b2b !important; }
+
+/* ── 暗色模式：乌木烟玻璃 ─────────────────────────────── */
+[data-user-color-scheme="dark"] #navbar.top-nav-collapse {
+  background: rgba(24, 24, 26, .62) !important;
+  border-bottom-color: rgba(255, 255, 255, .08);
+}
+[data-user-color-scheme="dark"] #navbar.top-nav-collapse .navbar-brand,
+[data-user-color-scheme="dark"] #navbar.top-nav-collapse .nav-link {
+  color: #e6e3dd !important;
+}
+[data-user-color-scheme="dark"] #navbar.top-nav-collapse .nav-link:hover {
+  color: #d47a7a !important;
+}
+[data-user-color-scheme="dark"] #navbar.top-nav-collapse .animated-icon span {
+  background: #e6e3dd !important;
+}
