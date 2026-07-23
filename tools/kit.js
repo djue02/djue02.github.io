@@ -4,8 +4,12 @@
  * 提供：① 深浅色模式（默认跟随系统，可手动切换，选择记在本机）
  *       ② 返回首页按钮（两者同在右上角）
  *
- * 用法：在工具 html 的 </head> 之前加一行（注意：放 head 末尾，
- *      不要加 defer，这样能在首屏绘制前定好主题，避免闪白）：
+ * 图标语义：常态 = 当前模式；悬浮 = 点下去会变成的模式。
+ *   白天 → 常态太阳，悬浮变月亮
+ *   夜间 → 常态月亮，悬浮变太阳
+ *
+ * 用法：在工具 html 的 </head> 之前加一行（放 head 末尾、不要加
+ *      defer，这样能在首屏绘制前定好主题，避免闪白）：
  *
  *      <script src="/tools/kit.js"></script>
  *
@@ -29,12 +33,17 @@
     '--code:#161618;--code-ink:#e8e8ea;'
   ].join('');
 
-  /* 变量覆盖不到的硬编码色（选择器不存在的工具会自动忽略这些规则） */
+  /* 暗色下：变量覆盖不到的硬编码色 + 日月对调
+     （选择器不存在的工具会自动忽略前面几条） */
   var FIX = [
     '.tabs{background:rgba(255,255,255,.08)}',
     '.tab.active{box-shadow:0 1px 4px rgba(0,0,0,.4)}',
     '.drop:hover,.drop.over{background:#12283d}',
-    '.fico,.chip:hover,.vacts button:hover{color:#1c1c1e}'
+    '.fico,.chip:hover,.vacts button:hover{color:#1c1c1e}',
+    '.tk-sun{opacity:0}',
+    '.tk-moon{opacity:1}',
+    '.tk-theme:hover .tk-sun{opacity:1}',
+    '.tk-theme:hover .tk-moon{opacity:0}'
   ].join('');
 
   function prefix(p, rules) {
@@ -45,17 +54,14 @@
   }
 
   var css = [
-    /* 手动选择深色 */
     ':root[data-theme="dark"]{' + DARK + '}',
     prefix(':root[data-theme="dark"]', FIX),
-    /* 未手动选择时跟随系统 */
     '@media (prefers-color-scheme:dark){',
     ':root:not([data-theme="light"]){' + DARK + '}',
     prefix(':root:not([data-theme="light"])', FIX),
     '}',
 
-    /* ── 两个按钮：同在右上角，横向并排 ──────────────────
-       返回在左、切换贴角，成一组；居中标题不受挤压 */
+    /* ── 按钮组：右上角横向并排 ─────────────────────── */
     '.tk-bar{position:fixed;top:16px;right:16px;z-index:99;',
     '  display:flex;align-items:center;gap:8px}',
     '.tk-home,.tk-theme{background:var(--surface,#fff);',
@@ -66,24 +72,39 @@
     '  box-shadow:0 2px 10px rgba(0,0,0,.06);',
     '  transition:color .2s ease,border-color .2s ease,transform .15s ease}',
     '.tk-home{height:34px;gap:7px;padding:0 14px 0 11px;font-size:13.5px}',
-    '.tk-theme{width:34px;height:34px;padding:0}',
+    '.tk-theme{width:34px;height:34px;padding:0;position:relative}',
     '.tk-home:hover,.tk-theme:hover{color:var(--ink,#1d1d1f);',
     '  border-color:var(--line2,rgba(0,0,0,.18))}',
     '.tk-home:active,.tk-theme:active{transform:scale(.94)}',
-    '.tk-home svg,.tk-theme svg{width:15px;height:15px;flex:none}',
-    /* 窄屏：按钮组会与居中标题撞位，故把内容整体下压让开 */
+    '.tk-home svg{width:15px;height:15px;flex:none}',
+
+    /* ── 悬浮反馈：常态=当前模式，悬浮=切换后的模式 ──── */
+    '.tk-ico{position:absolute;inset:0;display:flex;align-items:center;',
+    '  justify-content:center;transition:opacity .18s ease}',
+    '.tk-ico svg{width:15px;height:15px}',
+    '.tk-sun{opacity:1}',
+    '.tk-moon{opacity:0}',
+    '.tk-theme:hover .tk-sun{opacity:0}',
+    '.tk-theme:hover .tk-moon{opacity:1}',
+
+    /* 切换瞬间给主要元素一点颜色渐变，避免硬跳；
+       不想要就删掉下面这四行 */
+    '.tk-animating body,.tk-animating .card,.tk-animating .tabs,.tk-animating .drop,',
+    '.tk-animating .note,.tk-animating .hint,.tk-animating input,.tk-animating select,',
+    '.tk-animating textarea,.tk-animating button:not(.tk-theme),.tk-animating pre{',
+    '  transition:background-color .25s ease,color .25s ease,border-color .25s ease}',
+
     '@media (max-width:640px){',
     '  .tk-bar{top:12px;right:12px;gap:6px}',
     '  body{padding-top:62px}',
     '}'
   ].join('');
 
-  /* 样式：立即插入 head 末尾（晚于工具自身样式 → 优先级更高） */
   var st = document.createElement('style');
   st.textContent = css;
   (document.head || document.documentElement).appendChild(st);
 
-  /* 主题：绘制前先定好，避免闪白 */
+  /* 主题：首屏绘制前定好，避免闪白 */
   var root = document.documentElement;
   try {
     var saved = localStorage.getItem(KEY);
@@ -104,12 +125,12 @@
   function isDark() {
     var v = root.getAttribute('data-theme');
     if (v) return v === 'dark';
-    return window.matchMedia
-      && window.matchMedia('(prefers-color-scheme:dark)').matches;
+    return !!(window.matchMedia
+      && window.matchMedia('(prefers-color-scheme:dark)').matches);
   }
 
   function mount() {
-    if (document.querySelector('.tk-theme')) return;
+    if (document.querySelector('.tk-bar')) return;
 
     var home = document.createElement('a');
     home.className = 'tk-home';
@@ -122,15 +143,16 @@
     btn.type = 'button';
     btn.title = '切换深浅色';
     btn.setAttribute('aria-label', '切换深浅色');
-
-    function paint() { btn.innerHTML = isDark() ? SUN : MOON; }
-    paint();
+    /* 两个图标常驻，由 CSS 按当前模式 + 悬浮状态决定谁露面 */
+    btn.innerHTML = '<span class="tk-ico tk-sun">' + SUN + '</span>'
+                  + '<span class="tk-ico tk-moon">' + MOON + '</span>';
 
     btn.addEventListener('click', function () {
       var next = isDark() ? 'light' : 'dark';
+      root.classList.add('tk-animating');
       root.setAttribute('data-theme', next);
       try { localStorage.setItem(KEY, next); } catch (e) {}
-      paint();
+      setTimeout(function () { root.classList.remove('tk-animating'); }, 300);
     });
 
     var bar = document.createElement('div');
