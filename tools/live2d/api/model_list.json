@@ -1,0 +1,10 @@
+{
+    "models": [
+        "Potion-Maker/Pio",
+        "Potion-Maker/Tia"
+    ],
+    "messages": [
+        "Pio 来啦，药水店暂停营业～",
+        "Tia 参上！王宫直送的说～"
+    ]
+}

@@ -22,6 +22,9 @@
   /* ┌── 配置：以后改这里 ──────────────────────────────┐ */
   var HOME = { url: '/', label: '兔子窝' };
   var KEY  = 'tk_theme';
+  /* 看板娘：Potion Maker 的 Pio & Tia（自托管于 /tools/live2d/）
+     enable 设为 false 可整体关闭；minWidth 以下的屏幕不加载 */
+  var WAIFU = { enable: true, base: '/tools/live2d/', minWidth: 768 };
   /* └────────────────────────────────────────────────┘ */
 
   /* ── 暗色调色板（与浅色变量一一对应）────────────────── */
@@ -162,9 +165,155 @@
     document.body.appendChild(bar);
   }
 
+  /* ── 看板娘装载 ─────────────────────────────────────
+     页面主体加载完后再上岗（不抢 ffmpeg 工具的启动带宽）；
+     小屏不加载；样式含暗色适配。 */
+  function mountWaifu() {
+    if (!WAIFU.enable) return;
+    if (screen.width < WAIFU.minWidth || innerWidth < WAIFU.minWidth) return;
+    if (document.getElementById('waifu')) return;
+
+    var base = WAIFU.base;
+
+    /* 预取模型核心文件，与脚本并行下载，缩短她出现前的空白 */
+    [base + 'api/model/Potion-Maker/Pio/model.moc',
+     base + 'api/model/Potion-Maker/Pio/textures/default-costume.png'
+    ].forEach(function (href) {
+      var pl = document.createElement('link');
+      pl.rel = 'prefetch';
+      pl.href = href;
+      document.head.appendChild(pl);
+    });
+
+    /* 看板娘样式 + 本站适配（消息框暗色、层级让位给右上按钮组） */
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = base + 'dist/waifu.css';
+    document.head.appendChild(link);
+
+    var st = document.createElement('style');
+    st.textContent = [
+      '#waifu{z-index:98}',
+
+      /* ── 首次呈现不做任何动画（进页面她就该已经在那儿）──
+         ready 类由脚本在首帧稳定后补上，之后的关闭/召回才有过渡 */
+      'html:not(.tk-l2d-ready) #waifu,',
+      'html:not(.tk-l2d-ready) #waifu-toggle{transition:none!important}',
+
+      /* ── 之后：退场快落 .5s，召回上浮 .9s，各用各的节奏 ── */
+      '#waifu{opacity:0;transition:transform .3s ease-in-out,',
+      '  bottom .5s cubic-bezier(.55,0,.8,.4),opacity .4s ease}',
+      '#waifu.waifu-active{opacity:1;transition:transform .3s ease-in-out,',
+      '  bottom .9s cubic-bezier(.22,1,.36,1),opacity .65s ease .05s}',
+      '@media (prefers-reduced-motion:reduce){',
+      '  #waifu,#waifu.waifu-active{transition:none!important;opacity:1}}',
+
+      /* ── 召回按钮：左下角独立圆钮，就在她原本站的位置 ──
+         原版是贴左缘滑出的橙色方块，这里改成定点浮现的圆形卡片 */
+      '#waifu-toggle{position:fixed;display:flex;left:22px;bottom:22px;margin-left:0;',
+      '  width:44px;height:44px;padding:0;overflow:hidden;',
+      '  justify-content:flex-start;align-items:center;border-radius:999px;',
+      '  background:var(--surface,#fff);border:1px solid var(--line,rgba(0,0,0,.09));',
+      '  box-shadow:0 2px 12px rgba(0,0,0,.08);color:var(--ink2,#6e6e73);',
+      '  opacity:0;visibility:hidden;transform:scale(.7);pointer-events:none;',
+      '  transition:opacity .3s ease,transform .35s cubic-bezier(.22,1,.36,1),',
+      '    width .32s cubic-bezier(.22,1,.36,1),color .2s ease,border-color .2s ease}',
+      '#waifu-toggle svg{width:17px;height:20px;flex:none;margin-left:12px;',
+      '  display:block;fill:currentColor}',
+      /* 文字标签用伪元素补，静息时被 overflow 裁掉 */
+      '#waifu-toggle::after{content:"看板娘";white-space:nowrap;font-size:13.5px;',
+      '  margin:0 16px 0 8px;opacity:0;transition:opacity .18s ease}',
+      '#waifu-toggle.waifu-toggle-active{opacity:1;visibility:visible;',
+      '  transform:scale(1);pointer-events:auto;margin-left:0}',
+      /* 关键：原版有 :hover{margin-left:-30px}，权重比普通类高，
+         不显式盖掉会导致按钮悬浮时左窜→脱离光标→抖动闪烁 */
+      '#waifu-toggle.waifu-toggle-active:hover{margin-left:0;width:118px;',
+      '  color:var(--ink,#1d1d1f);border-color:var(--line2,rgba(0,0,0,.18))}',
+      '#waifu-toggle.waifu-toggle-active:hover::after{opacity:1;transition-delay:.08s}',
+      '#waifu-toggle.waifu-toggle-active:active{transform:scale(.96)}',
+      '@media (prefers-reduced-motion:reduce){#waifu-toggle{transition:none}}',
+
+      /* ── 暗色：消息框 + 召回按钮 ── */
+      ':root[data-theme="dark"] #waifu-tips{background:rgba(44,44,46,.92);',
+      '  border-color:rgba(255,255,255,.14);color:#e8e8ea;',
+      '  box-shadow:0 3px 15px rgba(0,0,0,.45)}',
+      ':root[data-theme="dark"] #waifu-toggle{background:#2c2c2e;',
+      '  border-color:rgba(255,255,255,.14);color:#98989d}',
+      ':root[data-theme="dark"] #waifu-toggle.waifu-toggle-active:hover{color:#f5f5f7}',
+      '@media (prefers-color-scheme:dark){',
+      ':root:not([data-theme="light"]) #waifu-tips{background:rgba(44,44,46,.92);',
+      '  border-color:rgba(255,255,255,.14);color:#e8e8ea;',
+      '  box-shadow:0 3px 15px rgba(0,0,0,.45)}',
+      ':root:not([data-theme="light"]) #waifu-toggle{background:#2c2c2e;',
+      '  border-color:rgba(255,255,255,.14);color:#98989d}',
+      ':root:not([data-theme="light"]) #waifu-toggle.waifu-toggle-active:hover{color:#f5f5f7}',
+      '}'
+    ].join('');
+    document.head.appendChild(st);
+
+    /* 首帧稳定后再开过渡总闸：此前不论她登场还是按钮浮现，
+       都是「本来就在那儿」，没有任何动画 */
+    var gate = setInterval(function () {
+      var wf = document.getElementById('waifu');
+      var tg = document.getElementById('waifu-toggle');
+      var shown = (wf && wf.classList.contains('waifu-active'))
+               || (tg && tg.classList.contains('waifu-toggle-active'));
+      if (!shown) return;
+      clearInterval(gate);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          document.documentElement.classList.add('tk-l2d-ready');
+        });
+      });
+    }, 80);
+    setTimeout(function () { clearInterval(gate); }, 30000);
+
+    /* 原版 JS 写死「离场 3 秒后才显示召回按钮」，与我们 0.5s 的退场
+       节奏对不上，会空出两秒多的尬等。这里代理关闭按钮的点击，
+       退场一结束就把状态类补上（幂等，原版稍后再执行也无副作用）。 */
+    document.addEventListener('click', function (e) {
+      var q = e.target && e.target.closest && e.target.closest('#waifu-tool-quit');
+      if (!q) return;
+      setTimeout(function () {
+        var w = document.getElementById('waifu');
+        var t = document.getElementById('waifu-toggle');
+        if (w) w.classList.add('waifu-hidden');
+        if (t) t.classList.add('waifu-toggle-active');
+      }, 560);
+    });
+
+    /* 加载器为 ES Module，onload 后 initWidget 挂到 window */
+    var sc = document.createElement('script');
+    sc.type = 'module';
+    sc.src = base + 'dist/waifu-tips.js';
+    sc.onload = function () {
+      if (typeof window.initWidget !== 'function') return;
+      window.initWidget({
+        waifuPath:   base + 'waifu-tips.json',
+        cdnPath:     base + 'api/',
+        cubism2Path: base + 'dist/live2d.min.js',
+        tools: ['hitokoto', 'switch-model', 'switch-texture',
+                'photo', 'info', 'quit'],
+        logLevel: 'error',
+        drag: false
+      });
+    };
+    document.head.appendChild(sc);
+  }
+
+  function scheduleWaifu() {
+    /* DOM 就绪即装载。工具的 ffmpeg 是点击后才下载的，此刻没有带宽竞争，
+       再等 window.load + 延迟只会白白留出一段空白期。 */
+    mountWaifu();
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mount);
+    document.addEventListener('DOMContentLoaded', function () {
+      mount();
+      scheduleWaifu();
+    });
   } else {
     mount();
+    scheduleWaifu();
   }
 })();
