@@ -916,5 +916,57 @@ html[data-user-color-scheme="dark"] #life-loader .lf-burst { border-color: #F4F6
   <noscript>
     <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
-</body>
+<!-- hexo injector body_end start -->
+<script>
+(function(){
+  var SCOPE  = "all";
+  var ASSETS = ["/tools/live2d/dist/waifu-tips.js","/tools/live2d/dist/chunk/index.js","/tools/live2d/dist/chunk/index2.js","/tools/live2d/dist/live2d.min.js","/tools/live2d/dist/waifu.css","/tools/live2d/waifu-tips.json","/tools/live2d/api/model_list.json","/tools/live2d/api/model/Potion-Maker/Pio/index.json","/tools/live2d/api/model/Potion-Maker/Pio/model.moc","/tools/live2d/api/model/Potion-Maker/Pio/textures/default-costume.png"];
+  var path   = location.pathname;
+
+  /* 工具页自己会正常加载，不需要预取 */
+  if (path.indexOf('/tools/') === 0) return;
+  /* 只在分类页预取的模式 */
+  if (SCOPE === 'categories' && path.indexOf('/categories') !== 0) return;
+  /* 小屏不加载看板娘，预取纯属浪费 */
+  if (window.innerWidth < 768 || screen.width < 768) return;
+  /* 尊重省流量模式与弱网 */
+  var c = navigator.connection;
+  if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ''))) return;
+  /* Safari 至今不支持 rel=prefetch（该特性尚未进入 Baseline）。
+     检测到不支持时改用最低优先级的 fetch 填充 HTTP 缓存 ——
+     MDN 明确指出两者功能等价，只是 prefetch 的优先级更低一档。 */
+  function supportsPrefetch(){
+    try { return document.createElement('link').relList.supports('prefetch'); }
+    catch(e){ return false; }
+  }
+
+  function prefetch(){
+    if (supportsPrefetch()) {
+      ASSETS.forEach(function(url){
+        var l = document.createElement('link');
+        l.rel = 'prefetch';
+        l.href = url;
+        document.head.appendChild(l);
+      });
+      return;
+    }
+    ASSETS.forEach(function(url){
+      /* priority 字段不被支持时会被静默忽略，不会抛错；
+         读完 body 才算真正落进缓存，所以要 .blob() 排空 */
+      fetch(url, { priority: 'low', credentials: 'same-origin' })
+        .then(function(r){ return r.blob(); })
+        .catch(function(){});
+    });
+  }
+
+  /* 等本页资源都就绪、浏览器空闲了再动手，绝不和当前页面抢带宽 */
+  function schedule(){
+    var idle = window.requestIdleCallback || function(f){ setTimeout(f, 1500); };
+    idle(prefetch, { timeout: 4000 });
+  }
+  if (document.readyState === 'complete') schedule();
+  else window.addEventListener('load', schedule);
+})();
+</script>
+<!-- hexo injector body_end end --></body>
 </html>
