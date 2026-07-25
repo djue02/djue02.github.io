@@ -24,10 +24,9 @@
   var KEY  = 'tk_theme';
   /* 看板娘：Potion Maker 的 Pio & Tia（自托管于 /tools/live2d/）
      enable  整体开关
-     minWidth 以上：进页面自动出现
-     minWidth 以下（手机）：不自动加载，改为在右上角多一个召唤按钮，
-              点了才下载；选择记在本机，之后自动出现 */
-  var WAIFU  = { enable: true, base: '/tools/live2d/', minWidth: 768 };
+     桌面与手机一律默认不加载，靠左下角的贴边标签召唤；
+     召唤过一次即记在本机，之后进页面自动上岗（点她的关闭键可撤销）*/
+  var WAIFU  = { enable: true, base: '/tools/live2d/' };
   var MKEY   = 'tk_waifu_mobile';
   /* └────────────────────────────────────────────────┘ */
 
@@ -108,13 +107,32 @@
 
     '#waifu{z-index:98}',
 
-    /* 手机：模型缩到 200px，气泡收窄并上移，工具栏别顶出屏幕 */
+    /* ── 手机端 ────────────────────────────────────────
+       全部加 body 前缀提权：本样式在文档里排在 waifu.css 之前，
+       同权重会输给它（原版竖排 / 25px 图标就是这么盖回来的）。
+
+       #waifu 自带 transform:translateY(25px)，会把她整体压到视口下方
+       25px，底部必被裁 —— 故先 transform:none 归位。
+
+       工具栏保持原版竖排，但把按钮缩到 24px、间距 3px，
+       6×24+5×3 = 159px，正好与她 160px 的高度齐平，不再顶出头顶。 */
     '@media (max-width:640px){',
-    '  #waifu #live2d{width:160px!important;height:160px!important}',
-    '  #waifu-tips{width:min(180px,48vw)!important;font-size:12.5px;',
+    '  body #waifu{transform:none!important}',
+    '  body #waifu.waifu-active{bottom:0!important}',
+    '  body #waifu #live2d{width:160px!important;height:160px!important}',
+    '  body #waifu-tips{width:min(180px,48vw)!important;font-size:12.5px;',
     '    line-height:19px;min-height:48px;margin:-14px 10px!important}',
-    '  #waifu-tool{right:0;top:34px;gap:2px}',
-    '  #waifu-tool span{width:24px;height:24px}',
+    /* 触屏没有 hover，原版工具栏（含关闭键）默认 opacity:0，
+       不常驻等于关不掉她 */
+    '  body #waifu-tool{opacity:1!important;position:absolute;',
+    '    flex-direction:column;top:0;bottom:auto;right:-7px;left:auto;gap:3px}',
+    '  body #waifu-tool span{width:24px;height:24px;display:flex;',
+    '    align-items:center;justify-content:center;border-radius:50%;',
+    '    background:var(--surface,#fff);',
+    '    box-shadow:0 1px 4px rgba(0,0,0,.15)}',
+    /* 图标 viewBox 非方形（320×512 / 640×512 等），只锁高、宽自适应，
+       否则强行等宽等高会把图标压扁 */
+    '  body #waifu-tool svg{height:11px!important;width:auto;max-width:14px}',
     '}',
 
     /* ── 首次呈现不做任何动画（进页面她就该已经在那儿）──
@@ -138,7 +156,8 @@
        另必须显式 top:auto —— 原版设了 bottom:66px，若上下同时被钉住，
        固定定位元素会被拉成长条。
        无动画：出现即到位。 */
-    'body #waifu-toggle,body .tk-summon{position:fixed;left:0;bottom:24px;',
+    'body #waifu-toggle,body .tk-summon{position:fixed;left:0;',
+    '  bottom:calc(24px + env(safe-area-inset-bottom,0px));',
     '  top:auto;right:auto;z-index:99;',
     '  display:flex;flex-direction:column;align-items:center;gap:5px;',
     '  width:auto;height:auto;margin:0;padding:9px 5px 8px;',
@@ -166,7 +185,11 @@
     'body:root[data-theme="dark"] #waifu-toggle,',
     ':root[data-theme="dark"] body .tk-summon{background:#2c2c2e;',
     '  border-color:rgba(255,255,255,.14);color:#98989d}',
-    ':root[data-theme="dark"] .tk-arrow{color:#636366}',
+    ':root[data-theme="dark"] body .tk-arrow{color:#636366}',
+    '@media (max-width:640px){',
+    ':root[data-theme="dark"] body #waifu-tool span{background:#2c2c2e;',
+    '  box-shadow:0 1px 5px rgba(0,0,0,.5)}',
+    '}',
     '@media (prefers-color-scheme:dark){',
     ':root:not([data-theme="light"]) #waifu-tips{background:rgba(44,44,46,.92);',
     '  border-color:rgba(255,255,255,.14);color:#e8e8ea;',
@@ -174,7 +197,11 @@
     ':root:not([data-theme="light"]) body #waifu-toggle,',
     ':root:not([data-theme="light"]) body .tk-summon{background:#2c2c2e;',
     '  border-color:rgba(255,255,255,.14);color:#98989d}',
-    ':root:not([data-theme="light"]) .tk-arrow{color:#636366}',
+    ':root:not([data-theme="light"]) body .tk-arrow{color:#636366}',
+    '@media (max-width:640px){',
+    ':root:not([data-theme="light"]) body #waifu-tool span{background:#2c2c2e;',
+    '  box-shadow:0 1px 5px rgba(0,0,0,.5)}',
+    '}',
     '}'
   ].join('');
 
@@ -199,14 +226,10 @@
   var ARROWICON = '<svg class="tk-arrow" viewBox="0 0 24 24" fill="none"'
                 + ' stroke="currentColor" stroke-width="2.6" stroke-linecap="round"'
                 + ' stroke-linejoin="round"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg>';
-  var TAB_HTML = '<span class="tk-vt">看板娘休息中</span>' + ARROWICON;
+  var TAB_HTML = '<span class="tk-vt">这里有看板娘</span>' + ARROWICON;
   var HOMEICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"'
                + ' stroke-linecap="round" stroke-linejoin="round">'
                + '<path d="M3.2 10.4 12 3.4l8.8 7"/><path d="M5.7 9.2v11.4h12.6V9.2"/></svg>';
-
-  function small() {
-    return window.innerWidth < WAIFU.minWidth || screen.width < WAIFU.minWidth;
-  }
 
   function isDark() {
     var v = root.getAttribute('data-theme');
@@ -247,11 +270,11 @@
     bar.appendChild(btn);
     document.body.appendChild(bar);
 
-    /* 手机：默认不加载，改用贴边标签召唤（与桌面召回标签同一形态） */
-    if (WAIFU.enable && small()) {
+    /* 默认不加载：桌面与手机一致，都用贴边标签召唤 */
+    if (WAIFU.enable) {
       var remembered = false;
       try { remembered = localStorage.getItem(MKEY) === '1'; } catch (e) {}
-      if (remembered) { mountWaifu(true); return; }
+      if (remembered) { mountWaifu(); return; }
 
       var tab = document.createElement('button');
       tab.className = 'tk-summon';
@@ -260,20 +283,20 @@
       tab.innerHTML = TAB_HTML;
       tab.addEventListener('click', function () {
         try { localStorage.setItem(MKEY, '1'); } catch (e) {}
-        tab.classList.remove('on');
-        mountWaifu(true);
+        tab.remove();
+        mountWaifu();
       });
       tab.classList.add('on');          /* 无动画，直接到位 */
       document.body.appendChild(tab);
+      /* 召唤后本标签退场，之后由 widget 自建的 #waifu-toggle 接手召回 */
     }
   }
 
   /* ── 看板娘装载 ─────────────────────────────────────
      页面主体加载完后再上岗（不抢 ffmpeg 工具的启动带宽）；
      小屏不加载；样式含暗色适配。 */
-  function mountWaifu(force) {
+  function mountWaifu() {
     if (!WAIFU.enable) return;
-    if (!force && small()) return;        /* 手机默认不自动加载，等召唤 */
     if (document.getElementById('waifu')) return;
 
     var base = WAIFU.base;
@@ -346,10 +369,8 @@
   }
 
   function scheduleWaifu() {
-    /* DOM 就绪即装载。工具的 ffmpeg 是点击后才下载的，此刻没有带宽竞争，
-       再等 window.load + 延迟只会白白留出一段空白期。
-       手机上不在这里加载 —— 由右上角召唤按钮触发（见 mount）。 */
-    if (!small()) mountWaifu();
+    /* 默认一律不自动加载 —— 由贴边标签召唤，或读到本机记忆后上岗。
+       具体见 mount() 末尾。 */
   }
 
   if (document.readyState === 'loading') {
