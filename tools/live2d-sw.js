@@ -16,7 +16,7 @@
  * 更新模型或改了 kit.js 之后：把下面的版本号 +1，旧缓存会自动清掉。
  * ═══════════════════════════════════════════════════════════════ */
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE   = 'tk-live2d-' + VERSION;
 const SCOPE   = '/tools/live2d/';
 

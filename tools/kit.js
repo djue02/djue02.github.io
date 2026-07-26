@@ -24,15 +24,11 @@
   var KEY  = 'tk_theme';
   /* 看板娘：Potion Maker 的 Pio & Tia（自托管于 /tools/live2d/）
      enable  整体开关
-     进入工具页即加载；资源经 Service Worker 缓存，只在首次真正下载。
-     点她的关闭键可让她下班，左下角随即出现召回标签。 */
-  var WAIFU  = { enable: true, base: '/tools/live2d/' };
-  /* AI 对话：填你的 Worker 地址（末尾不要斜杠）。留空则不显示对话按钮。
-     weather:true 会让她拿到访客所在地天气，可以自然带进闲聊。 */
-  var AI = {
-    url: 'https://weather.icome.world/chat',
-    weather: true
-  };
+     quietCopy 复制时不让她说话（工具页要频繁复制命令，每次点评太吵）
+     进入工具页会预下载她的资源并缓存，但默认【不显示】；
+     点左下角「这里有看板娘」标签才现身（资源已就位，秒开）。
+     她被关闭后，widget 会自建一个外观一致的召回标签。 */
+  var WAIFU  = { enable: true, base: '/tools/live2d/', quietCopy: true };
   /* └────────────────────────────────────────────────┘ */
 
   /* ── 暗色调色板（与浅色变量一一对应）────────────────── */
@@ -110,57 +106,6 @@
     '  body{padding-top:62px}',
     '}',
 
-    /* ── AI 对话条 ──────────────────────────────────────
-       贴在她右侧的胶囊输入框：输入 + 发送 + 关闭。
-       回复显示在自建气泡里（不抢 widget 自己的 #waifu-tips，
-       免得她的闲聊定时器把 AI 的答复冲掉）。 */
-    '.tk-chat{position:fixed;left:184px;bottom:26px;z-index:99;',
-    '  display:none;align-items:center;gap:8px;',
-    '  padding:7px 8px 7px 7px;border-radius:999px;',
-    '  background:var(--surface,#fff);border:1px solid var(--line,rgba(0,0,0,.09));',
-    '  box-shadow:0 4px 18px rgba(0,0,0,.10)}',
-    '.tk-chat.on{display:flex}',
-    '.tk-chat input{width:min(300px,52vw);height:34px;padding:0 14px;',
-    '  border:1px solid var(--line2,rgba(0,0,0,.15));border-radius:999px;',
-    '  background:var(--bg,#f5f5f7);color:var(--ink,#1d1d1f);',
-    '  font:inherit;font-size:13.5px;outline:none;',
-    '  transition:border-color .2s ease}',
-    '.tk-chat input:focus{border-color:var(--blue,#0071e3)}',
-    '.tk-chat input::placeholder{color:var(--ink3,#aeaeb2)}',
-    '.tk-chat button{width:32px;height:32px;flex:none;padding:0;border:none;',
-    '  border-radius:50%;background:var(--fill,#f0f0f2);color:var(--ink2,#6e6e73);',
-    '  cursor:pointer;display:flex;align-items:center;justify-content:center;',
-    '  transition:background .2s ease,color .2s ease,transform .15s ease}',
-    '.tk-chat button:hover{background:var(--blue,#0071e3);color:#fff}',
-    '.tk-chat button:active{transform:scale(.92)}',
-    '.tk-chat button.tk-x{background:transparent}',
-    '.tk-chat button.tk-x:hover{background:transparent;color:var(--ink,#1d1d1f)}',
-    '.tk-chat svg{width:15px;height:15px}',
-    '.tk-chat.busy input{opacity:.6;pointer-events:none}',
-    /* 注入的对话按钮：沿用 widget 工具栏的观感 */
-    '#waifu-tool .tk-chat-btn{cursor:pointer;align-items:center;',
-    '  justify-content:center;display:flex}',
-    '#waifu-tool .tk-chat-btn svg{width:25px;height:25px;fill:#7b8c9d;',
-    '  transition:fill .3s}',
-    '#waifu-tool .tk-chat-btn:hover svg{fill:#0684bd}',
-
-    /* 她的回复气泡（自建，浮在输入条上方） */
-    '.tk-say{position:fixed;left:184px;bottom:74px;z-index:99;display:none;',
-    '  max-width:min(320px,60vw);padding:11px 15px;border-radius:14px;',
-    '  background:var(--surface,#fff);border:1px solid var(--line,rgba(0,0,0,.09));',
-    '  box-shadow:0 4px 18px rgba(0,0,0,.10);',
-    '  font-size:13.5px;line-height:1.65;color:var(--ink,#1d1d1f);',
-    '  white-space:pre-wrap;word-break:break-word}',
-    '.tk-say.on{display:block}',
-    '.tk-say.dim{color:var(--ink3,#aeaeb2)}',
-
-    '@media (max-width:640px){',
-    '  .tk-chat{left:8px;right:8px;bottom:14px;',
-    '    padding:6px 7px 6px 6px}',
-    '  .tk-chat input{width:auto;flex:1;height:32px;font-size:13px}',
-    '  .tk-say{left:8px;right:8px;bottom:62px;max-width:none}',
-    '}',
-
     '#waifu{z-index:98}',
 
     /* ── 手机端 ────────────────────────────────────────
@@ -189,7 +134,7 @@
     '  body #waifu-tool{opacity:1!important;position:absolute;',
     '    flex-direction:column;justify-content:space-between;gap:0;',
     '    top:auto;bottom:0;right:-6px;left:auto;height:118px}',
-    '  body #waifu-tool span,body #waifu-tool .tk-chat-btn{',
+    '  body #waifu-tool span{',
     'width:21px;height:21px;display:flex;flex:none;',
     '    align-items:center;justify-content:center;border-radius:50%;',
     '    background:var(--surface,#fff);',
@@ -295,10 +240,6 @@
                + ' stroke-linecap="round" stroke-linejoin="round">'
                + '<path d="M3.2 10.4 12 3.4l8.8 7"/><path d="M5.7 9.2v11.4h12.6V9.2"/></svg>';
 
-  function small() {
-    return window.innerWidth < 640 || screen.width < 640;
-  }
-
   function isDark() {
     var v = root.getAttribute('data-theme');
     if (v) return v === 'dark';
@@ -341,138 +282,276 @@
   }
 
 
-  /* ═══ AI 对话 ═══════════════════════════════════════
-     交互：她的工具栏里注入一个「对话」按钮 → 展开输入条 →
-     回车或点纸飞机发送 → 回复显示在输入条上方的气泡里。
-     发送时会把当前页面状态一并带上，她才知道你在干什么。 */
 
-  var chatHistory = [];
+  /* ── 预下载 ───────────────────────────────────────────
+     进页面即把她的资源拉进缓存（Service Worker 会存下来），
+     但不初始化 widget —— 所以她不显示，点标签召唤时是秒开。
+     用最低优先级、且等浏览器空闲后才开始，不跟工具本体抢带宽。 */
+  var PRELOAD = [
+    'dist/waifu-tips.js', 'dist/chunk/index.js', 'dist/chunk/index2.js',
+    'dist/live2d.min.js', 'dist/waifu.css', 'waifu-tips.json',
+    'api/model_list.json',
+    'api/model/Potion-Maker/Pio/index.json',
+    'api/model/Potion-Maker/Pio/model.moc',
+    'api/model/Potion-Maker/Pio/textures/default-costume.png'
+  ];
 
-  function pageContext() {
-    var q = function (sel) { var e = document.querySelector(sel); return e ? e : null; };
-    var txt = function (sel) { var e = q(sel); return e ? (e.textContent || '').trim() : ''; };
-    var ctx = {};
-    var tab = q('.tab.active');
-    if (tab) ctx.tab = (tab.textContent || '').trim();
-    var fn = txt('#oFn');
-    if (fn) ctx.fileName = fn;
-    var fi = q('#oFi');
-    if (fi && fi.style.display !== 'none') {
-      var m = (fi.textContent || '').match(/[\d.]+\s*(GB|MB|KB)/i);
-      if (m) ctx.fileSize = m[0];
-    }
-    var fmt = q('#oFmt');
-    if (fmt && fmt.selectedIndex >= 0 && fmt.options[fmt.selectedIndex]) {
-      ctx.format = fmt.options[fmt.selectedIndex].text;
-    }
-    var st = txt('#oSt');
-    if (st) ctx.status = st;
-    return ctx;
-  }
+  var preloaded = false;
+  function preloadWaifu() {
+    if (!WAIFU.enable) return;
+    var c = navigator.connection;
+    if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ''))) return;
 
-  function say(text, dim) {
-    var b = document.querySelector('.tk-say');
-    if (!b) return;
-    b.textContent = text;
-    b.classList.toggle('dim', !!dim);
-    b.classList.add('on');
-  }
-
-  function buildChat() {
-    if (!AI.url || AI.url.indexOf('你的worker') !== -1) return null;
-    if (document.querySelector('.tk-chat')) return null;
-
-    var bubble = document.createElement('div');
-    bubble.className = 'tk-say';
-    document.body.appendChild(bubble);
-
-    var bar = document.createElement('div');
-    bar.className = 'tk-chat';
-    bar.innerHTML =
-      '<input type="text" maxlength="200" placeholder="和看板娘说点什么…">'
-      + '<button class="tk-send" title="发送" aria-label="发送">'
-      +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"'
-      +   ' stroke-linecap="round" stroke-linejoin="round">'
-      +   '<path d="M21 3 10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg></button>'
-      + '<button class="tk-x" title="收起" aria-label="收起">'
-      +   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"'
-      +   ' stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
-    document.body.appendChild(bar);
-
-    var input = bar.querySelector('input');
-
-    function close() {
-      bar.classList.remove('on');
-      bubble.classList.remove('on');
-    }
-
-    async function send() {
-      var text = input.value.trim();
-      if (!text || bar.classList.contains('busy')) return;
-      input.value = '';
-      bar.classList.add('busy');
-      say('……', true);
-
-      chatHistory.push({ role: 'user', content: text });
-      if (chatHistory.length > 12) chatHistory = chatHistory.slice(-12);
-
-      try {
-        var res = await fetch(AI.url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: chatHistory,
-            context: pageContext(),
-            weather: !!AI.weather
-          })
-        });
-        var data = await res.json();
-        if (data.reply) {
-          chatHistory.push({ role: 'assistant', content: data.reply });
-          say(data.reply);
-        } else if (data.error === 'rate-limited') {
-          say('问得太急了，等 ' + (data.retryAfterMin || 1) + ' 分钟再来。', true);
-        } else if (data.error === 'ai-quota') {
-          say('今天的脑子用完了，明天再聊。', true);   // Worker 的免费额度用尽
-        } else {
-          say('线路不太通，等会儿再试。', true);
-        }
-      } catch (e) {
-        say('连不上，检查下网络。', true);
-      }
-      bar.classList.remove('busy');
-      input.focus();
-    }
-
-    bar.querySelector('.tk-send').addEventListener('click', send);
-    bar.querySelector('.tk-x').addEventListener('click', close);
-    input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); send(); }
-      if (e.key === 'Escape') close();
-    });
-
-    return {
-      toggle: function () {
-        var on = bar.classList.toggle('on');
-        if (on) { input.focus(); }
-        else { bubble.classList.remove('on'); }
-      }
+    var go = function () {
+      if (preloaded) return;          /* 幂等：load 事件可能触发多次 */
+      preloaded = true;
+      PRELOAD.forEach(function (path) {
+        /* 读完 body 才算真正落进缓存，故用 .blob() 排空 */
+        fetch(WAIFU.base + path, { priority: 'low', credentials: 'same-origin' })
+          .then(function (r) { return r.blob(); })
+          .catch(function () {});
+      });
     };
+    var idle = window.requestIdleCallback || function (f) { setTimeout(f, 1200); };
+    if (document.readyState === 'complete') idle(go, { timeout: 4000 });
+    else window.addEventListener('load', function () { idle(go, { timeout: 4000 }); });
   }
 
-  /* 把「对话」按钮注入她自己的工具栏，样式与其它按钮一致 */
-  function injectChatButton(chat) {
-    if (!chat) return;
-    var tool = document.getElementById('waifu-tool');
-    if (!tool || tool.querySelector('.tk-chat-btn')) return;
-    var b = document.createElement('span');
-    b.className = 'tk-chat-btn';
-    b.title = '和她聊聊';
-    b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor">'
-      + '<path d="M12 3C6.9 3 3 6.4 3 10.5c0 2.3 1.2 4.3 3.2 5.7l-.8 3.6 3.9-2a11 11 0 0 0 2.7.3'
-      + 'c5.1 0 9-3.4 9-7.6S17.1 3 12 3z"/></svg>';
-    b.addEventListener('click', chat.toggle);
-    tool.insertBefore(b, tool.firstChild);
+  /* ── 召唤标签 ─────────────────────────────────────────
+     与她被关闭后 widget 自建的 #waifu-toggle 共用一套样式，
+     所以两者外观完全一致。 */
+  function buildSummonTab() {
+    if (!WAIFU.enable) return;
+    if (document.querySelector('.tk-summon')) return;
+
+    var tab = document.createElement('button');
+    tab.className = 'tk-summon';
+    tab.type = 'button';
+    tab.title = '召唤看板娘';
+    tab.innerHTML = TAB_HTML;
+    tab.addEventListener('click', function () {
+      tab.remove();          /* 之后由 widget 自建的召回标签接手 */
+      mountWaifu();
+    });
+    tab.classList.add('on');   /* 无动画，直接到位 */
+    document.body.appendChild(tab);
+  }
+
+
+  /* ═══ 双人格台词 ═══════════════════════════════════════
+     widget 的台词表是全局的，两个模型共用一套 —— 那样 Pio 和 Tia
+     说话就一模一样。这里在【捕获阶段】截下点击/悬停事件（捕获先于冒泡，
+     widget 的监听器挂在冒泡阶段，因此收不到），按当前模型挑自己的词，
+     再直接写进气泡。闲聊也用同样的办法定期替换。
+
+     modelId 由 widget 存在 localStorage：0 = Pio，1 = Tia。
+
+     优先级说明：widget 的欢迎语用 11、持续 7 秒，会压住一切。
+     点击是明确的主动操作，故用 12 —— 开场问候期间点她也立刻有回应。
+     悬停仍用 8 且不覆盖同级，既不打断问候，也不会随鼠标闪烁。
+
+     人设：
+       Pio  药水店主，被借调来看工具。倦怠、话少、毒舌里带真本事，
+            爱拿熬药类比转码。
+       Tia  王宫派来的助手。话密、热心、爱管事，报数字给建议催进度，
+            偶尔炫耀自己比 Pio 勤快。
+     改词直接改下面的数组即可。 */
+  var PERSONA = {
+      "0": {
+          "tapBody": [
+              "……手。",
+              "别戳，药会洒。",
+              "我在看火候，你在看什么。",
+              "这一下扣你半分钟。",
+              "熬药的手，不是给你戳着玩的。",
+              "行吧，戳完了说正事。",
+              "再来一下我就装睡。",
+              "你很闲？那正好，文件拖进来。",
+              "力气用在这儿，不如去点「开始处理」。",
+              "我记账的，戳一次记一笔。",
+              "唔……刚才那锅差点糊了。",
+              "别闹，围裙要皱。",
+              "第八次了。我数着的。",
+              "哼。",
+              "怕、怕痒……把手拿开。",
+              "……不是说了别戳吗。你还挺开心的样子。",
+              "唔，戳吧戳吧。反正我也没打算走。",
+              "你要是真的无聊，我陪你待会儿也不是不行。",
+              "再戳我就把苦的那锅端给你。",
+              "别以为我没听见你在笑。"
+          ],
+          "hoverBody": [
+              "嗯。",
+              "有事说事。",
+              "手悬在那儿做什么，等它自己转好吗。",
+              "我醒着，别试探了。",
+              "看火比看我有意思。",
+              "凉。",
+              "这只手挺闲的样子。",
+              "再靠近一点就要收学费了。",
+              "看什么，我脸上有配方？",
+              "药味重，退后点。",
+              "……别一直盯着我。",
+              "唔，痒。",
+              "你就这么喜欢晃来晃去吗。",
+              "手拿开，我会分心的。"
+          ],
+          "idle": [
+              "转码和熬药一个道理，急了就废。",
+              "无损进无损出，一分不差，这点我担保。",
+              "有损的源转成无损，只是把水装进更大的瓶子。",
+              "文件拖进来，别在那儿犹豫。",
+              "浏览器里熬，不出锅、不外传。",
+              "一点五个 G 往上，换「大文件命令」那口锅。",
+              "第一次要等引擎下来，二十来兆，只这一回。",
+              "Tia 又要来抢班了，随她去。",
+              "工具做得好的标志，是你想不起它。",
+              "锅开了会响，进度条到头会停，都一样。",
+              "急也没用，火候到了自然好。",
+              "有些事拖着拖着就凉了，比如这锅，比如你那个文件。",
+              "格式这种东西，选对一次，往后都省事。",
+              "……安静挺好的。你继续，我不吵你。",
+              "站久了会困。你别学我。",
+              "唔……刚才是不是打了个盹。没有，我没有。",
+              "衣柜里十二套，你要是无聊，挑一套给我换换也行。",
+              "我不催你。反正等的是你自己。",
+              "偶尔也想被人问一句累不累。……当我没说。"
+          ]
+      },
+      "1": {
+          "tapBody": [
+              "诶？找我有事吗！",
+              "在的在的，说吧。",
+              "戳一下就来了，服务到位吧。",
+              "别急别急，一件一件来。",
+              "你今天第三次戳我了，我记着呢。",
+              "有什么要帮忙的，直接讲。",
+              "我可比某人勤快多了，你说是不是。",
+              "需要我从头讲一遍流程吗，真的不要钱。",
+              "戳我不如戳「开始处理」，那个才管用。",
+              "是不是又卡住了？说出来我帮你看。",
+              "有事按流程来，没事也可以聊两句。",
+              "王宫那边可没人敢这么戳我。",
+              "呜哇——吓我一跳！",
+              "戳戳戳……好啦好啦，我理你还不行吗～",
+              "喔，是想让我夸你吗？那我夸咯。",
+              "唔哇，痒痒痒！停一下停一下～",
+              "又是你！……嗯，也不是不高兴啦。",
+              "夸我一句嘛，就一句，我今天很努力的。",
+              "手感不错？那也要适可而止哦。",
+              "再戳……好吧其实我不介意。"
+          ],
+          "hoverBody": [
+              "在呢在呢。",
+              "要点什么？我给你找。",
+              "犹豫的话，我建议先选文件。",
+              "这里这里，说吧。",
+              "你是不是又不知道点哪个了。",
+              "需要我念一遍步骤吗，不要钱的。",
+              "别光看着呀。",
+              "我这边随时待命。",
+              "有问题现在问最合适。",
+              "嗯？嗯？怎么啦～",
+              "痒的痒的，别挠了！",
+              "看我做什么，工具在右边呀。",
+              "手停在这儿……是要摸摸头吗？",
+              "被你看得有点不好意思了。"
+          ],
+          "idle": [
+              "选无损的话 WAV 和 FLAC 都行，FLAC 体积小一半。",
+              "视频也能直接提音频，不用先转一遍。",
+              "起始和结束留空就是整段，不填也没关系。",
+              "全都在你自己电脑上跑，一个字节都不上传，放心。",
+              "大文件别硬来，去「大文件命令」抄一条更快。",
+              "音频分割是无损的，切完音质一点不掉。",
+              "引擎下过一次就有缓存了，之后秒开。",
+              "卡住的话先刷新，八成就好了。",
+              "衣柜里整整十二套，今天想看我穿哪件？",
+              "Pio 又在打盹了，这班我先替她上着。",
+              "有问题就戳我，别自己在那儿猜。",
+              "今天也要把「待会儿再弄」变成「已经弄完」哦。",
+              "时间写成 1:23 我也认，不用换算成秒。",
+              "转完记得听一遍再关，别白忙一场。",
+              "唔……好安静。你还在吗？",
+              "我一个人待着也是会无聊的呀。",
+              "偷偷说，我今天的发型很不错吧。",
+              "做完一件划掉一件，这样才有成就感嘛。",
+              "我在这儿盯着，你放心弄你的。",
+              "要是我帮上忙了，记得夸我一下哦。"
+          ]
+      }
+  };
+
+  function whoAmI() {
+    var id;
+    try { id = localStorage.getItem('modelId'); } catch (e) {}
+    return PERSONA[id === '1' ? '1' : '0'];      /* 缺省算 Pio */
+  }
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  /* 复刻 widget 的 showMessage：同样用 sessionStorage 做优先级，
+     免得和它自己的消息互相打架。
+     override=false 时，同优先级的消息不会打断正在显示的那条 ——
+     悬停必须用这个语义：鼠标每移动一像素都会派发一次 hoverbody，
+     若同级也能覆盖，文字就会随鼠标疯狂重刷（闪烁）。 */
+  function tell(text, timeout, priority, override) {
+    var tips = document.getElementById('waifu-tips');
+    if (!tips) return;
+    var cur = parseInt(sessionStorage.getItem('waifu-message-priority'), 10);
+    if (isNaN(cur)) cur = 0;
+    if (override === false ? cur >= priority : cur > priority) return;
+    if (tell._t) { clearTimeout(tell._t); tell._t = null; }
+    try { sessionStorage.setItem('waifu-message-priority', String(priority)); } catch (e) {}
+    tips.innerHTML = text;
+    tips.classList.add('waifu-tips-active');
+    tell._t = setTimeout(function () {
+      try { sessionStorage.removeItem('waifu-message-priority'); } catch (e) {}
+      tips.classList.remove('waifu-tips-active');
+    }, timeout);
+  }
+
+  function personaTalk() {
+    /* 点身体 / 悬停：截下 widget 的通用词，换成本人格的 */
+    window.addEventListener('live2d:tapbody', function (e) {
+      e.stopImmediatePropagation();
+      tell(pick(whoAmI().tapBody), 4000, 12);   /* 12 > 欢迎语的 11：点了必有回应 */
+    }, true);
+    window.addEventListener('live2d:hoverbody', function (e) {
+      e.stopImmediatePropagation();
+      tell(pick(whoAmI().hoverBody), 4000, 8, false);   /* 同级不打断，防闪烁 */
+    }, true);
+
+    /* 闲聊：只在访客静止一段时间后才开口 —— 正在操作时插话很打扰。
+       与 widget 自带的通用闲聊同级（9），两者自然轮替：
+       通用词讲工具事实，人格词讲她自己的话。 */
+    var lastAct = Date.now();
+    ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach(function (ev) {
+      document.addEventListener(ev, function () { lastAct = Date.now(); },
+        { passive: true });
+    });
+    setInterval(function () {
+      if (document.hidden) return;
+      if (Date.now() - lastAct < 12000) return;   /* 静止满 12 秒才开口 */
+      var w = document.getElementById('waifu');
+      if (!w || w.classList.contains('waifu-hidden')) return;
+      var cur = parseInt(sessionStorage.getItem('waifu-message-priority'), 10);
+      if (!isNaN(cur) && cur > 9) return;          /* 只让位给更要紧的话 */
+      tell(pick(whoAmI().idle), 6000, 9);
+    }, 25000);
+  }
+
+  /* 复制静音：widget 在 window 上监听 copy 事件、每次复制都要说一句。
+     工具页本身用的是 clipboard API（不触发该事件），所以触发者只会是
+     访客手动 Ctrl+C —— 而这页正是用来复制 ffmpeg 命令的，次次点评太吵。
+     这里在【捕获阶段】拦下事件：捕获先于冒泡，widget 的监听器挂在冒泡阶段，
+     于是收不到；浏览器自身的复制动作不受影响（没有 preventDefault）。
+     想让她恢复点评，把 WAIFU.quietCopy 改成 false。 */
+  function silenceCopy() {
+    if (!WAIFU.quietCopy) return;
+    window.addEventListener('copy', function (e) {
+      e.stopImmediatePropagation();
+    }, true);
   }
 
   /* 注册 Service Worker：把 /tools/live2d/ 下的资源缓存到本地，
@@ -500,10 +579,8 @@
     document.head.appendChild(link);
 
     /* widget 自建的召回按钮内容替换成与手机端同一套（图标+文字+箭头） */
-    var chat = buildChat();
     var dress = setInterval(function () {
       var t = document.getElementById('waifu-toggle');
-      injectChatButton(chat);
       if (!t) return;
       clearInterval(dress);
       t.innerHTML = TAB_HTML;
@@ -554,12 +631,10 @@
         waifuPath:   base + 'waifu-tips.json',
         cdnPath:     base + 'api/',
         cubism2Path: base + 'dist/live2d.min.js',
-        /* 桌面留全部六个；手机上竖排工具栏要塞进她 118px 的可见高度，
-           砍掉「一言」（要拉外部 API）和「信息」（跳项目主页），
-           留换人/换装/拍照/关闭四个。「对话」按钮由本文件下方自行注入。 */
-        tools: small()
-          ? ['switch-model', 'switch-texture', 'photo', 'quit']
-          : ['hitokoto', 'switch-model', 'switch-texture', 'photo', 'info', 'quit'],
+        /* 五个：换人 / 换装 / 拍照 / 介绍 / 关闭。
+           「一言」要拉外部 API、工具页用不上，去掉。
+           桌面与手机一致 —— 5×21px 正好落在她 118px 的可见高度内。 */
+        tools: ['switch-model', 'switch-texture', 'photo', 'info', 'quit'],
         logLevel: 'error',
         drag: false
       });
@@ -567,19 +642,23 @@
     document.head.appendChild(sc);
   }
 
-  function scheduleWaifu() {
-    /* 进页面即加载。资源由 Service Worker 缓存，第二次起直接走本地缓存。 */
+  function bootWaifu() {
+    /* 进页面做三件事：注册缓存、预下载资源、放出召唤标签。
+       注意这里【不】初始化 widget —— 她默认不显示。 */
     registerSW();
-    mountWaifu();
+    silenceCopy();
+    personaTalk();
+    preloadWaifu();      /* 资源照常下载并进缓存，但她不出现 */
+    buildSummonTab();    /* 左下角标签，点了才现身（此时秒开） */
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       mount();
-      scheduleWaifu();
+      bootWaifu();
     });
   } else {
     mount();
-    scheduleWaifu();
+    bootWaifu();
   }
 })();
