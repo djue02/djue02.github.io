@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span>友情链接</span>
                     </div>
                     <div class="sidebar-links-list">
+<!--
                         <a href="https://linaiai.com" target="_blank" class="sidebar-link-item">
                             <i class="fas fa-quote-left"></i>
                             <span>linaiai</span>
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-quote-left"></i>
                             <span>sukitao</span>
                         </a>
+ -->
                     </div>
                 </div>
 
