@@ -1,0 +1,28 @@
+/**
+ * subtitle-audio.css
+ * 配合 subtitle-audio.js 使用
+ * 放置位置：博客根目录 source/css/subtitle-audio.css
+ * （如果已有 custom.css，把下面内容追加进去即可）
+ *
+ * 只在悬停时给反馈，播放过程中不做任何视觉变化。
+ */
+
+.subtitle-audio {
+  /* inline-block：让点击区域只覆盖文字，而不是整行 */
+  display: inline-block;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  /* 移动端点击时不出现灰色高亮块 */
+  -webkit-tap-highlight-color: transparent;
+  /* 连点时不会选中文字出现蓝色高亮 */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* @media (hover: hover)：避免触屏上点完之后 hover 状态卡住不退 */
+@media (hover: hover) {
+  .subtitle-audio:hover {
+    opacity: 0.75;
+  }
+}
