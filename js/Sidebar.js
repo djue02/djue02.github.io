@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <p class="sidebar-avatar-bio">莫道黯然销魂，何处柳暗花明</p>
                     <div class="sidebar-social">
-                        <a href="mailto:20251211@icome.world" class="sidebar-social-link" aria-label="邮箱">
+                        <a href="mailto:20251211@goodblog.org" class="sidebar-social-link" aria-label="邮箱">
                             <i class="fas fa-envelope"></i>
                         </a>
                     </div>

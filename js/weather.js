@@ -7,7 +7,7 @@
 
   /* ===================== 配置区 ===================== */
   var CONFIG = {
-    endpoint: 'https://weather.icome.world/',
+    endpoint: 'https://blog.djue02.workers.dev/',
     slot:     '#sidebar-weather-slot',   // 侧边栏插槽
     cacheMin: 20
   };

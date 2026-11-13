@@ -7,7 +7,7 @@ function umiTongji() {
   var umiId = "c48f9a0c-b3f7-450d-a9ff-52252405c8cc";
   var umiTime = Date.now();
   var startTime = new Date('2025-12-17').getTime();
-  var umiUrl = "https://umami.icome.world/api/websites/" + umiId + "/stats?startAt=" + startTime + "&endAt=" + umiTime;
+  var umiUrl = "https://umami.goodblog.org/api/websites/" + umiId + "/stats?startAt=" + startTime + "&endAt=" + umiTime;
   
   fetch(umiUrl, {
     method: 'GET',
