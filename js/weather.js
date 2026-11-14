@@ -66,7 +66,10 @@
 
   /* --------------------- 城市搜索 --------------------- */
 
+  var cleanupSearch = null;
+
   function buildFixRow() {
+    if (cleanupSearch) cleanupSearch();
     var manual = readManualLoc();
     var wrap = el('div', 'mw-fixrow');
 
@@ -74,47 +77,123 @@
     var field = el('div', 'mw-searchfield');
     var icon = el('span', 'mw-search-icon');
     icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.1 15.1 5.4 5.4"/></svg>';
     var input = el('input', 'mw-input');
     input.type = 'text';
     input.placeholder = '你那儿的天气怎么样？';
     input.setAttribute('aria-label', '搜索城市');
     var results = el('div', 'mw-results');
+    results.hidden = true;
+    results.setAttribute('aria-label', '城市搜索结果');
+    var matches = el('div', 'mw-matches');
+    document.body.appendChild(results);
     field.appendChild(icon);
     field.appendChild(input);
     box.appendChild(field);
-    box.appendChild(results);
+
     wrap.appendChild(box);
 
     if (manual) {
-      var reset = el('button', 'mw-fixlink mw-reset', '恢复默认地点');
+      var reset = el('button', 'mw-result mw-default-city', '青青子衿，悠悠我心');
+      reset.setAttribute('aria-label', '回到兰溪');
+      reset.title = '回到兰溪';
       reset.type = 'button';
       reset.addEventListener('click', function (e) {
         e.stopPropagation();
+        closeResults();
         clearManualLoc();
         clearWxCache();
         update();
       });
-      wrap.appendChild(reset);
+      results.appendChild(reset);
     }
 
+    results.appendChild(matches);
+
     var timer = null;
-    input.addEventListener('input', function () {
+    var requestVersion = 0;
+    function closeResults() {
+      results.hidden = true;
+      requestVersion++;
+      clearTimeout(timer);
+    }
+    function placeResults() {
+      var rect = field.getBoundingClientRect();
+      results.style.width = rect.width + 'px';
+      results.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - rect.width - 8)) + 'px';
+      results.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+      results.style.maxHeight = Math.max(48, Math.min(220, rect.top - 16)) + 'px';
+    }
+    function search() {
       var q = input.value.trim();
-      results.textContent = '';
-      if (timer) clearTimeout(timer);
-      if (!q) return;
-      timer = setTimeout(function () { doSearch(q, results); }, 350);
+      closeResults();
+      matches.textContent = '';
+      if (!q) {
+        if (manual) {
+          placeResults();
+          results.hidden = false;
+        }
+        return;
+      }
+      var version = requestVersion;
+      timer = setTimeout(function () {
+        placeResults();
+        results.hidden = false;
+        doSearch(q, matches, function () { return version === requestVersion && field.isConnected; });
+      }, 350);
+    }
+    function outsideClick(e) {
+      if (!box.contains(e.target) && !results.contains(e.target)) closeResults();
+    }
+    function scrollOutside(e) {
+      if (!results.contains(e.target)) closeResults();
+    }
+    function escape(e) { if (e.key === 'Escape') closeResults(); }
+    var sidebar = document.getElementById('sidebar');
+    var observer = new MutationObserver(function () {
+      var root = document.getElementById(EL_ID);
+      if (sidebar && sidebar.classList.contains('sidebar-hidden')) {
+        closeResults();
+        input.value = '';
+        matches.textContent = '';
+        if (document.activeElement === input) input.blur();
+        if (root && root.classList.contains('mw-open')) {
+          root.classList.remove('mw-open');
+          var head = root.querySelector('.mw-head');
+          if (head) head.setAttribute('aria-expanded', 'false');
+        }
+      } else if (!root || !root.classList.contains('mw-open')) {
+        closeResults();
+      }
     });
+    if (sidebar) observer.observe(sidebar, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    input.addEventListener('input', search);
+    input.addEventListener('focus', search);
+    input.addEventListener('click', function () { if (results.hidden) search(); });
+    document.addEventListener('pointerdown', outsideClick);
+    document.addEventListener('scroll', scrollOutside, true);
+    document.addEventListener('keydown', escape);
+    window.addEventListener('resize', closeResults);
+    cleanupSearch = function () {
+      closeResults();
+      observer.disconnect();
+      results.remove();
+      document.removeEventListener('pointerdown', outsideClick);
+      document.removeEventListener('scroll', scrollOutside, true);
+      document.removeEventListener('keydown', escape);
+      window.removeEventListener('resize', closeResults);
+    };
 
     return wrap;
   }
 
-  function doSearch(q, results) {
+  function doSearch(q, results, isCurrent) {
     results.textContent = '';
     results.appendChild(el('div', 'mw-hint', '搜索中…'));
     fetch(CONFIG.endpoint.replace(/\/$/, '') + '/search?q=' + encodeURIComponent(q))
       .then(function (r) { return r.json(); })
       .then(function (d) {
+        if (!isCurrent()) return;
         results.textContent = '';
         var items = (d && d.items) || [];
         if (!items.length) {
@@ -122,9 +201,11 @@
           return;
         }
         items.forEach(function (it) {
-          var r = el('div', 'mw-result', it.label || it.name);
+          var r = el('button', 'mw-result', it.label || it.name);
+          r.type = 'button';
           r.addEventListener('click', function (e) {
             e.stopPropagation();
+            results.closest('.mw-results').hidden = true;
             writeManualLoc({ lat: it.lat, lon: it.lon, city: it.name });
             clearWxCache();
             update();
@@ -133,6 +214,7 @@
         });
       })
       .catch(function () {
+        if (!isCurrent()) return;
         results.textContent = '';
         results.appendChild(el('div', 'mw-hint', '搜索失败，稍后再试'));
       });
@@ -191,12 +273,47 @@
     detail.appendChild(inner);
     root.appendChild(detail);
     root.classList.add('mw-ready');
+    requestAnimationFrame(sizeWeatherSearch);
 
     head.addEventListener('click', function () {
       var open = root.classList.toggle('mw-open');
       head.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   }
+
+  function sizeWeatherSearch() {
+    var root = document.getElementById(EL_ID);
+    var sidebar = document.getElementById('sidebar');
+    var toggle = document.getElementById('sidebar-toggle');
+    if (!root) return;
+    var width = 0;
+    root.querySelectorAll('.mw-head, .mw-line').forEach(function (line) {
+      var range = document.createRange();
+      range.selectNodeContents(line);
+      width = Math.max(width, range.getBoundingClientRect().width);
+    });
+    var box = root.querySelector('.mw-searchbox');
+    var field = root.querySelector('.mw-searchfield');
+    if (box && width) {
+      var searchWidth = Math.max(Math.ceil(width) + 20, 179);
+      box.style.width = searchWidth + 'px';
+      box.style.setProperty('--mw-placeholder-size', '12.5px');
+    }
+    if (sidebar && toggle && field) {
+      var bottom = parseFloat(getComputedStyle(toggle).bottom) || 32;
+      var fieldRect = field.getBoundingClientRect();
+      var trailing = field.closest('.mw-fixrow').getBoundingClientRect().bottom - fieldRect.bottom;
+      var padding = bottom + toggle.getBoundingClientRect().height / 2 - fieldRect.height / 2 - trailing;
+      sidebar.style.setProperty('--mw-bottom-space', Math.max(0, padding) + 'px');
+      var head = root.querySelector('.mw-head');
+      if (head) {
+        var collapsedPadding = bottom + toggle.getBoundingClientRect().height / 2 - head.getBoundingClientRect().height / 2 - 2;
+        sidebar.style.setProperty('--mw-collapsed-bottom-space', Math.max(0, collapsedPadding) + 'px');
+      }
+    }
+  }
+  window.addEventListener('resize', sizeWeatherSearch);
+  if (document.fonts) document.fonts.ready.then(sizeWeatherSearch);
 
   function buildQuery() {
     var manual = readManualLoc();
