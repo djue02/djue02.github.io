@@ -187,11 +187,36 @@
     return wrap;
   }
 
+  var cityIndexPromise = null;
+  function searchCities(q) {
+    var query = q.trim();
+    function remoteSearch() {
+      return fetch(CONFIG.endpoint.replace(/\/$/, '') + '/search?q=' + encodeURIComponent(query))
+        .then(function (r) {
+          if (!r.ok) throw new Error('City search failed');
+          return r.json();
+        });
+    }
+    if (!/^[a-z]{2,6}$/i.test(query)) return remoteSearch();
+    if (!cityIndexPromise) {
+      cityIndexPromise = fetch('/data/weather-cities.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error('City index unavailable');
+          return r.json();
+        })
+        .then(function (d) { return d.items; })
+        .catch(function (error) { cityIndexPromise = null; throw error; });
+    }
+    return cityIndexPromise.then(function (cities) {
+      var matches = cities.filter(function (city) { return city.initial === query.toLowerCase(); });
+      return matches.length ? { items: matches } : remoteSearch();
+    }, remoteSearch);
+  }
+
   function doSearch(q, results, isCurrent) {
     results.textContent = '';
     results.appendChild(el('div', 'mw-hint', '搜索中…'));
-    fetch(CONFIG.endpoint.replace(/\/$/, '') + '/search?q=' + encodeURIComponent(q))
-      .then(function (r) { return r.json(); })
+    searchCities(q)
       .then(function (d) {
         if (!isCurrent()) return;
         results.textContent = '';
