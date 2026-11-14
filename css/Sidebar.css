@@ -416,10 +416,16 @@
         background: rgba(210, 208, 205, 0.3);
     }
     
+    .sidebar-toggle:active i {
+        color: #5BC2E7;
+    }
+}
+
+/* 仅在不支持悬停的设备上取消 hover，桌面窄窗口保留反馈。 */
+@media (hover: none) {
     .sidebar-toggle:hover i {
         color: inherit;
     }
-    
     .sidebar-toggle:active i {
         color: #5BC2E7;
     }
@@ -486,4 +492,27 @@
 
 [data-user-color-scheme="dark"] .sidebar-hitokoto-from {
     color: rgba(200, 195, 190, 0.4);
+}
+
+/* 亮粉色标识展开状态，收起时保留原有半透明底色。 */
+#sidebar-toggle.sidebar-toggle-active {
+    background: rgba(232, 75, 155, 0.8) !important;
+    color: #fff;
+    transition: background-color 0.2s ease;
+}
+
+#sidebar-toggle.sidebar-toggle-active i {
+    color: #fff;
+}
+
+@media (hover: hover) {
+    #sidebar-toggle.sidebar-toggle-active:hover {
+        background: rgba(232, 75, 155, 1) !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #sidebar-toggle.sidebar-toggle-active {
+        transition: none;
+    }
 }
