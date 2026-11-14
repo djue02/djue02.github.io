@@ -9,12 +9,13 @@
   var CONFIG = {
     endpoint: 'https://weather.goodblog.org/',
     slot:     '#sidebar-weather-slot',   // 侧边栏插槽
-    cacheMin: 20
+    cacheMin: 20,
+    defaultLoc: { lat: '29.21007', lon: '119.46052', city: '兰溪' }
   };
   /* ================================================== */
 
   var EL_ID   = 'mw-weather';
-  var WX_KEY  = 'mw-qw-cache';
+  var WX_KEY  = 'mw-qw-cache-lanxi';
   var LOC_KEY = 'mw-qw-manual-loc';
 
   function readManualLoc() {
@@ -84,7 +85,7 @@
     wrap.appendChild(box);
 
     if (manual) {
-      var reset = el('button', 'mw-fixlink mw-reset', '恢复自动定位');
+      var reset = el('button', 'mw-fixlink mw-reset', '恢复默认地点');
       reset.type = 'button';
       reset.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -205,10 +206,9 @@
 
   function buildQuery() {
     var manual = readManualLoc();
-    if (manual && manual.lat && manual.lon) {
-      return '?lat=' + manual.lat + '&lon=' + manual.lon + '&city=' + encodeURIComponent(manual.city || '');
-    }
-    return '';
+    var loc = manual && manual.lat && manual.lon ? manual : CONFIG.defaultLoc;
+    return '?lat=' + encodeURIComponent(loc.lat) + '&lon=' + encodeURIComponent(loc.lon) +
+      '&city=' + encodeURIComponent(loc.city || '');
   }
 
   function update(retries) {
