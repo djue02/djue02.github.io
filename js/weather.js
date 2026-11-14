@@ -64,23 +64,24 @@
     return l;
   }
 
-  /* --------------------- 位置校正 --------------------- */
+  /* --------------------- 城市搜索 --------------------- */
 
   function buildFixRow() {
     var manual = readManualLoc();
     var wrap = el('div', 'mw-fixrow');
 
-    var link = el('button', 'mw-fixlink', manual ? '位置：' + manual.city + '（重选）' : '位置不对？点此修正');
-    link.type = 'button';
-    wrap.appendChild(link);
-
     var box = el('div', 'mw-searchbox');
-    box.style.display = 'none';
+    var field = el('div', 'mw-searchfield');
+    var icon = el('span', 'mw-search-icon');
+    icon.setAttribute('aria-hidden', 'true');
     var input = el('input', 'mw-input');
     input.type = 'text';
-    input.placeholder = '输入城市名';
+    input.placeholder = '你那儿的天气怎么样？';
+    input.setAttribute('aria-label', '搜索城市');
     var results = el('div', 'mw-results');
-    box.appendChild(input);
+    field.appendChild(icon);
+    field.appendChild(input);
+    box.appendChild(field);
     box.appendChild(results);
     wrap.appendChild(box);
 
@@ -95,13 +96,6 @@
       });
       wrap.appendChild(reset);
     }
-
-    link.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var open = box.style.display !== 'none';
-      box.style.display = open ? 'none' : 'block';
-      if (!open) input.focus();
-    });
 
     var timer = null;
     input.addEventListener('input', function () {

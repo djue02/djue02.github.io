@@ -66,8 +66,8 @@
 #mw-weather .mw-v { font-variant-numeric: tabular-nums; letter-spacing: .03em; }
 #mw-weather .mw-dot { opacity: .3; margin: 0 .45em; }
 
-/* ———————————————— 位置校正 ———————————————— */
-#mw-weather .mw-fixrow { margin-top: 6px; }
+/* ———————————————— 城市搜索 ———————————————— */
+#mw-weather .mw-fixrow { margin-top: 10px; }
 #mw-weather .mw-fixlink {
   all: unset;
   cursor: pointer;
@@ -79,29 +79,75 @@
   transition: color .2s ease, opacity .2s ease;
 }
 #mw-weather .mw-fixlink:hover { color: #5BC2E7; opacity: 1; }
-#mw-weather .mw-reset { margin-left: 1em; }
+#mw-weather .mw-reset { margin-top: 7px; }
 
-#mw-weather .mw-searchbox { margin: 6px auto 2px; }
-#mw-weather .mw-input {
-  width: 150px;
-  max-width: 100%;
+#mw-weather .mw-searchbox {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto 2px;
+}
+#mw-weather .mw-searchfield {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
   box-sizing: border-box;
-  padding: 4px 8px;
+  padding: 0 13px;
+  color: rgba(255, 255, 255, .94);
+  background: rgba(36, 43, 56, .9);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 999px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .08), 0 3px 10px rgba(23, 30, 45, .1);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+#mw-weather .mw-searchfield:focus-within {
+  border-color: rgba(255, 255, 255, .4);
+  box-shadow: 0 0 0 2px rgba(91, 194, 231, .2);
+}
+#mw-weather .mw-search-icon {
+  position: relative;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  opacity: .8;
+}
+#mw-weather .mw-search-icon::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+#mw-weather .mw-search-icon::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 5px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+#mw-weather .mw-input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 0;
   font-size: 12px;
   font-family: inherit;
-  text-align: center;
-  letter-spacing: .05em;
+  text-align: left;
+  letter-spacing: .02em;
   color: inherit;
   caret-color: currentColor;
   background: transparent;
-  border: none;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  border-radius: 0;
+  border: 0;
   outline: none;
-  transition: border-color .25s ease;
 }
-#mw-weather .mw-input:focus { border-bottom-color: color-mix(in srgb, currentColor 48%, transparent); }
-#mw-weather .mw-input::placeholder { color: inherit; opacity: .45; }
+#mw-weather .mw-input::placeholder { color: inherit; opacity: .72; }
 
 #mw-weather .mw-results {
   margin-top: 4px;
