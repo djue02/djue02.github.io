@@ -30,7 +30,7 @@
     var audio = null;
 
     el.classList.add('subtitle-audio');
-    el.setAttribute('title', '点一下');
+    el.setAttribute('title', '让我陪着你呀');
 
     el.addEventListener('click', function () {
       if (!audio) {

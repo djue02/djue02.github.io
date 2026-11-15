@@ -105,8 +105,8 @@
 
     if (manual) {
       var reset = el('button', 'mw-result mw-default-city', '青青子衿，悠悠我心');
-      reset.setAttribute('aria-label', '回到兰溪');
-      reset.title = '回到兰溪';
+      reset.setAttribute('aria-label', '常回家看看');
+      reset.title = '常回家看看';
       reset.type = 'button';
       reset.addEventListener('click', function (e) {
         e.stopPropagation();
