@@ -18,10 +18,20 @@
   var WX_KEY  = 'mw-qw-cache-lanxi';
   var LOC_KEY = 'mw-qw-manual-loc';
 
+  function isDefaultLoc(loc) {
+    return !!loc && (loc.city === '兰溪' || loc.city === '兰溪市') &&
+      Math.abs(Number(loc.lat) - Number(CONFIG.defaultLoc.lat)) < 0.05 &&
+      Math.abs(Number(loc.lon) - Number(CONFIG.defaultLoc.lon)) < 0.05;
+  }
   function readManualLoc() {
-    try { return JSON.parse(localStorage.getItem(LOC_KEY)); } catch (e) { return null; }
+    try {
+      var loc = JSON.parse(localStorage.getItem(LOC_KEY));
+      if (isDefaultLoc(loc)) { clearManualLoc(); return null; }
+      return loc;
+    } catch (e) { return null; }
   }
   function writeManualLoc(loc) {
+    if (isDefaultLoc(loc)) { clearManualLoc(); return; }
     try { localStorage.setItem(LOC_KEY, JSON.stringify(loc)); } catch (e) {}
   }
   function clearManualLoc() {
